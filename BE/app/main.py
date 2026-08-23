@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from app.api.routes.auth import router as auth_router
-from app.api.routes.routines import router as routines_router
-from app.api.routes.workouts import router as workouts_router
-from app.db import SessionLocal, init_db
-from app.models import Exercise, Routine, User
+from BE.app.api.routes.auth import router as auth_router
+from BE.app.api.routes.routines import router as routines_router
+from BE.app.api.routes.workouts import router as workouts_router
+from BE.app.db import SessionLocal, init_db
+from BE.app.models import Exercise, Routine, User
 
 app = FastAPI(title="LiftLog API", version="0.1.0")
 

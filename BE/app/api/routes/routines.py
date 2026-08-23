@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
-from app.db import get_db
-from app.models import Routine, RoutineExercise, User
-from app.schemas import RoutineCreate, RoutineListResponse, RoutineRead, RoutineUpdate
+from BE.app.api.deps import get_current_user
+from BE.app.db import get_db
+from BE.app.models import Routine, RoutineExercise, User
+from BE.app.schemas import RoutineCreate, RoutineListResponse, RoutineRead, RoutineUpdate
 
 router = APIRouter(prefix="/routines", tags=["routines"])
 

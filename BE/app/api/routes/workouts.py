@@ -3,10 +3,10 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
-from app.db import get_db
-from app.models import Exercise, User, Workout, WorkoutExercise, WorkoutSet
-from app.schemas import WorkoutCreate, WorkoutExerciseCreate, WorkoutExerciseRead, WorkoutListResponse, WorkoutRead, WorkoutSetCreate, WorkoutSetRead
+from BE.app.api.deps import get_current_user
+from BE.app.db import get_db
+from BE.app.models import Exercise, User, Workout, WorkoutExercise, WorkoutSet
+from BE.app.schemas import WorkoutCreate, WorkoutExerciseCreate, WorkoutExerciseRead, WorkoutListResponse, WorkoutRead, WorkoutSetCreate, WorkoutSetRead
 
 router = APIRouter(prefix="/workouts", tags=["workouts"])
 
