@@ -1,0 +1,19 @@
+# Local database
+liftlog.db
+
+# Temporary runtime files
+BE/run.txt
+
+# Python cache
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node / Angular
+node_modules/
+FE/dist/
+FE/.angular/
+
+# OS files
+.DS_Store

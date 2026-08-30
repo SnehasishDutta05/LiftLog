@@ -75,7 +75,8 @@
         <!-- Start Empty Workout -->
         <button
           class="empty-workout-button"
-          type="button">
+          type="button"
+          (click)="startEmptyWorkout()">
 
           <span class="plus">+</span>
           <span>Start Empty Workout</span>
@@ -90,8 +91,8 @@
 
           <div class="routine-list">
 
-            <div class="routine">
-              <span class="routine-name">Legs</span>
+            <div class="routine" *ngFor="let routine of routines">
+              <span class="routine-name">{{ routine.name }}</span>
 
               <button
                 type="button"
@@ -100,48 +101,8 @@
               </button>
             </div>
 
-
-            <div class="routine">
-              <span class="routine-name">Chest</span>
-
-              <button
-                type="button"
-                class="start-button">
-                + Start now
-              </button>
-            </div>
-
-
-            <div class="routine">
-              <span class="routine-name">Back</span>
-
-              <button
-                type="button"
-                class="start-button">
-                + Start now
-              </button>
-            </div>
-
-
-            <div class="routine">
-              <span class="routine-name">Arms</span>
-
-              <button
-                type="button"
-                class="start-button">
-                + Start now
-              </button>
-            </div>
-
-
-            <div class="routine">
-              <span class="routine-name">Shoulders</span>
-
-              <button
-                type="button"
-                class="start-button">
-                + Start now
-              </button>
+            <div class="routine" *ngIf="!routines.length">
+              <span class="routine-name">No routines saved yet</span>
             </div>
 
           </div>
