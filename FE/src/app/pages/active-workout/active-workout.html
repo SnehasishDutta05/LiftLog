@@ -1,0 +1,183 @@
+<div class="workout-page">
+
+  <!-- ======================================================
+       TOP BAR
+       ====================================================== -->
+
+  <header class="workout-header">
+
+    <div class="header-left">
+
+      <button
+        class="collapse-button"
+        type="button"
+        aria-label="Go back"
+        (click)="goBack()"
+      >
+        <span class="chevron"></span>
+      </button>
+
+      <h1>
+        Log Workout
+      </h1>
+
+    </div>
+
+
+    <div class="header-actions">
+
+      <button
+        class="timer-button"
+        type="button"
+        aria-label="Workout timer"
+      >
+
+        <span class="timer-icon">
+
+          <span class="timer-hand"></span>
+
+        </span>
+
+      </button>
+
+
+      <button
+        class="finish-button"
+        type="button"
+        (click)="finishWorkout()"
+      >
+        Finish
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ======================================================
+       WORKOUT STATS
+       ====================================================== -->
+
+  <section class="workout-stats">
+
+    <div class="stat-item">
+
+      <span class="stat-label">
+        Duration
+      </span>
+
+      <strong class="duration-value">
+        {{ formattedDuration }}
+      </strong>
+
+    </div>
+
+
+    <div class="stat-item">
+
+      <span class="stat-label">
+        Volume
+      </span>
+
+      <strong>
+        {{ totalVolume }} kg
+      </strong>
+
+    </div>
+
+
+    <div class="stat-item">
+
+      <span class="stat-label">
+        Sets
+      </span>
+
+      <strong>
+        {{ totalSets }}
+      </strong>
+
+    </div>
+
+  </section>
+
+
+  <!-- ======================================================
+       EMPTY WORKOUT
+       ====================================================== -->
+
+  <main class="workout-content">
+
+    <div class="empty-state">
+
+      <div class="dumbbell-icon">
+
+        <span class="weight weight-left"></span>
+
+        <span class="bar"></span>
+
+        <span class="weight weight-right"></span>
+
+      </div>
+
+
+      <h2>
+        Get started
+      </h2>
+
+
+      <p>
+        Add an exercise to start your workout
+      </p>
+
+    </div>
+
+
+    <!-- ====================================================
+         ADD EXERCISE
+         ==================================================== -->
+
+    <button
+      class="add-exercise-button"
+      type="button"
+      (click)="addExercise()"
+    >
+
+      <span class="plus-icon">
+        +
+      </span>
+
+      <span>
+        Add Exercise
+      </span>
+
+    </button>
+
+
+    <!-- ====================================================
+         BOTTOM ACTIONS
+         ==================================================== -->
+
+    <div class="bottom-actions">
+
+      <button
+        class="settings-button"
+        type="button"
+        (click)="openSettings()"
+      >
+        Settings
+      </button>
+
+
+      <button
+        class="discard-button"
+        type="button"
+        (click)="discardWorkout()"
+      >
+        Discard Workout
+      </button>
+
+    </div>
+
+  </main>
+
+</div>

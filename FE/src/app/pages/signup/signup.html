@@ -1,0 +1,154 @@
+<div class="signup-page">
+
+  <!-- Brand -->
+  <header class="brand">
+
+    <div class="logo-icon">
+      P
+    </div>
+
+    <span>
+      PulseOS
+    </span>
+
+  </header>
+
+
+  <!-- Header -->
+  <section class="signup-header">
+
+    <p class="eyebrow">
+      START YOUR JOURNEY
+    </p>
+
+    <h1>
+      Create your account 🌱
+    </h1>
+
+    <p>
+      Let's get to know you and build your
+      fitness journey together.
+    </p>
+
+  </section>
+
+
+  <!-- Form -->
+  <main class="signup-card">
+
+    <div class="form-group">
+
+      <label for="name">
+        Full name
+      </label>
+
+      <input
+        id="name"
+        type="text"
+        placeholder="Enter your name"
+        autocomplete="name"
+      />
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="email">
+        Email
+      </label>
+
+      <input
+        id="email"
+        type="email"
+        placeholder="Enter your email"
+        autocomplete="email"
+      />
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="phone">
+        Phone number
+      </label>
+
+      <input
+        id="phone"
+        type="tel"
+        placeholder="Enter your phone number"
+        autocomplete="tel"
+      />
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="password">
+        Password
+      </label>
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Create a password"
+        autocomplete="new-password"
+      />
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="confirmPassword">
+        Confirm password
+      </label>
+
+      <input
+        id="confirmPassword"
+        type="password"
+        placeholder="Confirm your password"
+        autocomplete="new-password"
+      />
+
+    </div>
+
+
+    <!-- Create Account -->
+    <button
+      type="button"
+      class="primary-button"
+      (click)="createAccount()">
+
+      <span>
+        Create Account
+      </span>
+
+      <span>
+        →
+      </span>
+
+    </button>
+
+
+    <!-- Login -->
+    <p class="login-text">
+
+      Already have an account?
+
+      <button
+        type="button"
+        class="login-button"
+        (click)="goToLogin()">
+
+        Sign in
+
+      </button>
+
+    </p>
+
+  </main>
+
+</div>

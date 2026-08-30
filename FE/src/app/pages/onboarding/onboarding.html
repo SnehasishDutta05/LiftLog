@@ -1,0 +1,200 @@
+<div class="chat-page">
+
+  <!-- Header -->
+  <header class="chat-header">
+
+    <div class="brand">
+
+      <div class="logo-icon">
+        P
+      </div>
+
+      <div>
+        <strong>PulseOS</strong>
+        <span>Your fitness companion</span>
+      </div>
+
+    </div>
+
+    <div class="status">
+      <span></span>
+      Online
+    </div>
+
+  </header>
+
+
+  <!-- Progress -->
+  <div class="progress-container">
+
+    <div class="progress-info">
+
+      <span>
+        SETTING UP YOUR PROFILE
+      </span>
+
+      <strong>
+        {{ currentQuestionIndex }}/{{ questions.length }}
+      </strong>
+
+    </div>
+
+    <div class="progress-bar">
+
+      <div
+        class="progress-fill"
+        [style.width.%]="progress">
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Chat -->
+  <main class="chat-container">
+
+    <div class="messages">
+
+      @for (
+      message of messages;
+      track $index
+      ) {
+
+      <div
+        class="message-row"
+        [class.user-row]="message.sender === 'user'"
+        [class.bot-row]="message.sender === 'bot'"
+      >
+
+        @if (message.sender === 'bot') {
+
+        <div class="bot-avatar">
+          P
+        </div>
+
+        }
+
+        <div class="message">
+          {{ message.text }}
+        </div>
+
+      </div>
+
+      }
+
+    </div>
+
+
+    <!-- Answer Area -->
+    @if (!completed) {
+
+    <div class="answer-area">
+
+      <!-- Choice Questions -->
+      @if (currentQuestion.type === 'choice') {
+
+      <div class="options">
+
+        @for (
+        option of currentQuestion.options;
+        track option
+        ) {
+
+        <button
+          class="option-button"
+          type="button"
+          (click)="submitAnswer(option)"
+        >
+
+          {{ option }}
+
+          <span>→</span>
+
+        </button>
+
+        }
+
+      </div>
+
+      }
+
+
+      <!-- Number / Text Questions -->
+      @if (currentQuestion.type !== 'choice') {
+
+      <form
+        class="input-area"
+        (ngSubmit)="submitAnswer()"
+      >
+
+        <input
+          type="text"
+          [attr.inputmode]="currentQuestion.type === 'number' ? 'numeric' : 'text'"
+          [placeholder]="currentQuestion.placeholder"
+          [(ngModel)]="currentInput"
+          name="answer"
+          autocomplete="off"
+          (keydown)="blockNonNumeric($event)"
+          (input)="sanitizeInput()"
+        />
+
+        <button
+          type="submit"
+          class="send-button"
+          [disabled]="!currentInput.trim()"
+        >
+          →
+        </button>
+
+      </form>
+
+      }
+
+    </div>
+
+    }
+
+
+    <!-- Completion -->
+    @if (completed) {
+
+    <div class="complete-area">
+
+      <div class="complete-icon">
+        ✓
+      </div>
+
+      <h2>
+        Your profile is ready!
+      </h2>
+
+      <p>
+        Let's create your personalized fitness journey.
+      </p>
+
+      <div class="completion-loader">
+
+        <span></span>
+        <span></span>
+        <span></span>
+
+      </div>
+
+      <p class="redirect-text">
+        Taking you to your dashboard...
+      </p>
+
+    </div>
+
+    }
+
+  </main>
+
+
+  <!-- Footer -->
+  <footer>
+    Your information stays private and secure.
+  </footer>
+
+</div>

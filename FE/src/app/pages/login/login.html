@@ -1,0 +1,195 @@
+<div class="login-page">
+
+  <!-- Brand -->
+  <header class="brand">
+
+    <div class="logo-icon">
+      P
+    </div>
+
+    <span>
+      PulseOS
+    </span>
+
+  </header>
+
+
+  <!-- Hero -->
+  <section class="hero">
+
+    <p class="eyebrow">
+      YOUR FITNESS JOURNEY
+    </p>
+
+    <h1>
+      Become stronger.<br>
+      Feel better.<br>
+      <span>Live better.</span>
+    </h1>
+
+    <p class="hero-text">
+      Track your workouts, build healthy habits,
+      and stay consistent with your fitness journey.
+    </p>
+
+  </section>
+
+
+  <!-- Login Card -->
+  <main class="login-card">
+
+    <div class="login-header">
+
+      <h2>
+        Welcome back 👋
+      </h2>
+
+      <p>
+        Sign in to continue your fitness journey.
+      </p>
+
+    </div>
+
+
+    <!-- Email -->
+    <div class="form-group">
+
+      <label for="email">
+        Email
+      </label>
+
+      <input
+        id="email"
+        type="email"
+        placeholder="Enter your email"
+        autocomplete="email"
+      />
+
+    </div>
+
+
+    <!-- Password -->
+    <div class="form-group">
+
+      <div class="password-label">
+
+        <label for="password">
+          Password
+        </label>
+
+        <button
+          type="button"
+          class="forgot-button">
+
+          Forgot password?
+
+        </button>
+
+      </div>
+
+
+      <div class="password-input">
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+        />
+
+        <button
+          type="button"
+          class="eye-button"
+          aria-label="Show password">
+
+          👁
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- Sign In -->
+    <button
+      type="button"
+      class="primary-button"
+      (click)="signIn()">
+
+      <span>
+        Sign In
+      </span>
+
+      <span class="arrow">
+        →
+      </span>
+
+    </button>
+
+
+    <!-- Divider -->
+    <div class="divider">
+
+      <span></span>
+
+      <p>
+        or continue with
+      </p>
+
+      <span></span>
+
+    </div>
+
+
+    <!-- Google -->
+    <button
+      type="button"
+      class="secondary-button">
+
+      <span class="google-icon">
+        G
+      </span>
+
+      <span>
+        Continue with Google
+      </span>
+
+    </button>
+
+
+    <!-- Phone -->
+    <button
+      type="button"
+      class="secondary-button">
+
+      <span class="phone-icon">
+        ☎
+      </span>
+
+      <span>
+        Continue with Phone Number
+      </span>
+
+    </button>
+
+
+    <!-- Sign Up -->
+    <p class="signup-text">
+
+      Don't have an account?
+
+      <button
+        type="button"
+        class="signup-button"
+        (click)="goToSignup()">
+
+        Sign up
+
+      </button>
+
+    </p>
+
+  </main>
+
+</div>

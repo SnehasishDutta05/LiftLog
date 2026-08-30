@@ -1,0 +1,721 @@
+/* =========================================================
+   PulseOS Dashboard
+   ========================================================= */
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
+
+/* =========================================================
+   Dashboard
+   ========================================================= */
+
+.dashboard {
+  width: 100%;
+  min-height: 100vh;
+
+  background: #f5f7f6;
+  color: #10231d;
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   Desktop Sidebar
+   ========================================================= */
+
+.desktop-sidebar {
+  display: none;
+}
+
+
+/* =========================================================
+   Main Area
+   ========================================================= */
+
+.dashboard-main {
+  width: 100%;
+  min-height: 100vh;
+}
+
+
+/* =========================================================
+   Header
+   ========================================================= */
+
+.dashboard-header {
+  width: 100%;
+  height: 72px;
+
+  background: #10231d;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 20px;
+
+  box-sizing: border-box;
+}
+
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+
+  border-radius: 10px;
+
+  background: #74d9a5;
+  color: #10231d;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 800;
+}
+
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+
+.profile-button {
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 50%;
+
+  background: transparent;
+  color: white;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   Content
+   ========================================================= */
+
+.dashboard-content {
+  width: 100%;
+  max-width: 700px;
+
+  margin: 0 auto;
+
+  padding: 24px 16px 100px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   Workout
+   ========================================================= */
+
+.workout-section {
+  background: white;
+
+  border-radius: 20px;
+
+  padding: 20px;
+
+  box-shadow:
+    0 4px 20px rgba(16,35,29,.06);
+}
+
+
+.section-header h1 {
+  margin: 0 0 20px;
+
+  font-size: 26px;
+  font-weight: 750;
+}
+
+
+.empty-workout-button {
+  width: 100%;
+  min-height: 54px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: #74d9a5;
+  color: #10231d;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+}
+
+
+.empty-workout-button:hover {
+  background: #5fc891;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 14px rgba(16,35,29,.14);
+}
+
+
+.plus {
+  font-size: 22px;
+}
+
+
+/* =========================================================
+   Routines
+   ========================================================= */
+
+.routines {
+  margin-top: 28px;
+}
+
+
+.routines h2 {
+  margin: 0 0 12px;
+
+  font-size: 17px;
+}
+
+
+.routine-list {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.routine {
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid #e8eeeb;
+}
+
+
+.routine:last-child {
+  border-bottom: none;
+}
+
+
+.routine-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+
+.start-button {
+  border: 1px solid #74d9a5;
+  border-radius: 10px;
+
+  background: transparent;
+  color: #10231d;
+
+  padding: 9px 12px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+}
+
+
+.start-button:hover {
+  background: #74d9a5;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 10px rgba(16,35,29,.12);
+}
+
+
+/* =========================================================
+   Progress
+   ========================================================= */
+
+.progress-section {
+  margin-top: 20px;
+}
+
+
+.progress-section .section-header h2 {
+  margin: 0 0 12px;
+
+  font-size: 19px;
+}
+
+
+.progress-card {
+  background: white;
+
+  border-radius: 20px;
+
+  padding: 20px;
+
+  box-shadow:
+    0 4px 20px rgba(16,35,29,.06);
+}
+
+
+.progress-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.progress-label {
+  display: block;
+
+  color: #7a8580;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+.progress-value {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+
+.progress-percentage {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+
+.weekly-activity {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-top: 28px;
+}
+
+
+.activity-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.activity-dot {
+  width: 30px;
+  height: 30px;
+
+  border-radius: 50%;
+
+  background: #e8eeeb;
+
+  border: 2px solid #dce5e0;
+}
+
+
+.activity-day.completed .activity-dot {
+  background: #74d9a5;
+  border-color: #74d9a5;
+}
+
+
+.activity-label {
+  font-size: 11px;
+  font-weight: 600;
+
+  color: #7a8580;
+}
+
+
+.progress-bar-container {
+  margin-top: 24px;
+}
+
+
+.progress-bar {
+  width: 100%;
+  height: 9px;
+
+  background: #e8eeeb;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+}
+
+
+.progress-bar-fill {
+  width: 80%;
+  height: 100%;
+
+  background: #74d9a5;
+}
+
+
+/* =========================================================
+   Mobile Bottom Navigation
+   ========================================================= */
+
+.bottom-navigation {
+  position: fixed;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 72px;
+
+  background: white;
+
+  border-top: 1px solid #e5ebe8;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  z-index: 1000;
+
+  padding-bottom: env(safe-area-inset-bottom);
+
+  box-sizing: border-box;
+}
+
+
+.nav-item {
+  min-width: 60px;
+  min-height: 52px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: transparent;
+
+  color: #7a8580;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.nav-item.active {
+  color: #10231d;
+}
+
+
+.nav-item:hover {
+  background: #f0f6f3;
+}
+
+
+.nav-icon {
+  font-size: 21px;
+}
+
+
+/* =========================================================
+   DESKTOP
+   ========================================================= */
+
+@media (min-width: 768px) {
+
+  .dashboard {
+    display: flex;
+    align-items: flex-start;
+  }
+
+
+  /* Sidebar */
+
+  .desktop-sidebar {
+    display: flex;
+
+    width: 240px;
+    min-width: 240px;
+
+    min-height: 100vh;
+
+    background: #10231d;
+    color: white;
+
+    flex-direction: column;
+
+    padding: 28px 16px;
+
+    box-sizing: border-box;
+  }
+
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 0 12px 36px;
+  }
+
+
+  .sidebar-brand-mark {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 11px;
+
+    background: #74d9a5;
+    color: #10231d;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 800;
+  }
+
+
+  .sidebar-brand-name {
+    font-size: 21px;
+    font-weight: 700;
+  }
+
+
+  .sidebar-navigation {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+  }
+
+
+  .sidebar-nav-item {
+    width: 100%;
+    min-height: 48px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: transparent;
+    color: rgba(255,255,255,.68);
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 0 14px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+  }
+
+
+  .sidebar-nav-item:hover {
+    background: rgba(116,217,165,.10);
+    color: white;
+  }
+
+
+  .sidebar-nav-item.active {
+    background: #74d9a5;
+    color: #10231d;
+  }
+
+
+  .sidebar-nav-icon {
+    width: 22px;
+
+    display: flex;
+    justify-content: center;
+
+    font-size: 20px;
+  }
+
+
+  /* Main */
+
+  .dashboard-main {
+    flex: 1;
+
+    width: auto;
+    min-width: 0;
+
+    min-height: 100vh;
+  }
+
+
+  /* Header */
+
+  .dashboard-header {
+    height: 76px;
+
+    background: white;
+    color: #10231d;
+
+    border-bottom: 1px solid #e5ebe8;
+
+    padding: 0 32px;
+  }
+
+
+  .dashboard-header .brand {
+    display: none;
+  }
+
+
+  .profile-button {
+    margin-left: auto;
+
+    border-color: #dce5e0;
+
+    color: #10231d;
+  }
+
+
+  /* Content */
+
+  .dashboard-content {
+    max-width: 900px;
+
+    padding: 40px 32px 80px;
+  }
+
+
+  .workout-section {
+    padding: 28px;
+  }
+
+
+  /* Hide mobile nav */
+
+  .bottom-navigation {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   Large Desktop
+   ========================================================= */
+
+@media (min-width: 1200px) {
+
+  .desktop-sidebar {
+    width: 260px;
+    min-width: 260px;
+  }
+
+
+  .dashboard-content {
+    max-width: 1000px;
+
+    padding: 48px 40px 100px;
+  }
+}
+
+
+/* =========================================================
+   Small Phones
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+  .dashboard-header {
+    padding: 0 16px;
+  }
+
+
+  .dashboard-content {
+    padding: 18px 12px 100px;
+  }
+
+
+  .workout-section {
+    padding: 16px;
+  }
+
+
+  .section-header h1 {
+    font-size: 24px;
+  }
+
+
+  .start-button {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+
+  .routine-name {
+    font-size: 14px;
+  }
+
+
+  .progress-card {
+    padding: 16px;
+  }
+
+
+  .activity-dot {
+    width: 26px;
+    height: 26px;
+  }
+}
