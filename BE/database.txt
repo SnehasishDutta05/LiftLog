@@ -1,0 +1,161 @@
+we have already added the following tables to DB
+
+| Table                 | Columns                                                                                                                                                                       |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |                                                                                                                               |
+| **exercises**         | `exercise_id` (PK), `user_id` (FK → users.id), `name_exercise`                                                                                      |
+| **routines**          | `routine_id` (PK), `user_id` (FK → users.id), `name_routine`,                                                                                       |
+| **routine_exercises** | `routine_exercise_id` (PK), `user_id` (FK → users.id), `routine_id` (FK → routines.routine_id), `exercise_id` (FK → exercises.exercise_id), `order_index`, `target_sets` |
+| **workouts**          | `workout_id` (PK), `user_id` (FK → users.id), `routine_id` (FK → routines.routine_id, nullable), `started_at`, `finished_at`, `duration_seconds`                         |
+| **workout_exercises** | `workout_exercise_id` (PK), `user_id` (FK → users.id), `workout_id` (FK → workouts.workout_id), `exercise_id` (FK → exercises.exercise_id), `order_index`                |
+| **sets**              | `set_id` (PK), `user_id` (FK → users.id), `workout_exercise_id` (FK → workout_exercises.workout_exercise_id), `set_number`, `weight`, `reps`                             |
+
+now i need some new/ updated end points :
+NOTE : for all the endpoints the user is authorised by access token
+
+POST
+/workouts
+Save the entire completed workout when user clicks Finish
+
+request :
+{
+  "routine_id": null,
+  "started_at": "2026-09-01T18:00:00Z",
+  "finished_at": "2026-09-01T19:05:00Z",
+  "exercises": [
+    {
+      "exercise_id": 101,
+      "sets": [
+        {
+          "weight": 82.5,
+          "reps": 8
+        },
+        {
+          "weight": 82.5,
+          "reps": 7
+        },
+        {
+          "weight": 80,
+          "reps": 8
+        }
+      ]
+    },
+    {
+      "exercise_id": 102,
+      "sets": [
+        {
+          "weight": 30,
+          "reps": 10
+        },
+        {
+          "weight": 30,
+          "reps": 8
+        }
+      ]
+    }
+  ]
+}
+
+routine_id : null if user has clicked on start empty workout , if user has clicked on start routine then routine id will be present 
+
+response:
+{
+  "workout_id": 1003,
+  "routine_id": null,
+  "started_at": "2026-09-01T18:00:00Z",
+  "finished_at": "2026-09-01T19:05:00Z",
+  "duration_seconds": 3900,
+  "exercises": [
+    {
+      "workout_exercise_id": 5006,
+      "exercise_id": 101,
+      "sets": [
+        {
+          "set_id": 21,
+          "set_number": 1,
+          "weight": 82.5,
+          "reps": 8
+        },
+        {
+          "set_id": 22,
+          "set_number": 2,
+          "weight": 82.5,
+          "reps": 7
+        },
+        {
+          "set_id": 23,
+          "set_number": 3,
+          "weight": 80,
+          "reps": 8
+        }
+      ]
+    }
+  ]
+}
+
+
+GET
+/exercises/{exercise_id}/top-sets
+Get user's top 10 weight × reps for an exercise
+
+Response
+{
+  "exercise_id": 101,
+  "exercise_name": "Bench Press",
+  "top_sets": [
+    {
+      "rank": 1,
+      "weight": 100,
+      "reps": 5,
+      "volume": 500
+    },
+    {
+      "rank": 2,
+      "weight": 95,
+      "reps": 5,
+      "volume": 475
+    },
+    {
+      "rank": 3,
+      "weight": 90,
+      "reps": 6,
+      "volume": 540
+    }
+  ]
+}
+
+
+GET
+/exercises/{exercise_id}/history
+Get the user's most recent completed workout data for that exercise — sets, weight and reps
+
+response :
+{
+  "exercise_id": 101,
+  "exercise_name": "Bench Press",
+  "last_workout": {
+    "workout_id": 1002,
+    "date": "2026-08-30",
+    "sets": [
+      {
+        "set_number": 1,
+        "weight": 82.5,
+        "reps": 8
+      },
+      {
+        "set_number": 2,
+        "weight": 82.5,
+        "reps": 7
+      },
+      {
+        "set_number": 3,
+        "weight": 80,
+        "reps": 8
+      },
+      {
+        "set_number": 4,
+        "weight": 75,
+        "reps": 10
+      }
+    ]
+  }
+}
