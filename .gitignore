@@ -3,6 +3,10 @@ liftlog.db
 
 # Temporary runtime files
 BE/run.txt
+BE/logs/
+BE/database.txt
+FE.log
+nohup.out
 
 # Python cache
 __pycache__/

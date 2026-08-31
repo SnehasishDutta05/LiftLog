@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserPublic(BaseModel):
@@ -100,38 +100,6 @@ class UserProfileResponse(BaseModel):
         from_attributes = True
 
 
-class RoutineCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=120)
-
-
-class RoutineUpdate(BaseModel):
-    name: Optional[str] = Field(default=None, min_length=1, max_length=120)
-
-
-class RoutineRead(BaseModel):
-    id: int
-    user_id: int
-    name: str
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class RoutineListResponse(BaseModel):
-    routines: list[RoutineRead]
-
-
-class ExerciseRead(BaseModel):
-    id: int
-    name: str
-    created_by: Optional[int] = None
-    is_custom: bool
-
-    class Config:
-        from_attributes = True
-
 
 class WorkoutCreate(BaseModel):
     name: Optional[str] = None
@@ -179,8 +147,61 @@ class WorkoutSetRead(BaseModel):
     set_number: int
     weight: Optional[float] = None
     reps: Optional[int] = None
-    completed: bool
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class ExerciseRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    exercise_id: int = Field(validation_alias="id")
+    name: str
+
+
+class RoutineExerciseCreate(BaseModel):
+    exercise_id: int
+    target_sets: int
+
+
+class RoutineExerciseRead(BaseModel):
+    exercise_id: int
+    name: str
+    target_sets: Optional[int] = None
+    order_index: int
+
+    class Config:
+        from_attributes = True
+
+
+class RoutineCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=120)
+    exercises: list[RoutineExerciseCreate]
+
+
+class RoutineUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=120)
+    exercises: list[RoutineExerciseCreate]
+
+
+class RoutineRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    routine_id: int = Field(validation_alias="id")
+    user_id: int
+    name: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class RoutineReadWithExercises(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    routine_id: int = Field(validation_alias="id")
+    name: str
+    exercises: list[RoutineExerciseRead]
+
+
+class RoutineListResponse(BaseModel):
+    routines: list[RoutineRead]

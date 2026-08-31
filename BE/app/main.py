@@ -9,11 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from BE.app.api.routes.auth import router as auth_router
+from BE.app.api.routes.exercises import router as exercises_router
 from BE.app.api.routes.profile import router as profile_router
 from BE.app.api.routes.routines import router as routines_router
 from BE.app.api.routes.workouts import router as workouts_router
 from BE.app.db import SessionLocal, init_db
 from BE.app.models import Exercise, Routine, User
+from BE.app.utils.exercises_loader import load_exercises_data
 
 LOG_DIR = Path(__file__).resolve().parent.parent / "logs"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -102,6 +104,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(exercises_router, prefix="/api/v1")
 app.include_router(profile_router, prefix="/api/v1")
 app.include_router(routines_router, prefix="/api/v1")
 app.include_router(workouts_router, prefix="/api/v1")
@@ -131,20 +134,32 @@ def seed_demo_data() -> None:
         else:
             demo_user = db.query(User).filter(User.email == "demo@liftlog.app").first()
 
-        default_exercises = [
-            "Bench Press",
-            "Incline DB Press",
-            "Cable Fly",
-            "Shoulder Press",
-            "Lateral Raise",
-            "Squat",
-            "Deadlift",
-            "Leg Press",
-        ]
-        for name in default_exercises:
-            if not db.query(Exercise).filter(Exercise.name == name).first():
-                db.add(Exercise(name=name, created_by=None, is_custom=False))
-        db.commit()
+        # Load exercises from FE/exercises-data.js
+        exercises_data = load_exercises_data()
+        
+        if exercises_data:
+            for exercise_data in exercises_data:
+                if not db.query(Exercise).filter(Exercise.id == exercise_data['id']).first():
+                    db.add(Exercise(id=exercise_data['id'], name=exercise_data['name']))
+            db.commit()
+            logger.info(f"Seeded {len(exercises_data)} exercises from exercises-data.js")
+        else:
+            # Fallback to basic exercises if exercises-data.js not found
+            default_exercises = [
+                "Bench Press",
+                "Incline DB Press",
+                "Cable Fly",
+                "Shoulder Press",
+                "Lateral Raise",
+                "Squat",
+                "Deadlift",
+                "Leg Press",
+            ]
+            for name in default_exercises:
+                if not db.query(Exercise).filter(Exercise.name == name).first():
+                    db.add(Exercise(name=name))
+            db.commit()
+            logger.info("Seeded fallback exercises")
 
         if demo_user and not db.query(Routine).filter(Routine.user_id == demo_user.id).first():
             push_day = Routine(user_id=demo_user.id, name="Push Day")
