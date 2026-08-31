@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class UserPublic(BaseModel):
@@ -105,19 +105,90 @@ class WorkoutCreate(BaseModel):
     name: Optional[str] = None
 
 
+class WorkoutSetInput(BaseModel):
+    weight: Optional[float] = None
+    reps: Optional[int] = None
+
+
+class WorkoutExerciseInput(BaseModel):
+    exercise_id: int
+    sets: list[WorkoutSetInput] = Field(default_factory=list)
+
+
+class WorkoutCompleteRequest(BaseModel):
+    routine_id: Optional[int] = None
+    started_at: datetime
+    finished_at: datetime
+    exercises: list[WorkoutExerciseInput]
+
+
 class WorkoutRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     user_id: int
-    status: str
+    routine_id: Optional[int] = None
     started_at: datetime
+    finished_at: Optional[datetime] = None
+    duration_seconds: Optional[int] = None
+    status: Optional[str] = None
     completed_at: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
 
 
 class WorkoutListResponse(BaseModel):
     workouts: list[WorkoutRead]
+
+
+class WorkoutSetDetail(BaseModel):
+    set_number: int
+    weight: Optional[float] = None
+    reps: Optional[int] = None
+
+
+class WorkoutExerciseDetail(BaseModel):
+    workout_exercise_id: int
+    exercise_id: int
+    exercise_name: Optional[str] = None
+    sets: list[WorkoutSetDetail]
+
+
+class WorkoutDetailResponse(BaseModel):
+    workout_id: int
+    routine_id: Optional[int] = None
+    started_at: datetime
+    finished_at: Optional[datetime] = None
+    duration_seconds: Optional[int] = None
+    exercises: list[WorkoutExerciseDetail]
+
+
+class WorkoutListPaginatedResponse(BaseModel):
+    items: list[WorkoutDetailResponse]
+    total: int
+    limit: int
+    offset: int
+    has_more: bool
+
+
+class WorkoutSetSummary(BaseModel):
+    set_id: int
+    set_number: int
+    weight: Optional[float] = None
+    reps: Optional[int] = None
+
+
+class WorkoutExerciseSummary(BaseModel):
+    workout_exercise_id: int
+    exercise_id: int
+    sets: list[WorkoutSetSummary]
+
+
+class WorkoutCompleteResponse(BaseModel):
+    workout_id: int
+    routine_id: Optional[int] = None
+    started_at: datetime
+    finished_at: datetime
+    duration_seconds: int
+    exercises: list[WorkoutExerciseSummary]
 
 
 class WorkoutExerciseCreate(BaseModel):
@@ -153,9 +224,40 @@ class WorkoutSetRead(BaseModel):
         from_attributes = True
 
 
+class TopSetEntry(BaseModel):
+    rank: int
+    weight: Optional[float] = None
+    reps: Optional[int] = None
+    volume: Optional[float] = None
+
+
+class ExerciseTopSetsResponse(BaseModel):
+    exercise_id: int
+    exercise_name: str
+    top_sets: list[TopSetEntry]
+
+
+class ExerciseHistorySet(BaseModel):
+    set_number: int
+    weight: Optional[float] = None
+    reps: Optional[int] = None
+
+
+class ExerciseLastWorkout(BaseModel):
+    workout_id: int
+    date: str
+    sets: list[ExerciseHistorySet]
+
+
+class ExerciseHistoryResponse(BaseModel):
+    exercise_id: int
+    exercise_name: str
+    last_workout: Optional[ExerciseLastWorkout] = None
+
+
 class ExerciseRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    
+
     exercise_id: int = Field(validation_alias="id")
     name: str
 
@@ -186,9 +288,9 @@ class RoutineUpdate(BaseModel):
 
 
 class RoutineRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    
-    routine_id: int = Field(validation_alias="id")
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+    routine_id: int = Field(validation_alias=AliasChoices("routine_id", "id"))
     user_id: int
     name: str
     created_at: datetime
@@ -196,9 +298,9 @@ class RoutineRead(BaseModel):
 
 
 class RoutineReadWithExercises(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    
-    routine_id: int = Field(validation_alias="id")
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+    routine_id: int = Field(validation_alias=AliasChoices("routine_id", "id"))
     name: str
     exercises: list[RoutineExerciseRead]
 

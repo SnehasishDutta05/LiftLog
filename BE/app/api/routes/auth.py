@@ -153,7 +153,3 @@ def refresh_access_token(payload: RefreshTokenRequest, db: Session = Depends(get
     logger.info("AUTH /refresh response=%s", response.model_dump())
     return response
 
-
-@router.get("/me", response_model=UserPublic)
-def get_me(current_user: User = Depends(get_current_user)):
-    return UserPublic.model_validate(current_user)

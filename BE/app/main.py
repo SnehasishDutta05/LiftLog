@@ -1,8 +1,7 @@
 import json
 import logging
 import time
-from logging.handlers import TimedRotatingFileHandler
-from pathlib import Path
+import uuid
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,35 +13,18 @@ from BE.app.api.routes.profile import router as profile_router
 from BE.app.api.routes.routines import router as routines_router
 from BE.app.api.routes.workouts import router as workouts_router
 from BE.app.db import SessionLocal, init_db
+from BE.app.logging_config import setup_logging
 from BE.app.models import Exercise, Routine, User
 from BE.app.utils.exercises_loader import load_exercises_data
 
-LOG_DIR = Path(__file__).resolve().parent.parent / "logs"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-
-formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s %(message)s",
-    handlers=[
-        logging.StreamHandler(),
-        TimedRotatingFileHandler(LOG_DIR / "liftlog.log", when="midnight", backupCount=7),
-    ],
-    force=True,
-)
-
-for handler in logging.getLogger().handlers:
-    handler.setFormatter(formatter)
-
-logger = logging.getLogger("liftlog")
-logger.setLevel(logging.INFO)
+logger = setup_logging()
 
 app = FastAPI(title="LiftLog API", version="0.1.0")
 
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
+    request_id = uuid.uuid4().hex[:12]
     start = time.perf_counter()
     body = await request.body()
     request_body = body.decode("utf-8", errors="replace") if body else ""
@@ -51,6 +33,22 @@ async def log_requests(request: Request, call_next):
         request_json = json.loads(request_body) if request_body else None
     except json.JSONDecodeError:
         request_json = request_body
+
+    safe_headers = {
+        key: value
+        for key, value in request.headers.items()
+        if key.lower() not in {"authorization", "cookie", "set-cookie"}
+    }
+
+    logger.info(
+        "REQUEST START request_id=%s method=%s path=%s query=%s headers=%s body=%s",
+        request_id,
+        request.method,
+        request.url.path,
+        dict(request.query_params),
+        safe_headers,
+        request_json,
+    )
 
     try:
         response = await call_next(request)
@@ -66,14 +64,13 @@ async def log_requests(request: Request, call_next):
 
         elapsed_ms = round((time.perf_counter() - start) * 1000, 2)
         logger.info(
-            "REQUEST %s %s query=%s body=%s -> STATUS %s elapsed_ms=%s response=%s",
+            "REQUEST END request_id=%s method=%s path=%s status=%s elapsed_ms=%s response=%s",
+            request_id,
             request.method,
             request.url.path,
-            dict(request.query_params),
-            request_json,
             response.status_code,
             elapsed_ms,
-            payload_json,
+            payload_json[:2000] if isinstance(payload_json, str) else payload_json,
         )
 
         return Response(
@@ -85,13 +82,13 @@ async def log_requests(request: Request, call_next):
     except Exception as exc:  # pragma: no cover
         elapsed_ms = round((time.perf_counter() - start) * 1000, 2)
         logger.exception(
-            "REQUEST %s %s query=%s body=%s FAILED after %s ms: %s",
+            "REQUEST FAILED request_id=%s method=%s path=%s query=%s body=%s elapsed_ms=%s",
+            request_id,
             request.method,
             request.url.path,
             dict(request.query_params),
             request_json,
             elapsed_ms,
-            exc,
         )
         raise
 
