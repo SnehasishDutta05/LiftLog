@@ -5,8 +5,13 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  inject,
+} from '@angular/core';
+
+import {
+  Router,
+} from '@angular/router';
 
 import {
   catchError,
@@ -28,6 +33,7 @@ export function authInterceptor(
   const authService =
     inject(AuthService);
 
+
   const router =
     inject(Router);
 
@@ -37,18 +43,26 @@ export function authInterceptor(
   ===================================================== */
 
   const isSignupRequest =
-    request.url.includes('/auth/signup');
+    request.url.includes(
+      '/auth/signup',
+    );
+
 
   const isLoginRequest =
-    request.url.includes('/auth/login');
+    request.url.includes(
+      '/auth/demo-login',
+    );
+
 
   const isRefreshRequest =
-    request.url.includes('/auth/refresh');
+    request.url.includes(
+      '/auth/refresh',
+    );
 
 
   /*
-   * Signup, login and refresh requests should not have
-   * the existing access token attached to them.
+   * Do not attach an old access token
+   * to authentication endpoints.
    */
   if (
     isSignupRequest ||
@@ -62,7 +76,7 @@ export function authInterceptor(
 
 
   /* =====================================================
-     GET ACCESS TOKEN
+     ACCESS TOKEN
   ===================================================== */
 
   const accessToken =
@@ -72,10 +86,6 @@ export function authInterceptor(
   let authenticatedRequest =
     request;
 
-
-  /* =====================================================
-     ADD BEARER TOKEN
-  ===================================================== */
 
   if (accessToken) {
 
@@ -100,113 +110,119 @@ export function authInterceptor(
 
   return next(
     authenticatedRequest,
-  ).pipe(
+  )
+    .pipe(
 
-    catchError(
-      (error: HttpErrorResponse) => {
-
-
-        /* =================================================
-           NOT A 401 ERROR
-        ================================================= */
-
-        if (error.status !== 401) {
-
-          return throwError(
-            () => error,
-          );
-
-        }
+      catchError(
+        (
+          error: HttpErrorResponse,
+        ) => {
 
 
-        /* =================================================
-           CHECK REFRESH TOKEN
-        ================================================= */
+          /* =============================================
+             NON-401 ERROR
+          ============================================= */
 
-        const refreshToken =
-          authService.getRefreshToken();
+          if (error.status !== 401) {
 
+            return throwError(
+              () => error,
+            );
 
-        if (!refreshToken) {
-
-          authService.logout();
-
-          router.navigate([
-            '/login',
-          ]);
-
-          return throwError(
-            () => error,
-          );
-
-        }
+          }
 
 
-        /* =================================================
-           REFRESH ACCESS TOKEN
-        ================================================= */
+          /* =============================================
+             CHECK REFRESH TOKEN
+          ============================================= */
 
-        return authService
-          .refreshAccessToken()
-          .pipe(
-
-            switchMap(
-              (response) => {
-
-                const newAccessToken =
-                  response.user.access_token;
+          const refreshToken =
+            authService.getRefreshToken();
 
 
-                /* =========================================
-                   RETRY ORIGINAL REQUEST
-                ========================================= */
+          if (!refreshToken) {
 
-                const retryRequest =
-                  request.clone({
+            authService.logout();
 
-                    setHeaders: {
-
-                      Authorization:
-                        `Bearer ${newAccessToken}`,
-
-                    },
-
-                  });
+            router.navigate([
+              '/login',
+            ]);
 
 
-                return next(
-                  retryRequest,
-                );
+            return throwError(
+              () => error,
+            );
 
-              },
-            ),
+          }
 
 
-            /* =============================================
-               REFRESH TOKEN INVALID / EXPIRED
-            ============================================= */
+          /* =============================================
+             REFRESH ACCESS TOKEN
+          ============================================= */
 
-            catchError(
-              (refreshError) => {
+          return authService
+            .refreshAccessToken()
+            .pipe(
 
-                authService.logout();
+              switchMap(
+                (response) => {
 
-                router.navigate([
-                  '/login',
-                ]);
+                  const newAccessToken =
+                    response.user.access_token;
 
-                return throwError(
-                  () => refreshError,
-                );
 
-              },
-            ),
+                  /* =====================================
+                     RETRY ORIGINAL REQUEST
+                  ===================================== */
 
-          );
+                  const retryRequest =
+                    request.clone({
 
-      },
-    ),
+                      setHeaders: {
 
-  );
+                        Authorization:
+                          `Bearer ${newAccessToken}`,
+
+                      },
+
+                    });
+
+
+                  return next(
+                    retryRequest,
+                  );
+
+                },
+              ),
+
+
+              /* =========================================
+                 REFRESH TOKEN EXPIRED / INVALID
+              ========================================= */
+
+              catchError(
+                (refreshError) => {
+
+                  authService.logout();
+
+
+                  router.navigate([
+                    '/login',
+                  ]);
+
+
+                  return throwError(
+                    () => refreshError,
+                  );
+
+                },
+              ),
+
+            );
+
+        },
+      ),
+
+    );
 
 }
