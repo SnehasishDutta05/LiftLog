@@ -57,29 +57,29 @@
     <div class="messages">
 
       @for (
-      message of messages;
-      track $index
+        message of messages;
+        track $index
       ) {
 
-      <div
-        class="message-row"
-        [class.user-row]="message.sender === 'user'"
-        [class.bot-row]="message.sender === 'bot'"
-      >
+        <div
+          class="message-row"
+          [class.user-row]="message.sender === 'user'"
+          [class.bot-row]="message.sender === 'bot'"
+        >
 
-        @if (message.sender === 'bot') {
+          @if (message.sender === 'bot') {
 
-        <div class="bot-avatar">
-          P
+            <div class="bot-avatar">
+              P
+            </div>
+
+          }
+
+          <div class="message">
+            {{ message.text }}
+          </div>
+
         </div>
-
-        }
-
-        <div class="message">
-          {{ message.text }}
-        </div>
-
-      </div>
 
       }
 
@@ -87,71 +87,119 @@
 
 
     <!-- Answer Area -->
-    @if (!completed) {
+    @if (!completed && !isSavingProfile) {
 
-    <div class="answer-area">
+      <div class="answer-area">
 
-      <!-- Choice Questions -->
-      @if (currentQuestion.type === 'choice') {
+        <!-- Choice Questions -->
+        @if (currentQuestion.type === 'choice') {
 
-      <div class="options">
+          <div class="options">
 
-        @for (
-        option of currentQuestion.options;
-        track option
-        ) {
+            @for (
+              option of currentQuestion.options;
+              track option
+            ) {
 
-        <button
-          class="option-button"
-          type="button"
-          (click)="submitAnswer(option)"
-        >
+              <button
+                class="option-button"
+                type="button"
+                (click)="submitAnswer(option)"
+              >
 
-          {{ option }}
+                {{ option }}
 
-          <span>→</span>
+                <span>→</span>
 
-        </button>
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+
+        <!-- DOB / Number / Text Questions -->
+        @if (currentQuestion.type !== 'choice') {
+
+          <form
+            class="input-area"
+            (ngSubmit)="submitAnswer()"
+          >
+
+            <input
+              type="text"
+              [attr.inputmode]="
+                currentQuestion.type === 'number' ||
+                currentQuestion.type === 'dob'
+                  ? 'numeric'
+                  : 'text'
+              "
+              [placeholder]="currentQuestion.placeholder"
+              [(ngModel)]="currentInput"
+              name="answer"
+              autocomplete="off"
+              (keydown)="blockNonNumeric($event)"
+              (input)="sanitizeInput()"
+              [attr.maxlength]="
+                currentQuestion.type === 'dob'
+                  ? 10
+                  : null
+              "
+            />
+
+            <button
+              type="submit"
+              class="send-button"
+              [disabled]="!currentInput.trim()"
+            >
+              →
+            </button>
+
+          </form>
+
+        }
+
+
+        @if (dobError) {
+
+          <p class="input-error">
+            {{ dobError }}
+          </p>
+
+        }
+
+
+        @if (profileError) {
+
+          <p class="input-error">
+            {{ profileError }}
+          </p>
 
         }
 
       </div>
 
-      }
+    }
 
 
-      <!-- Number / Text Questions -->
-      @if (currentQuestion.type !== 'choice') {
+    <!-- Saving State -->
+    @if (isSavingProfile && !completed) {
 
-      <form
-        class="input-area"
-        (ngSubmit)="submitAnswer()"
-      >
+      <div class="saving-area">
 
-        <input
-          type="text"
-          [attr.inputmode]="currentQuestion.type === 'number' ? 'numeric' : 'text'"
-          [placeholder]="currentQuestion.placeholder"
-          [(ngModel)]="currentInput"
-          name="answer"
-          autocomplete="off"
-          (keydown)="blockNonNumeric($event)"
-          (input)="sanitizeInput()"
-        />
+        <div class="saving-spinner"></div>
 
-        <button
-          type="submit"
-          class="send-button"
-          [disabled]="!currentInput.trim()"
-        >
-          →
-        </button>
+        <h2>
+          Setting up your profile...
+        </h2>
 
-      </form>
+        <p>
+          We're putting the finishing touches on your PulseOS experience.
+        </p>
 
-      }
-
-    </div>
+      </div>
 
     }
 
@@ -159,33 +207,38 @@
     <!-- Completion -->
     @if (completed) {
 
-    <div class="complete-area">
+      <div class="complete-area">
 
-      <div class="complete-icon">
-        ✓
+        <div class="complete-icon">
+          ✓
+        </div>
+
+        <p class="welcome-label">
+          WELCOME ABOARD
+        </p>
+
+        <h2>
+          You're all set! 💚
+        </h2>
+
+        <p>
+          Your PulseOS profile is ready.
+          Your fitness journey starts now.
+        </p>
+
+        <div class="completion-loader">
+
+          <span></span>
+          <span></span>
+          <span></span>
+
+        </div>
+
+        <p class="redirect-text">
+          Taking you to your dashboard...
+        </p>
+
       </div>
-
-      <h2>
-        Your profile is ready!
-      </h2>
-
-      <p>
-        Let's create your personalized fitness journey.
-      </p>
-
-      <div class="completion-loader">
-
-        <span></span>
-        <span></span>
-        <span></span>
-
-      </div>
-
-      <p class="redirect-text">
-        Taking you to your dashboard...
-      </p>
-
-    </div>
 
     }
 
