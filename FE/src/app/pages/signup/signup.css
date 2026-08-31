@@ -1,18 +1,59 @@
 :host {
   display: block;
+
+  width: 100%;
+  min-height: 100vh;
+
+  background: #f5f7f6;
 }
+
+
+/* =========================================================
+   RESET
+========================================================= */
 
 * {
   box-sizing: border-box;
 }
 
+button,
+input {
+  font: inherit;
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
 .signup-page {
-  min-height: 100dvh;
+  width: 100%;
+  min-height: 100vh;
 
-  background: #f6f8f7;
-  color: #18221e;
+  display: flex;
+  justify-content: center;
 
-  padding: 28px 20px 35px;
+  background: #f5f7f6;
+}
+
+
+/* =========================================================
+   PORTRAIT CONTAINER
+========================================================= */
+
+.signup-container {
+  width: 100%;
+  max-width: 444px;
+
+  min-height: 100vh;
+
+  padding:
+    18px
+    16px
+    36px;
+
+  background: #f5f7f6;
+  color: #15241f;
 
   font-family:
     Inter,
@@ -20,285 +61,615 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-
-  overflow-x: hidden;
 }
 
 
-/* =========================
+/* =========================================================
    BRAND
-   ========================= */
+========================================================= */
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
 
-  margin-bottom: 38px;
-
-  font-size: 21px;
-  font-weight: 750;
+  gap: 12px;
 }
 
-.logo-icon {
-  width: 40px;
-  height: 40px;
+.brand-logo {
+  width: 48px;
+  height: 48px;
 
-  border-radius: 11px;
-
-  background: #74d9a5;
-  color: #10231d;
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 20px;
+  border-radius: 13px;
+
+  background: #70d9a5;
+  color: #10231d;
+
+  font-size: 25px;
   font-weight: 800;
 }
 
+.brand-name {
+  color: #15241f;
 
-/* =========================
-   HEADER
-   ========================= */
+  font-size: 26px;
+  font-weight: 800;
 
-.signup-header {
-  margin-bottom: 25px;
+  letter-spacing: -0.8px;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+  padding-top: 58px;
 }
 
 .eyebrow {
-  margin: 0 0 11px;
+  margin: 0 0 18px;
 
-  color: #4f8b70;
+  color: #4e9275;
 
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
 
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
 }
 
-.signup-header h1 {
+.hero h1 {
   margin: 0;
 
-  font-size: 31px;
+  color: #15241f;
 
+  font-size: 34px;
   line-height: 1.05;
+  font-weight: 850;
 
-  letter-spacing: -1px;
-
-  font-weight: 800;
+  letter-spacing: -1.5px;
 }
 
-.signup-header p:last-child {
-  margin: 13px 0 0;
+.leaf {
+  font-size: 28px;
+}
 
-  color: #718078;
+.hero-description {
+  margin:
+    20px
+    0
+    0;
 
-  font-size: 13px;
+  color: #798b84;
 
+  font-size: 16px;
   line-height: 1.5;
-
-  max-width: 350px;
 }
 
 
-/* =========================
-   CARD
-   ========================= */
+/* =========================================================
+   SIGNUP CARD
+========================================================= */
 
 .signup-card {
-  background: white;
+  margin-top: 30px;
 
-  border-radius: 22px;
+  padding:
+    26px
+    22px
+    24px;
 
-  padding: 24px 21px;
+  border-radius: 24px;
+
+  background: #ffffff;
 
   box-shadow:
-    0 8px 30px rgba(30, 50, 40, 0.06);
+    0 16px 42px
+    rgba(16, 35, 29, 0.07);
 }
 
 
-/* =========================
+/* =========================================================
    FORM
-   ========================= */
+========================================================= */
 
 .form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-
-  margin-bottom: 7px;
-
-  color: #26332e;
-
-  font-size: 13px;
-  font-weight: 650;
-}
-
-input {
   width: 100%;
 
-  height: 50px;
+  margin-bottom: 20px;
+}
 
-  padding: 0 14px;
+.form-group > label {
+  display: block;
 
-  border: 1px solid #dbe3df;
+  margin-bottom: 8px;
 
-  border-radius: 12px;
-
-  background: white;
-
-  color: #18221e;
-
-  font-family: inherit;
+  color: #24332d;
 
   font-size: 14px;
+  font-weight: 750;
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.input-wrapper {
+  position: relative;
+
+  width: 100%;
+}
+
+.input-wrapper input {
+  width: 100%;
+  height: 58px;
+
+  padding:
+    0
+    48px
+    0
+    16px;
+
+  border: 1.5px solid #d8e1dc;
+  border-radius: 14px;
 
   outline: none;
 
-  transition: 0.2s ease;
+  background: #ffffff;
+  color: #15241f;
+
+  font-size: 16px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-input::placeholder {
-  color: #a3aea9;
+.input-wrapper input::placeholder {
+  color: #adb9b4;
 }
 
-input:focus {
-  border-color: #5fcf95;
+.input-wrapper input:focus {
+  border-color: #5ed99d;
 
   box-shadow:
-    0 0 0 3px rgba(95, 207, 149, 0.12);
+    0 0 0 4px
+    rgba(94, 217, 157, 0.10);
 }
 
 
-/* =========================
-   BUTTON
-   ========================= */
+/* =========================================================
+   VALID / INVALID
+========================================================= */
 
-.primary-button {
-  width: 100%;
+.input-wrapper.valid input {
+  border-color: #49b579;
+}
 
-  height: 52px;
+.input-wrapper.invalid input {
+  border-color: #df6969;
+}
 
-  margin-top: 5px;
+.valid-icon {
+  position: absolute;
 
-  border: none;
+  top: 50%;
+  right: 16px;
 
-  border-radius: 12px;
-
-  background: #173d30;
-
-  color: white;
+  width: 25px;
+  height: 25px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
-  gap: 9px;
+  border-radius: 50%;
 
-  font-family: inherit;
+  background: #39a867;
+  color: #ffffff;
 
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 800;
 
-  font-weight: 700;
+  transform: translateY(-50%);
+}
+
+
+/* =========================================================
+   PASSWORD
+========================================================= */
+
+.password-wrapper input {
+  padding-right: 58px;
+}
+
+.eye-button {
+  position: absolute;
+
+  top: 50%;
+  right: 10px;
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  font-size: 18px;
 
   cursor: pointer;
 
-  transition: 0.2s ease;
+  transform: translateY(-50%);
 }
 
-.primary-button:hover {
-  background: #235642;
+.eye-button:active {
+  transform:
+    translateY(-50%)
+    scale(0.94);
 }
 
-.primary-button:active {
-  transform: scale(0.98);
+
+/* =========================================================
+   EMAIL / PASSWORD FEEDBACK
+========================================================= */
+
+.success-message,
+.error-message {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  margin:
+    7px
+    2px
+    0;
+
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.success-message {
+  color: #339c61;
+}
+
+.error-message {
+  color: #d75858;
+}
+
+.success-message span {
+  width: 16px;
+  height: 16px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #39a867;
+  color: #ffffff;
+
+  font-size: 9px;
 }
 
 
-/* =========================
-   LOGIN
-   ========================= */
+/* =========================================================
+   PASSWORD STRENGTH
+========================================================= */
 
-.login-text {
-  margin: 18px 0 0;
+.strength-row {
+  display: flex;
+  align-items: center;
 
-  text-align: center;
+  gap: 10px;
 
-  color: #7d8984;
-
-  font-size: 12px;
+  margin-top: 8px;
 }
 
-.login-button {
+.strength-bars {
+  flex: 1;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 4px;
+}
+
+.strength-bars span {
+  height: 4px;
+
+  border-radius: 999px;
+
+  background: #e6ebe8;
+
+  transition: background 0.2s ease;
+}
+
+.strength-bars span.active {
+  background: #39a867;
+}
+
+.strength-label {
+  color: #9aa7a1;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.strength-label.strong {
+  color: #338d59;
+}
+
+
+/* =========================================================
+   PASSWORD REQUIREMENTS
+========================================================= */
+
+.password-rules {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap:
+    8px
+    12px;
+
+  margin-top: 12px;
+
+  padding: 13px;
+
+  border-radius: 13px;
+
+  background: #f5f8f6;
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: #7c8b84;
+
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.rule span {
+  width: 15px;
+  height: 15px;
+
+  flex: 0 0 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: #9aa7a1;
+
+  font-size: 10px;
+}
+
+.rule.valid-rule {
+  color: #2f8053;
+
+  font-weight: 650;
+}
+
+.rule.valid-rule span {
+  background: #39a867;
+  color: #ffffff;
+}
+
+.rule-wide {
+  grid-column: 1 / -1;
+}
+
+
+/* =========================================================
+   CREATE ACCOUNT BUTTON
+========================================================= */
+
+.create-account-button {
+  width: 100%;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  margin-top: 4px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: #154b3b;
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.15s ease;
+}
+
+.create-account-button:active {
+  transform: scale(0.99);
+}
+
+.create-account-button.disabled {
+  opacity: 0.48;
+}
+
+.button-arrow {
+  font-size: 24px;
+  line-height: 1;
+}
+
+
+/* =========================================================
+   LOGIN LINK
+========================================================= */
+
+.login-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  margin-top: 20px;
+
+  color: #84928c;
+
+  font-size: 13px;
+}
+
+.login-link button {
   padding: 0;
 
   border: none;
 
   background: transparent;
+  color: #38875f;
 
-  color: #39855f;
-
-  font-family: inherit;
-
-  font-size: 12px;
-
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 750;
 
   cursor: pointer;
 }
 
 
-/* =========================
+/* =========================================================
    SMALL PHONES
-   ========================= */
+========================================================= */
 
-@media (max-height: 720px) {
+@media (max-width: 360px) {
 
-  .signup-page {
-    padding-top: 20px;
+  .signup-container {
+    padding:
+      15px
+      12px
+      28px;
   }
 
-  .brand {
-    margin-bottom: 25px;
+  .brand-logo {
+    width: 44px;
+    height: 44px;
+
+    font-size: 22px;
   }
 
-  .signup-header {
-    margin-bottom: 18px;
+  .brand-name {
+    font-size: 23px;
   }
 
-  .signup-header h1 {
-    font-size: 28px;
+  .hero {
+    padding-top: 46px;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  .hero-description {
+    font-size: 14px;
   }
 
   .signup-card {
-    padding: 20px 18px;
+    padding:
+      22px
+      17px
+      20px;
+
+    border-radius: 22px;
   }
 
-  .form-group {
-    margin-bottom: 12px;
+  .input-wrapper input {
+    height: 54px;
+
+    font-size: 16px;
+  }
+
+  .password-rules {
+    grid-template-columns: 1fr;
+  }
+
+  .rule-wide {
+    grid-column: auto;
+  }
+
+  .create-account-button {
+    height: 54px;
   }
 
 }
 
 
-/* =========================
-   DESKTOP PREVIEW
-   ========================= */
+/* =========================================================
+   DESKTOP
+   STILL PORTRAIT
+========================================================= */
 
-@media (min-width: 600px) {
+@media (min-width: 445px) {
 
-  .signup-page {
-    width: 430px;
-    min-height: 100dvh;
+  :host {
+    padding:
+      28px
+      0;
+  }
 
-    margin: 0 auto;
+  .signup-container {
+    min-height: calc(100vh - 56px);
 
-    padding-left: 24px;
-    padding-right: 24px;
+    box-shadow:
+      0 18px 55px
+      rgba(16, 35, 29, 0.08);
+  }
+
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .create-account-button:hover {
+    background: #103f31;
+  }
+
+  .login-link button:hover {
+    text-decoration: underline;
+  }
+
+  .eye-button:hover {
+    background: #f2f5f3;
   }
 
 }

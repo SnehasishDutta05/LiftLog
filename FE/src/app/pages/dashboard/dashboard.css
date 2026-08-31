@@ -1,24 +1,29 @@
-/* =========================================================
-   PulseOS Dashboard
-   ========================================================= */
-
 :host {
   display: block;
   width: 100%;
   min-height: 100vh;
+  background: #f5f7f6;
+}
+
+button {
+  font: inherit;
 }
 
 
 /* =========================================================
-   Dashboard
-   ========================================================= */
+   PAGE SHELL
+   Portrait-only layout on all screen sizes
+========================================================= */
 
-.dashboard {
+.dashboard-shell {
   width: 100%;
   min-height: 100vh;
 
+  display: flex;
+  justify-content: center;
+
   background: #f5f7f6;
-  color: #10231d;
+  color: #07152d;
 
   font-family:
     Inter,
@@ -26,416 +31,531 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-
-  box-sizing: border-box;
 }
 
 
 /* =========================================================
-   Desktop Sidebar
-   ========================================================= */
+   SIDEBAR
+   Disabled everywhere
+========================================================= */
 
-.desktop-sidebar {
-  display: none;
+.sidebar {
+  display: none !important;
 }
 
 
 /* =========================================================
-   Main Area
-   ========================================================= */
+   MAIN PORTRAIT APP
+========================================================= */
 
 .dashboard-main {
   width: 100%;
+  max-width: 444px;
   min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  padding-bottom: 105px;
+
+  background: #ffffff;
 }
 
 
 /* =========================================================
-   Header
-   ========================================================= */
+   HEADER
+========================================================= */
 
-.dashboard-header {
+.mobile-header {
   width: 100%;
-  height: 72px;
-
-  background: #10231d;
-  color: white;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding: 0 20px;
+  padding:
+    max(14px, env(safe-area-inset-top))
+    18px
+    12px;
 
-  box-sizing: border-box;
+  border-bottom: 1px solid #edf0f5;
+
+  background: #ffffff;
 }
 
-
-.brand {
+.mobile-brand {
   display: flex;
   align-items: center;
+
   gap: 10px;
+
+  min-width: 0;
 }
 
-
-.brand-mark {
-  width: 34px;
-  height: 34px;
-
-  border-radius: 10px;
-
-  background: #74d9a5;
-  color: #10231d;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-weight: 800;
-}
-
-
-.brand-name {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-
-.profile-button {
+.mobile-logo {
   width: 38px;
   height: 38px;
 
-  border: 1px solid rgba(255,255,255,.25);
-  border-radius: 50%;
-
-  background: transparent;
-  color: white;
-
-  cursor: pointer;
-}
-
-
-/* =========================================================
-   Content
-   ========================================================= */
-
-.dashboard-content {
-  width: 100%;
-  max-width: 700px;
-
-  margin: 0 auto;
-
-  padding: 24px 16px 100px;
-
-  box-sizing: border-box;
-}
-
-
-/* =========================================================
-   Workout
-   ========================================================= */
-
-.workout-section {
-  background: white;
-
-  border-radius: 20px;
-
-  padding: 20px;
-
-  box-shadow:
-    0 4px 20px rgba(16,35,29,.06);
-}
-
-
-.section-header h1 {
-  margin: 0 0 20px;
-
-  font-size: 26px;
-  font-weight: 750;
-}
-
-
-.empty-workout-button {
-  width: 100%;
-  min-height: 54px;
-
-  border: none;
-  border-radius: 14px;
-
-  background: #74d9a5;
-  color: #10231d;
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  gap: 8px;
+  border-radius: 9px;
+
+  background: #07152d;
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.mobile-brand strong {
+  display: block;
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.mobile-brand span {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #7b8494;
+
+  font-size: 10px;
+}
+
+.profile-avatar {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #eadbff;
+  color: #07152d;
 
   font-size: 15px;
   font-weight: 700;
 
   cursor: pointer;
-
-  transition: .2s ease;
 }
 
-
-.empty-workout-button:hover {
-  background: #5fc891;
-
-  transform: translateY(-1px);
-
-  box-shadow:
-    0 6px 14px rgba(16,35,29,.14);
-}
-
-
-.plus {
-  font-size: 22px;
+.desktop-profile-row {
+  display: none !important;
 }
 
 
 /* =========================================================
-   Routines
-   ========================================================= */
+   CONTENT
+========================================================= */
 
-.routines {
-  margin-top: 28px;
+.dashboard-content {
+  width: 100%;
+
+  padding: 24px 16px 30px;
 }
 
 
-.routines h2 {
-  margin: 0 0 12px;
+/* =========================================================
+   WORKOUT TITLE
+========================================================= */
+
+.workout-title-row {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 22px;
+}
+
+.workout-title-row h1 {
+  margin: 0;
+
+  color: #07152d;
+
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 800;
+
+  letter-spacing: -1.2px;
+}
+
+.dropdown-button {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f3f5f9;
+
+  cursor: pointer;
+}
+
+.dropdown-button span {
+  width: 10px;
+  height: 10px;
+
+  border-right: 2.5px solid #07152d;
+  border-bottom: 2.5px solid #07152d;
+
+  transform:
+    rotate(45deg)
+    translate(-2px, -2px);
+}
+
+
+/* =========================================================
+   START EMPTY WORKOUT
+========================================================= */
+
+.start-empty-workout {
+  width: 100%;
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  padding: 14px 18px;
+
+  border: none;
+  border-radius: 18px;
+
+  background: #f2f3f7;
+  color: #07152d;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+.start-empty-workout:active {
+  transform: scale(0.99);
+}
+
+.plus-icon {
+  position: relative;
+
+  width: 28px;
+  height: 28px;
+
+  flex: 0 0 28px;
+}
+
+.plus-horizontal,
+.plus-vertical {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  display: block;
+
+  border-radius: 999px;
+
+  background: #07152d;
+
+  transform: translate(-50%, -50%);
+}
+
+.plus-horizontal {
+  width: 26px;
+  height: 2.5px;
+}
+
+.plus-vertical {
+  width: 2.5px;
+  height: 26px;
+}
+
+.start-empty-label {
+  min-width: 0;
 
   font-size: 17px;
+  font-weight: 500;
+
+  letter-spacing: -0.2px;
 }
 
+
+/* =========================================================
+   SECTION TITLES
+========================================================= */
+
+.section-title {
+  margin: 28px 2px 12px;
+}
+
+.section-title h2 {
+  margin: 0;
+
+  color: #07152d;
+
+  font-size: 21px;
+  font-weight: 800;
+
+  letter-spacing: -0.4px;
+}
+
+
+/* =========================================================
+   ROUTINES
+========================================================= */
 
 .routine-list {
   display: flex;
   flex-direction: column;
+
+  gap: 9px;
 }
 
-
-.routine {
-  min-height: 58px;
+.routine-card {
+  width: 100%;
+  min-height: 74px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  border-bottom: 1px solid #e8eeeb;
+  gap: 10px;
+
+  padding: 11px 12px;
+
+  border: 1px solid #e5e8ef;
+  border-radius: 15px;
+
+  background: #ffffff;
 }
 
+.routine-left {
+  min-width: 0;
 
-.routine:last-child {
-  border-bottom: none;
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
 }
 
+.routine-badge {
+  width: 44px;
+  height: 44px;
 
-.routine-name {
+  flex: 0 0 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  color: #07152d;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.routine-badge.legs {
+  background: #eadcff;
+}
+
+.routine-badge.chest {
+  background: #dce8ff;
+}
+
+.routine-badge.back {
+  background: #d7f5e3;
+}
+
+.routine-badge.arms {
+  background: #ffe5bd;
+}
+
+.routine-badge.shoulders {
+  background: #ffdce0;
+}
+
+.routine-copy {
+  min-width: 0;
+}
+
+.routine-copy h3 {
+  margin: 0 0 4px;
+
+  color: #07152d;
+
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.routine-copy p {
+  margin: 0;
+
+  max-width: 165px;
+
+  overflow: hidden;
+
+  color: #7b8598;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 
-.start-button {
-  border: 1px solid #74d9a5;
+/* =========================================================
+   START ROUTINE BUTTON
+========================================================= */
+
+.start-routine-button {
+  min-width: 94px;
+  min-height: 38px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 8px 10px;
+
+  border: none;
   border-radius: 10px;
 
-  background: transparent;
-  color: #10231d;
+  background: #f5f6f8;
+  color: #07152d;
 
-  padding: 9px 12px;
-
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 
   cursor: pointer;
-
-  transition: .2s ease;
 }
 
-
-.start-button:hover {
-  background: #74d9a5;
-
-  transform: translateY(-1px);
-
-  box-shadow:
-    0 4px 10px rgba(16,35,29,.12);
+.routine-plus {
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 400;
 }
 
 
 /* =========================================================
-   Progress
-   ========================================================= */
+   PROGRESS
+========================================================= */
 
 .progress-section {
-  margin-top: 20px;
+  margin-top: 2px;
 }
 
+.progress-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 
-.progress-section .section-header h2 {
-  margin: 0 0 12px;
-
-  font-size: 19px;
+  gap: 10px;
 }
-
 
 .progress-card {
-  background: white;
+  min-width: 0;
+  min-height: 112px;
 
-  border-radius: 20px;
-
-  padding: 20px;
-
-  box-shadow:
-    0 4px 20px rgba(16,35,29,.06);
-}
-
-
-.progress-card-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+  flex-direction: column;
+  justify-content: center;
 
+  padding: 16px;
+
+  border: 1px solid #e5e8ef;
+  border-radius: 14px;
+
+  background: #ffffff;
+}
 
 .progress-label {
-  display: block;
+  color: #39465c;
 
-  color: #7a8580;
-
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 600;
 }
 
+.progress-card strong {
+  margin-top: 8px;
 
-.progress-value {
-  display: block;
+  color: #07152d;
 
-  margin-top: 4px;
-
-  font-size: 17px;
-  font-weight: 700;
-}
-
-
-.progress-percentage {
-  font-size: 24px;
+  font-size: 23px;
+  line-height: 1;
   font-weight: 800;
 }
 
+.progress-description {
+  margin-top: 8px;
 
-.weekly-activity {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  color: #7b8598;
 
-  margin-top: 28px;
-}
-
-
-.activity-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  gap: 8px;
-}
-
-
-.activity-dot {
-  width: 30px;
-  height: 30px;
-
-  border-radius: 50%;
-
-  background: #e8eeeb;
-
-  border: 2px solid #dce5e0;
-}
-
-
-.activity-day.completed .activity-dot {
-  background: #74d9a5;
-  border-color: #74d9a5;
-}
-
-
-.activity-label {
   font-size: 11px;
-  font-weight: 600;
-
-  color: #7a8580;
-}
-
-
-.progress-bar-container {
-  margin-top: 24px;
-}
-
-
-.progress-bar {
-  width: 100%;
-  height: 9px;
-
-  background: #e8eeeb;
-
-  border-radius: 999px;
-
-  overflow: hidden;
-}
-
-
-.progress-bar-fill {
-  width: 80%;
-  height: 100%;
-
-  background: #74d9a5;
 }
 
 
 /* =========================================================
-   Mobile Bottom Navigation
-   ========================================================= */
+   BOTTOM NAVIGATION
+   Fixed directly to the bottom
+========================================================= */
 
-.bottom-navigation {
+.mobile-bottom-nav {
   position: fixed;
 
-  left: 0;
-  right: 0;
+  left: 50%;
   bottom: 0;
 
-  height: 72px;
+  z-index: 100;
 
-  background: white;
+  width: 100%;
+  max-width: 444px;
 
-  border-top: 1px solid #e5ebe8;
+  min-height: 72px;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
 
-  z-index: 1000;
+  padding:
+    8px
+    4px
+    max(8px, env(safe-area-inset-bottom));
 
-  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid #e7eaf0;
 
-  box-sizing: border-box;
+  background: #ffffff;
+
+  transform: translateX(-50%);
 }
 
-
-.nav-item {
-  min-width: 60px;
+.mobile-nav-item {
+  min-width: 0;
   min-height: 52px;
-
-  border: none;
-  border-radius: 12px;
-
-  background: transparent;
-
-  color: #7a8580;
 
   display: flex;
   flex-direction: column;
@@ -444,278 +564,304 @@
 
   gap: 4px;
 
-  font-size: 11px;
+  padding: 4px;
+
+  border: none;
+
+  background: transparent;
+  color: #8b93a2;
+
+  font-size: 10px;
   font-weight: 600;
 
   cursor: pointer;
 }
 
-
-.nav-item.active {
-  color: #10231d;
+.mobile-nav-item.active {
+  color: #07152d;
 }
 
-
-.nav-item:hover {
-  background: #f0f6f3;
-}
-
-
-.nav-icon {
-  font-size: 21px;
+.mobile-nav-icon {
+  width: 19px;
+  height: 19px;
 }
 
 
 /* =========================================================
-   DESKTOP
-   ========================================================= */
+   ICONS
+========================================================= */
 
-@media (min-width: 768px) {
+.nav-symbol,
+.mobile-nav-icon {
+  position: relative;
 
-  .dashboard {
-    display: flex;
-    align-items: flex-start;
-  }
+  display: inline-block;
 
+  flex-shrink: 0;
+}
 
-  /* Sidebar */
+.home-symbol {
+  width: 19px;
+  height: 16px;
 
-  .desktop-sidebar {
-    display: flex;
+  border: 2px solid currentColor;
+  border-top: none;
+  border-radius: 2px;
+}
 
-    width: 240px;
-    min-width: 240px;
+.home-symbol::before {
+  content: "";
 
-    min-height: 100vh;
+  position: absolute;
 
-    background: #10231d;
-    color: white;
+  width: 12px;
+  height: 12px;
 
-    flex-direction: column;
+  top: -6px;
+  left: 1px;
 
-    padding: 28px 16px;
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
 
-    box-sizing: border-box;
-  }
+  transform: rotate(45deg);
+}
 
+.workout-symbol {
+  width: 17px;
+  height: 17px;
 
-  .sidebar-brand {
-    display: flex;
-    align-items: center;
+  border: 2px solid currentColor;
 
-    gap: 10px;
+  transform: rotate(45deg);
+}
 
-    padding: 0 12px 36px;
-  }
+.progress-symbol {
+  width: 19px;
+  height: 16px;
+}
 
+.progress-symbol::before {
+  content: "";
 
-  .sidebar-brand-mark {
-    width: 38px;
-    height: 38px;
+  position: absolute;
 
-    border-radius: 11px;
+  width: 7px;
+  height: 7px;
 
-    background: #74d9a5;
-    color: #10231d;
+  left: 1px;
+  bottom: 1px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
 
-    font-weight: 800;
-  }
+  transform: rotate(-45deg);
+}
 
+.progress-symbol::after {
+  content: "";
 
-  .sidebar-brand-name {
-    font-size: 21px;
-    font-weight: 700;
-  }
+  position: absolute;
 
+  width: 9px;
+  height: 9px;
 
-  .sidebar-navigation {
-    display: flex;
-    flex-direction: column;
+  right: 0;
+  top: 0;
 
-    gap: 6px;
-  }
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+}
 
+.profile-symbol {
+  width: 19px;
+  height: 19px;
+}
 
-  .sidebar-nav-item {
-    width: 100%;
-    min-height: 48px;
+.profile-symbol::before {
+  content: "";
 
-    border: none;
-    border-radius: 12px;
+  position: absolute;
 
-    background: transparent;
-    color: rgba(255,255,255,.68);
+  width: 7px;
+  height: 7px;
 
-    display: flex;
-    align-items: center;
+  top: 0;
+  left: 5px;
 
-    gap: 13px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
 
-    padding: 0 14px;
+.profile-symbol::after {
+  content: "";
 
-    font-size: 14px;
-    font-weight: 600;
+  position: absolute;
 
-    text-align: left;
+  width: 15px;
+  height: 7px;
 
-    cursor: pointer;
+  bottom: 0;
+  left: 1px;
 
-    transition: .2s ease;
-  }
-
-
-  .sidebar-nav-item:hover {
-    background: rgba(116,217,165,.10);
-    color: white;
-  }
-
-
-  .sidebar-nav-item.active {
-    background: #74d9a5;
-    color: #10231d;
-  }
-
-
-  .sidebar-nav-icon {
-    width: 22px;
-
-    display: flex;
-    justify-content: center;
-
-    font-size: 20px;
-  }
-
-
-  /* Main */
-
-  .dashboard-main {
-    flex: 1;
-
-    width: auto;
-    min-width: 0;
-
-    min-height: 100vh;
-  }
-
-
-  /* Header */
-
-  .dashboard-header {
-    height: 76px;
-
-    background: white;
-    color: #10231d;
-
-    border-bottom: 1px solid #e5ebe8;
-
-    padding: 0 32px;
-  }
-
-
-  .dashboard-header .brand {
-    display: none;
-  }
-
-
-  .profile-button {
-    margin-left: auto;
-
-    border-color: #dce5e0;
-
-    color: #10231d;
-  }
-
-
-  /* Content */
-
-  .dashboard-content {
-    max-width: 900px;
-
-    padding: 40px 32px 80px;
-  }
-
-
-  .workout-section {
-    padding: 28px;
-  }
-
-
-  /* Hide mobile nav */
-
-  .bottom-navigation {
-    display: none;
-  }
+  border: 2px solid currentColor;
+  border-radius: 8px 8px 3px 3px;
 }
 
 
 /* =========================================================
-   Large Desktop
-   ========================================================= */
-
-@media (min-width: 1200px) {
-
-  .desktop-sidebar {
-    width: 260px;
-    min-width: 260px;
-  }
-
-
-  .dashboard-content {
-    max-width: 1000px;
-
-    padding: 48px 40px 100px;
-  }
-}
-
-
-/* =========================================================
-   Small Phones
-   ========================================================= */
+   SMALL PHONES
+========================================================= */
 
 @media (max-width: 360px) {
 
-  .dashboard-header {
-    padding: 0 16px;
-  }
-
-
   .dashboard-content {
-    padding: 18px 12px 100px;
+    padding:
+      20px
+      12px
+      28px;
   }
 
-
-  .workout-section {
-    padding: 16px;
+  .workout-title-row {
+    margin-bottom: 18px;
   }
 
-
-  .section-header h1 {
-    font-size: 24px;
+  .workout-title-row h1 {
+    font-size: 31px;
   }
 
-
-  .start-button {
-    padding: 8px 10px;
-    font-size: 12px;
+  .dropdown-button {
+    width: 35px;
+    height: 35px;
   }
 
+  .start-empty-workout {
+    min-height: 62px;
 
-  .routine-name {
+    gap: 14px;
+
+    padding: 12px 15px;
+
+    border-radius: 16px;
+  }
+
+  .start-empty-label {
+    font-size: 15px;
+  }
+
+  .plus-icon {
+    width: 24px;
+    height: 24px;
+
+    flex-basis: 24px;
+  }
+
+  .plus-horizontal {
+    width: 22px;
+  }
+
+  .plus-vertical {
+    height: 22px;
+  }
+
+  .routine-card {
+    min-height: 68px;
+
+    gap: 8px;
+
+    padding: 9px 10px;
+  }
+
+  .routine-left {
+    gap: 9px;
+  }
+
+  .routine-badge {
+    width: 40px;
+    height: 40px;
+
+    flex-basis: 40px;
+
     font-size: 14px;
   }
 
+  .routine-copy h3 {
+    font-size: 14px;
+  }
+
+  .routine-copy p {
+    max-width: 110px;
+
+    font-size: 10px;
+  }
+
+  .start-routine-button {
+    min-width: 82px;
+    min-height: 36px;
+
+    padding: 7px 8px;
+
+    font-size: 10px;
+  }
+
+  .routine-plus {
+    font-size: 16px;
+  }
 
   .progress-card {
-    padding: 16px;
+    min-height: 102px;
+
+    padding: 13px;
   }
 
-
-  .activity-dot {
-    width: 26px;
-    height: 26px;
+  .progress-card strong {
+    font-size: 20px;
   }
+
+}
+
+
+/* =========================================================
+   LARGER SCREENS
+   Still portrait
+========================================================= */
+
+@media (min-width: 445px) {
+
+  :host {
+    padding: 28px 0;
+  }
+
+  .dashboard-main {
+    min-height: calc(100vh - 56px);
+
+    box-shadow:
+      0 16px 50px
+      rgba(7, 21, 45, 0.08);
+  }
+
+  .mobile-bottom-nav {
+    bottom: 0;
+  }
+
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .start-empty-workout:hover {
+    background: #e8eaef;
+  }
+
+  .start-routine-button:hover {
+    background: #eceef2;
+  }
+
+  .profile-avatar:hover {
+    opacity: 0.9;
+  }
+
 }

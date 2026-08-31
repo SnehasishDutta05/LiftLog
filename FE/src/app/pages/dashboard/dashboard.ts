@@ -1,50 +1,64 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { LiftlogApiService, Routine } from '../../services/liftlog-api.service';
+interface Routine {
+  name: string;
+  description: string;
+  shortName: string;
+  className: string;
+}
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard implements OnInit {
-  routines: Routine[] = [];
+export class Dashboard {
+  routines: Routine[] = [
+    {
+      name: 'Legs',
+      description: 'Lower body workout',
+      shortName: 'L',
+      className: 'legs',
+    },
+    {
+      name: 'Chest',
+      description: 'Chest focused workout',
+      shortName: 'C',
+      className: 'chest',
+    },
+    {
+      name: 'Back',
+      description: 'Back focused workout',
+      shortName: 'B',
+      className: 'back',
+    },
+    {
+      name: 'Arms',
+      description: 'Biceps and triceps',
+      shortName: 'A',
+      className: 'arms',
+    },
+    {
+      name: 'Shoulders',
+      description: 'Shoulder focused workout',
+      shortName: 'S',
+      className: 'shoulders',
+    },
+  ];
 
-  constructor(private readonly api: LiftlogApiService) {}
-
-  ngOnInit(): void {
-    const token = localStorage.getItem('liftlog_token');
-
-    if (!token) {
-      return;
-    }
-
-    this.api.getRoutines(token).subscribe({
-      next: (response) => {
-        this.routines = response.routines ?? [];
-      },
-      error: (error) => {
-        console.error('Failed to load routines', error);
-      },
-    });
-  }
+  constructor(private router: Router) {}
 
   startEmptyWorkout(): void {
-    const token = localStorage.getItem('liftlog_token');
+    this.router.navigate(['/active-workout']);
+  }
 
-    if (!token) {
-      return;
-    }
+  startRoutine(routine: Routine): void {
+    console.log('Starting routine:', routine.name);
 
-    this.api.createWorkout(token).subscribe({
-      next: (response) => {
-        console.log('Workout created', response);
-      },
-      error: (error) => {
-        console.error('Failed to create workout', error);
-      },
-    });
+    // For now routines open the active workout page.
+    // Later we can pass the routine id to the backend.
+    this.router.navigate(['/active-workout']);
   }
 }

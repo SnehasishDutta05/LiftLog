@@ -1,37 +1,64 @@
-<div class="dashboard">
+<div class="dashboard-shell">
 
-  <!-- Desktop Sidebar -->
-  <aside class="desktop-sidebar">
+  <!-- =====================================================
+       DESKTOP SIDEBAR
+  ====================================================== -->
 
-    <div class="sidebar-brand">
-      <span class="sidebar-brand-mark">P</span>
-      <span class="sidebar-brand-name">PulseOS</span>
+  <aside class="sidebar">
+
+    <div class="brand">
+
+      <div class="brand-logo">
+        P
+      </div>
+
+      <div class="brand-copy">
+        <strong>PulseOS</strong>
+        <span>Your fitness companion</span>
+      </div>
+
     </div>
 
-    <nav class="sidebar-navigation">
 
-      <button class="sidebar-nav-item active" type="button">
-        <span class="sidebar-nav-icon">⌂</span>
+    <nav class="desktop-nav">
+
+      <button
+        class="desktop-nav-item active"
+        type="button"
+      >
+        <span class="nav-symbol home-symbol"></span>
         <span>Home</span>
       </button>
 
-      <button class="sidebar-nav-item" type="button">
-        <span class="sidebar-nav-icon">♢</span>
+      <button
+        class="desktop-nav-item"
+        type="button"
+      >
+        <span class="nav-symbol workout-symbol"></span>
         <span>Workouts</span>
       </button>
 
-      <button class="sidebar-nav-item" type="button">
-        <span class="sidebar-nav-icon">◒</span>
+      <button
+        class="desktop-nav-item"
+        type="button"
+      >
+        <span class="nav-symbol progress-symbol"></span>
         <span>Progress</span>
       </button>
 
-      <button class="sidebar-nav-item" type="button">
-        <span class="sidebar-nav-icon">◇</span>
+      <button
+        class="desktop-nav-item"
+        type="button"
+      >
+        <span class="nav-symbol goals-symbol"></span>
         <span>Goals</span>
       </button>
 
-      <button class="sidebar-nav-item" type="button">
-        <span class="sidebar-nav-icon">○</span>
+      <button
+        class="desktop-nav-item"
+        type="button"
+      >
+        <span class="nav-symbol profile-symbol"></span>
         <span>Profile</span>
       </button>
 
@@ -40,195 +67,248 @@
   </aside>
 
 
-  <!-- Main Dashboard -->
-  <div class="dashboard-main">
+  <!-- =====================================================
+       MAIN CONTENT
+  ====================================================== -->
 
-    <!-- Header -->
-    <header class="dashboard-header">
+  <main class="dashboard-main">
 
-      <div class="brand">
-        <span class="brand-mark">P</span>
-        <span class="brand-name">PulseOS</span>
+    <!-- MOBILE HEADER -->
+
+    <header class="mobile-header">
+
+      <div class="mobile-brand">
+
+        <div class="mobile-logo">
+          P
+        </div>
+
+        <div>
+          <strong>PulseOS</strong>
+          <span>Your fitness companion</span>
+        </div>
+
       </div>
 
       <button
-        class="profile-button"
+        class="profile-avatar"
         type="button"
-        aria-label="Profile">
-        <span>◯</span>
+        aria-label="Profile"
+      >
+        P
       </button>
 
     </header>
 
 
-    <!-- Main Content -->
-    <main class="dashboard-content">
+    <!-- DESKTOP AVATAR -->
 
-      <!-- Workout Section -->
+    <div class="desktop-profile-row">
+
+      <button
+        class="profile-avatar"
+        type="button"
+        aria-label="Profile"
+      >
+        P
+      </button>
+
+    </div>
+
+
+    <div class="dashboard-content">
+
+      <!-- =================================================
+           WORKOUT TITLE
+      ================================================== -->
+
       <section class="workout-section">
 
-        <div class="section-header">
+        <div class="workout-title-row">
+
           <h1>Workout</h1>
+
+          <button
+            class="dropdown-button"
+            type="button"
+            aria-label="Workout options"
+          >
+            <span></span>
+          </button>
+
         </div>
 
 
-        <!-- Start Empty Workout -->
-        <button
-          class="empty-workout-button"
-          type="button"
-          (click)="startEmptyWorkout()">
+        <!-- =================================================
+             START EMPTY WORKOUT
+        ================================================== -->
 
-          <span class="plus">+</span>
-          <span>Start Empty Workout</span>
+        <button
+          class="start-empty-workout"
+          type="button"
+          (click)="startEmptyWorkout()"
+        >
+
+          <span class="plus-icon">
+            <span class="plus-horizontal"></span>
+            <span class="plus-vertical"></span>
+          </span>
+
+          <span class="start-empty-label">
+            Start Empty Workout
+          </span>
 
         </button>
 
 
-        <!-- My Routines -->
-        <div class="routines">
+        <!-- =================================================
+             ROUTINES
+        ================================================== -->
 
+        <div class="section-title">
           <h2>My Routines</h2>
+        </div>
 
-          <div class="routine-list">
 
-            <div class="routine" *ngFor="let routine of routines">
-              <span class="routine-name">{{ routine.name }}</span>
+        <div class="routine-list">
+
+          @for (routine of routines; track routine.name) {
+
+            <article class="routine-card">
+
+              <div class="routine-left">
+
+                <div
+                  class="routine-badge"
+                  [class]="routine.className"
+                >
+                  {{ routine.shortName }}
+                </div>
+
+                <div class="routine-copy">
+                  <h3>{{ routine.name }}</h3>
+                  <p>{{ routine.description }}</p>
+                </div>
+
+              </div>
+
 
               <button
+                class="start-routine-button"
                 type="button"
-                class="start-button">
-                + Start now
+                (click)="startRoutine(routine)"
+              >
+
+                <span class="routine-plus">
+                  +
+                </span>
+
+                <span>
+                  Start now
+                </span>
+
               </button>
-            </div>
 
-            <div class="routine" *ngIf="!routines.length">
-              <span class="routine-name">No routines saved yet</span>
-            </div>
+            </article>
 
-          </div>
+          }
 
         </div>
 
       </section>
-      <!-- Progress Section -->
+
+
+      <!-- =================================================
+           PROGRESS
+      ================================================== -->
+
       <section class="progress-section">
 
-        <div class="section-header">
+        <div class="section-title">
           <h2>Progress</h2>
         </div>
 
-        <div class="progress-card">
 
-          <div class="progress-card-header">
-            <div>
-              <span class="progress-label">Weekly Activity</span>
-              <span class="progress-value">4 / 5 workouts</span>
-            </div>
+        <div class="progress-grid">
 
-            <div class="progress-percentage">
-              80%
-            </div>
-          </div>
+          <article class="progress-card">
 
+            <span class="progress-label">
+              Workouts
+            </span>
 
-          <!-- Weekly Activity -->
-          <div class="weekly-activity">
+            <strong>
+              0
+            </strong>
 
-            <div class="activity-day completed">
-              <span class="activity-dot"></span>
-              <span class="activity-label">M</span>
-            </div>
+            <span class="progress-description">
+              This week
+            </span>
 
-            <div class="activity-day completed">
-              <span class="activity-dot"></span>
-              <span class="activity-label">T</span>
-            </div>
-
-            <div class="activity-day">
-              <span class="activity-dot"></span>
-              <span class="activity-label">W</span>
-            </div>
-
-            <div class="activity-day completed">
-              <span class="activity-dot"></span>
-              <span class="activity-label">T</span>
-            </div>
-
-            <div class="activity-day completed">
-              <span class="activity-dot"></span>
-              <span class="activity-label">F</span>
-            </div>
-
-            <div class="activity-day">
-              <span class="activity-dot"></span>
-              <span class="activity-label">S</span>
-            </div>
-
-            <div class="activity-day">
-              <span class="activity-dot"></span>
-              <span class="activity-label">S</span>
-            </div>
-
-          </div>
+          </article>
 
 
-          <!-- Progress Bar -->
-          <div class="progress-bar-container">
+          <article class="progress-card">
 
-            <div class="progress-bar">
-              <div class="progress-bar-fill"></div>
-            </div>
+            <span class="progress-label">
+              Volume
+            </span>
 
-          </div>
+            <strong>
+              0 kg
+            </strong>
+
+            <span class="progress-description">
+              This week
+            </span>
+
+          </article>
 
         </div>
 
       </section>
-    </main>
 
-  </div>
+    </div>
+
+  </main>
 
 
-  <!-- Mobile Bottom Navigation -->
-  <nav class="bottom-navigation">
+  <!-- =====================================================
+       MOBILE BOTTOM NAV
+  ====================================================== -->
+
+  <nav class="mobile-bottom-nav">
 
     <button
-      class="nav-item active"
-      type="button">
-
-      <span class="nav-icon">⌂</span>
+      class="mobile-nav-item active"
+      type="button"
+    >
+      <span class="mobile-nav-icon home-symbol"></span>
       <span>Home</span>
-
     </button>
 
-
     <button
-      class="nav-item"
-      type="button">
-
-      <span class="nav-icon">♢</span>
+      class="mobile-nav-item"
+      type="button"
+    >
+      <span class="mobile-nav-icon workout-symbol"></span>
       <span>Workouts</span>
-
     </button>
 
-
     <button
-      class="nav-item"
-      type="button">
-
-      <span class="nav-icon">◒</span>
+      class="mobile-nav-item"
+      type="button"
+    >
+      <span class="mobile-nav-icon progress-symbol"></span>
       <span>Progress</span>
-
     </button>
 
-
     <button
-      class="nav-item"
-      type="button">
-
-      <span class="nav-icon">○</span>
+      class="mobile-nav-item"
+      type="button"
+    >
+      <span class="mobile-nav-icon profile-symbol"></span>
       <span>Profile</span>
-
     </button>
 
   </nav>

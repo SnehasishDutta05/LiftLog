@@ -1,127 +1,383 @@
 <div class="signup-page">
 
-  <!-- Brand -->
-  <header class="brand">
+  <main class="signup-container">
 
-    <div class="logo-icon">
-      P
-    </div>
+    <!-- =====================================================
+         BRAND
+    ====================================================== -->
 
-    <span>
-      PulseOS
-    </span>
+    <header class="brand">
 
-  </header>
+      <div class="brand-logo">
+        P
+      </div>
 
+      <div class="brand-name">
+        PulseOS
+      </div>
 
-  <!-- Header -->
-  <section class="signup-header">
-
-    <p class="eyebrow">
-      START YOUR JOURNEY
-    </p>
-
-    <h1>
-      Create your account 🌱
-    </h1>
-
-    <p>
-      Let's get to know you and build your
-      fitness journey together.
-    </p>
-
-  </section>
+    </header>
 
 
-  <!-- Form -->
-  <main class="signup-card">
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
 
-    <div class="form-group">
+    <section class="hero">
 
-      <label for="email">
-        Email
-      </label>
+      <p class="eyebrow">
+        START YOUR JOURNEY
+      </p>
 
-      <input
-        id="email"
-        type="email"
-        placeholder="Enter your email"
-        autocomplete="email"
-        [(ngModel)]="email"
-        name="email"
-      />
+      <h1>
+        Create your account
+        <span class="leaf">🌱</span>
+      </h1>
 
-    </div>
+      <p class="hero-description">
+        Let's get to know you and build your fitness journey together.
+      </p>
 
-
-    <div class="form-group">
-
-      <label for="password">
-        Password
-      </label>
-
-      <input
-        id="password"
-        type="password"
-        placeholder="Create a password"
-        autocomplete="new-password"
-        [(ngModel)]="password"
-        name="password"
-      />
-
-    </div>
+    </section>
 
 
-    <div class="form-group">
+    <!-- =====================================================
+         SIGNUP CARD
+    ====================================================== -->
 
-      <label for="confirmPassword">
-        Confirm password
-      </label>
+    <section class="signup-card">
 
-      <input
-        id="confirmPassword"
-        type="password"
-        placeholder="Confirm your password"
-        autocomplete="new-password"
-        [(ngModel)]="confirmPassword"
-        name="confirmPassword"
-      />
+      <form
+        class="signup-form"
+        (ngSubmit)="createAccount()"
+      >
 
-    </div>
+        <!-- =================================================
+             FULL NAME
+        ================================================== -->
+
+        <div class="form-group">
+
+          <label for="fullName">
+            Full name
+          </label>
+
+          <div
+            class="input-wrapper"
+            [class.valid]="fullName.length > 0 && validFullName"
+            [class.invalid]="submitted && !validFullName"
+          >
+
+            <input
+              id="fullName"
+              name="fullName"
+              type="text"
+              [(ngModel)]="fullName"
+              placeholder="Enter your full name"
+              autocomplete="name"
+            />
+
+            @if (fullName.length > 0 && validFullName) {
+              <span class="valid-icon">
+                ✓
+              </span>
+            }
+
+          </div>
+
+          @if (submitted && !validFullName) {
+            <p class="error-message">
+              Please enter your full name.
+            </p>
+          }
+
+        </div>
 
 
-    <!-- Create Account -->
-    <button
-      type="button"
-      class="primary-button"
-      (click)="createAccount()">
+        <!-- =================================================
+             EMAIL
+        ================================================== -->
 
-      <span>
-        Create Account
-      </span>
+        <div class="form-group">
 
-      <span>
-        →
-      </span>
+          <label for="email">
+            Email
+          </label>
 
-    </button>
+          <div
+            class="input-wrapper"
+            [class.valid]="email.length > 0 && validEmail"
+            [class.invalid]="email.length > 0 && !validEmail"
+          >
+
+            <input
+              id="email"
+              name="email"
+              type="email"
+              [(ngModel)]="email"
+              placeholder="Enter your email"
+              autocomplete="email"
+            />
+
+            @if (email.length > 0 && validEmail) {
+              <span class="valid-icon">
+                ✓
+              </span>
+            }
+
+          </div>
+
+          @if (email.length > 0 && validEmail) {
+            <p class="success-message">
+              <span>✓</span>
+              Looks good!
+            </p>
+          }
+
+          @if (email.length > 0 && !validEmail) {
+            <p class="error-message">
+              Please enter a valid email address.
+            </p>
+          }
+
+        </div>
 
 
-    <!-- Login -->
-    <p class="login-text">
+        <!-- =================================================
+             PASSWORD
+        ================================================== -->
 
-      Already have an account?
+        <div class="form-group">
 
-      <button
-        type="button"
-        class="login-button"
-        (click)="goToLogin()">
+          <label for="password">
+            Password
+          </label>
 
-        Sign in
+          <div
+            class="input-wrapper password-wrapper"
+            [class.valid]="password.length > 0 && validPassword"
+          >
 
-      </button>
+            <input
+              id="password"
+              name="password"
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="password"
+              placeholder="Create a password"
+              autocomplete="new-password"
+            />
 
-    </p>
+            <button
+              class="eye-button"
+              type="button"
+              aria-label="Toggle password visibility"
+              (click)="togglePasswordVisibility()"
+            >
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
+
+          </div>
+
+
+          <!-- PASSWORD STRENGTH -->
+
+          @if (password.length > 0) {
+
+            <div class="strength-row">
+
+              <div class="strength-bars">
+
+                <span
+                  [class.active]="hasMinimumLength"
+                ></span>
+
+                <span
+                  [class.active]="hasUppercase && hasLowercase"
+                ></span>
+
+                <span
+                  [class.active]="hasDigit"
+                ></span>
+
+                <span
+                  [class.active]="hasSpecialCharacter"
+                ></span>
+
+              </div>
+
+              <span
+                class="strength-label"
+                [class.strong]="validPassword"
+              >
+                {{ validPassword ? 'Strong password' : 'Keep going' }}
+              </span>
+
+            </div>
+
+
+            <div class="password-rules">
+
+              <div
+                class="rule"
+                [class.valid-rule]="hasMinimumLength"
+              >
+                <span>
+                  {{ hasMinimumLength ? '✓' : '○' }}
+                </span>
+
+                At least 8 characters
+              </div>
+
+
+              <div
+                class="rule"
+                [class.valid-rule]="hasUppercase"
+              >
+                <span>
+                  {{ hasUppercase ? '✓' : '○' }}
+                </span>
+
+                At least 1 uppercase letter
+              </div>
+
+
+              <div
+                class="rule"
+                [class.valid-rule]="hasLowercase"
+              >
+                <span>
+                  {{ hasLowercase ? '✓' : '○' }}
+                </span>
+
+                At least 1 lowercase letter
+              </div>
+
+
+              <div
+                class="rule"
+                [class.valid-rule]="hasDigit"
+              >
+                <span>
+                  {{ hasDigit ? '✓' : '○' }}
+                </span>
+
+                At least 1 number
+              </div>
+
+
+              <div
+                class="rule rule-wide"
+                [class.valid-rule]="hasSpecialCharacter"
+              >
+                <span>
+                  {{ hasSpecialCharacter ? '✓' : '○' }}
+                </span>
+
+                At least 1 special character
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+
+        <!-- =================================================
+             CONFIRM PASSWORD
+        ================================================== -->
+
+        <div class="form-group">
+
+          <label for="confirmPassword">
+            Confirm password
+          </label>
+
+          <div
+            class="input-wrapper password-wrapper"
+            [class.valid]="confirmPassword.length > 0 && passwordsMatch"
+            [class.invalid]="confirmPassword.length > 0 && !passwordsMatch"
+          >
+
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              [(ngModel)]="confirmPassword"
+              placeholder="Confirm your password"
+              autocomplete="new-password"
+            />
+
+            <button
+              class="eye-button"
+              type="button"
+              aria-label="Toggle confirm password visibility"
+              (click)="toggleConfirmPasswordVisibility()"
+            >
+              {{ showConfirmPassword ? '🙈' : '👁️' }}
+            </button>
+
+          </div>
+
+          @if (confirmPassword.length > 0 && passwordsMatch) {
+            <p class="success-message">
+              <span>✓</span>
+              Passwords match
+            </p>
+          }
+
+          @if (confirmPassword.length > 0 && !passwordsMatch) {
+            <p class="error-message">
+              Passwords do not match.
+            </p>
+          }
+
+        </div>
+
+
+        <!-- =================================================
+             CREATE ACCOUNT
+        ================================================== -->
+
+        <button
+          class="create-account-button"
+          type="submit"
+          [class.disabled]="!formValid"
+        >
+
+          <span>
+            Create Account
+          </span>
+
+          <span class="button-arrow">
+            →
+          </span>
+
+        </button>
+
+      </form>
+
+
+      <!-- =================================================
+           LOGIN
+      ================================================== -->
+
+      <div class="login-link">
+
+        <span>
+          Already have an account?
+        </span>
+
+        <button
+          type="button"
+          (click)="goToLogin()"
+        >
+          Sign in
+        </button>
+
+      </div>
+
+    </section>
 
   </main>
 
