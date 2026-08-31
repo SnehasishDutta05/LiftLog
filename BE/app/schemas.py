@@ -27,13 +27,25 @@ class LoginRequest(BaseModel):
 
 
 class SignupRequest(BaseModel):
+    full_name: str = Field(..., min_length=1)
     email: str = Field(..., min_length=1)
     password: str = Field(..., min_length=6)
 
 
+class SignupUserResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    email: str
+    full_name: str
+
+
 class SignupResponse(BaseModel):
     message: str
-    user: UserPublic
+    user: SignupUserResponse
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str = Field(..., min_length=1)
 
 
 class RoutineCreate(BaseModel):

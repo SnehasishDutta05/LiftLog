@@ -12,6 +12,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, nullable=False, index=True)
     password_hash = Column(String, nullable=True)
+    access_token = Column(String, nullable=True)
+    refresh_token = Column(String, nullable=True)
     full_name = Column(String, nullable=False)
     auth_provider = Column(String, default="email")
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

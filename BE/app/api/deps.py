@@ -1,11 +1,19 @@
 import hashlib
 import hmac
 import secrets
+from datetime import datetime, timedelta, timezone
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
+from BE.app.core.config import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    JWT_ALGORITHM,
+    JWT_SECRET_KEY,
+    REFRESH_TOKEN_EXPIRE_DAYS,
+)
 from BE.app.db import get_db
 from BE.app.models import User
 
@@ -27,11 +35,55 @@ def verify_password(password: str, password_hash: str | None) -> bool:
 
 
 def create_access_token(user_id: int) -> str:
-    return f"liftlog-access-{user_id}.{secrets.token_urlsafe(16)}"
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": str(user_id), "type": "access", "exp": expire}
+    return jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 
 def create_refresh_token(user_id: int) -> str:
-    return f"liftlog-refresh-{user_id}.{secrets.token_urlsafe(16)}"
+    expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    payload = {"sub": str(user_id), "type": "refresh", "exp": expire}
+    return jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+
+
+def decode_token(token: str, expected_type: str) -> int:
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+    except jwt.PyJWTError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+
+    if payload.get("type") != expected_type:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid {expected_type} token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        user_id_int = int(payload.get("sub"))
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+
+    return user_id_int
+
+
+def issue_tokens_for_user(db: Session, user_id: int) -> tuple[str, str]:
+    access_token = create_access_token(user_id)
+    refresh_token = create_refresh_token(user_id)
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is not None:
+        user.access_token = access_token
+        user.refresh_token = refresh_token
+        db.commit()
+    return access_token, refresh_token
 
 
 def get_current_user(
@@ -46,28 +98,18 @@ def get_current_user(
         )
 
     token = credentials.credentials
-    if not token.startswith("liftlog-access-"):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid access token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    user_id = token.split("-", 2)[-1].split(".", 1)[0]
-    try:
-        user_id_int = int(user_id)
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid access token",
-            headers={"WWW-Authenticate": "Bearer"},
-        ) from exc
-
+    user_id_int = decode_token(token, expected_type="access")
     user = db.query(User).filter(User.id == user_id_int).first()
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid access token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if user.access_token != token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Access token is no longer valid",
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
