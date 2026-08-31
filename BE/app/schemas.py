@@ -48,6 +48,58 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str = Field(..., min_length=1)
 
 
+class UserProfileRequest(BaseModel):
+    # Physical data
+    dob: Optional[str] = None
+    height: Optional[float] = None
+    weight: Optional[float] = None
+    sex: Optional[str] = None
+
+    # Lifestyle
+    wake_time: Optional[str] = None
+    sleep_time: Optional[str] = None
+    work_schedule: Optional[str] = None
+    daily_activity: Optional[str] = None
+    commute: Optional[str] = None
+    available_training_time: Optional[str] = None
+
+    # Training
+    experience: Optional[str] = None
+    training_days: Optional[int] = None
+    preferred_time: Optional[str] = None
+    preferred_exercises: Optional[str] = None
+    disliked_exercises: Optional[str] = None
+    limitations: Optional[str] = None
+
+    # Nutrition
+    typical_foods: Optional[str] = None
+    meals_per_day: Optional[int] = None
+    eating_out_frequency: Optional[str] = None
+    favorite_foods: Optional[str] = None
+    favorite_snacks: Optional[str] = None
+    dietary_preferences: Optional[str] = None
+    cooking_constraints: Optional[str] = None
+
+    # Goals
+    primary_goal: Optional[str] = None
+    target_weight: Optional[float] = None
+    goal_description: Optional[str] = None
+    lifestyle_change_tolerance: Optional[str] = None
+
+    # Descriptions
+    current_description: Optional[str] = None
+    target_description: Optional[str] = None
+    target_characteristics: Optional[str] = None
+    inspiration_description: Optional[str] = None
+
+
+class UserProfileResponse(BaseModel):
+    message: str
+
+    class Config:
+        from_attributes = True
+
+
 class RoutineCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=120)
 

@@ -101,3 +101,58 @@ class WorkoutSet(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     workout_exercise = relationship("WorkoutExercise", back_populates="sets")
+
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True, index=True)
+
+    # Physical data
+    dob = Column(String, nullable=True)
+    height = Column(Float, nullable=True)
+    weight = Column(Float, nullable=True)
+    sex = Column(String, nullable=True)
+
+    # Lifestyle
+    wake_time = Column(String, nullable=True)
+    sleep_time = Column(String, nullable=True)
+    work_schedule = Column(String, nullable=True)
+    daily_activity = Column(String, nullable=True)
+    commute = Column(String, nullable=True)
+    available_training_time = Column(String, nullable=True)
+
+    # Training
+    experience = Column(String, nullable=True)
+    training_days = Column(Integer, nullable=True)
+    preferred_time = Column(String, nullable=True)
+    preferred_exercises = Column(String, nullable=True)
+    disliked_exercises = Column(String, nullable=True)
+    limitations = Column(String, nullable=True)
+
+    # Nutrition
+    typical_foods = Column(String, nullable=True)
+    meals_per_day = Column(Integer, nullable=True)
+    eating_out_frequency = Column(String, nullable=True)
+    favorite_foods = Column(String, nullable=True)
+    favorite_snacks = Column(String, nullable=True)
+    dietary_preferences = Column(String, nullable=True)
+    cooking_constraints = Column(String, nullable=True)
+
+    # Goals
+    primary_goal = Column(String, nullable=True)
+    target_weight = Column(Float, nullable=True)
+    goal_description = Column(String, nullable=True)
+    lifestyle_change_tolerance = Column(String, nullable=True)
+
+    # Descriptions
+    current_description = Column(String, nullable=True)
+    target_description = Column(String, nullable=True)
+    target_characteristics = Column(String, nullable=True)
+    inspiration_description = Column(String, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    user = relationship("User", backref="profile")
