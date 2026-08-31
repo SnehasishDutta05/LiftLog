@@ -27,8 +27,18 @@ def ensure_user_password_hash_column() -> None:
             conn.execute(text("ALTER TABLE users ADD COLUMN password_hash VARCHAR"))
 
 
+def ensure_user_token_columns() -> None:
+    with engine.begin() as conn:
+        for column_name in ["access_token", "refresh_token"]:
+            try:
+                conn.execute(text(f"SELECT {column_name} FROM users LIMIT 1"))
+            except exc.DatabaseError:
+                conn.execute(text(f"ALTER TABLE users ADD COLUMN {column_name} VARCHAR"))
+
+
 def init_db() -> None:
     from BE.app.models import Base as ModelsBase
 
     ModelsBase.metadata.create_all(bind=engine)
     ensure_user_password_hash_column()
+    ensure_user_token_columns()
