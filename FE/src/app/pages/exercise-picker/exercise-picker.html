@@ -1,0 +1,209 @@
+<div class="exercise-picker-page">
+
+  <header class="picker-header">
+
+    <button
+      class="cancel-button"
+      type="button"
+      (click)="cancel()"
+    >
+      Cancel
+    </button>
+
+    <h1>
+      Add Exercise
+    </h1>
+
+    <div></div>
+
+  </header>
+
+
+  <main class="picker-content">
+
+    <div class="search-box">
+
+      <span class="search-icon">
+        ⌕
+      </span>
+
+      <input
+        type="text"
+        placeholder="Search exercises"
+        [(ngModel)]="searchTerm"
+        autocomplete="off"
+      />
+
+    </div>
+
+
+    <div class="filter-row">
+
+      <div class="filter-container">
+
+        <button
+          class="filter-button"
+          type="button"
+          (click)="toggleEquipmentMenu()"
+        >
+          <span>
+            {{ selectedEquipment }}
+          </span>
+
+          <span>
+            ▾
+          </span>
+        </button>
+
+
+        @if (showEquipmentMenu) {
+
+          <div class="filter-menu">
+
+            @for (
+              equipment of equipmentOptions;
+              track equipment
+            ) {
+
+              <button
+                type="button"
+                (click)="selectEquipment(equipment)"
+              >
+                {{ equipment }}
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <div class="filter-container">
+
+        <button
+          class="filter-button"
+          type="button"
+          (click)="toggleMuscleMenu()"
+        >
+          <span>
+            {{ selectedMuscle }}
+          </span>
+
+          <span>
+            ▾
+          </span>
+        </button>
+
+
+        @if (showMuscleMenu) {
+
+          <div class="filter-menu">
+
+            @for (
+              muscle of muscleOptions;
+              track muscle
+            ) {
+
+              <button
+                type="button"
+                (click)="selectMuscle(muscle)"
+              >
+                {{ muscle }}
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+
+    <div class="result-count">
+      {{ filteredExercises.length }} exercises
+    </div>
+
+
+    <div class="exercise-list">
+
+      @for (
+        exercise of filteredExercises;
+        track exercise.id
+      ) {
+
+        <button
+          class="exercise-row"
+          type="button"
+          [class.selected]="isSelected(exercise.id)"
+          (click)="toggleExercise(exercise)"
+        >
+
+          <div class="exercise-avatar">
+            P
+          </div>
+
+
+          <div class="exercise-info">
+
+            <strong>
+              {{ exercise.n }}
+            </strong>
+
+            <span>
+              {{ exercise.tg }}
+            </span>
+
+            <small>
+              {{ exercise.bp }}
+              ·
+              {{ exercise.eq }}
+            </small>
+
+          </div>
+
+
+          <div class="selection-indicator">
+
+            @if (isSelected(exercise.id)) {
+              ✓
+            }
+
+          </div>
+
+        </button>
+
+      }
+
+    </div>
+
+  </main>
+
+
+  @if (selectedCount > 0) {
+
+    <div class="add-bar">
+
+      <button
+        type="button"
+        (click)="addSelectedExercises()"
+      >
+        Add
+        {{ selectedCount }}
+        {{
+          selectedCount === 1
+            ? 'Exercise'
+            : 'Exercises'
+        }}
+      </button>
+
+    </div>
+
+  }
+
+</div>

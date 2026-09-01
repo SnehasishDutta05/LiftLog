@@ -1,7 +1,7 @@
 <div class="workout-page">
 
   <!-- ======================================================
-       TOP BAR
+       HEADER
        ====================================================== -->
 
   <header class="workout-header">
@@ -17,6 +17,7 @@
         <span class="chevron"></span>
       </button>
 
+
       <h1>
         Log Workout
       </h1>
@@ -25,21 +26,6 @@
 
 
     <div class="header-actions">
-
-      <button
-        class="timer-button"
-        type="button"
-        aria-label="Workout timer"
-      >
-
-        <span class="timer-icon">
-
-          <span class="timer-hand"></span>
-
-        </span>
-
-      </button>
-
 
       <button
         class="finish-button"
@@ -102,34 +88,264 @@
 
 
   <!-- ======================================================
-       EMPTY WORKOUT
+       WORKOUT CONTENT
        ====================================================== -->
 
   <main class="workout-content">
 
-    <div class="empty-state">
 
-      <div class="dumbbell-icon">
+    <!-- ====================================================
+         EMPTY STATE
+         ==================================================== -->
 
-        <span class="weight weight-left"></span>
+    @if (
+      workoutExercises.length === 0
+    ) {
 
-        <span class="bar"></span>
+      <div class="empty-state">
 
-        <span class="weight weight-right"></span>
+        <div class="dumbbell-icon">
+
+          <span
+            class="weight weight-left"
+          ></span>
+
+          <span
+            class="bar"
+          ></span>
+
+          <span
+            class="weight weight-right"
+          ></span>
+
+        </div>
+
+
+        <h2>
+          Get started
+        </h2>
+
+
+        <p>
+          Add an exercise to start your workout
+        </p>
 
       </div>
 
-
-      <h2>
-        Get started
-      </h2>
+    }
 
 
-      <p>
-        Add an exercise to start your workout
-      </p>
+    <!-- ====================================================
+         EXERCISES
+         ==================================================== -->
 
-    </div>
+    @for (
+      workoutExercise
+      of workoutExercises;
+      track workoutExercise.exercise.id;
+      let exerciseIndex = $index
+    ) {
+
+      <section class="exercise-card">
+
+
+        <!-- ================================================
+             EXERCISE HEADER
+             ================================================ -->
+
+        <div class="exercise-card-header">
+
+          <div class="exercise-avatar">
+            P
+          </div>
+
+
+          <div class="exercise-title">
+
+            <h2>
+              {{
+                workoutExercise
+                  .exercise
+                  .n
+              }}
+            </h2>
+
+
+            <span>
+              {{
+                workoutExercise
+                  .exercise
+                  .tg
+              }}
+            </span>
+
+          </div>
+
+
+          <button
+            class="exercise-menu-button"
+            type="button"
+            aria-label="Remove exercise"
+            (click)="
+              removeExercise(
+                exerciseIndex
+              )
+            "
+          >
+            ⋮
+          </button>
+
+        </div>
+
+
+        <!-- ================================================
+             SET TABLE HEADER
+             ================================================ -->
+
+        <div class="set-table-header">
+
+          <span>
+            SET
+          </span>
+
+          <span>
+            PREVIOUS
+          </span>
+
+          <span>
+            KG
+          </span>
+
+          <span>
+            REPS
+          </span>
+
+          <span>
+            ✓
+          </span>
+
+        </div>
+
+
+        <!-- ================================================
+             SET ROWS
+             ================================================ -->
+
+        @for (
+          set
+          of workoutExercise.sets;
+          track $index;
+          let setIndex = $index
+        ) {
+
+          <div
+            class="set-row"
+            [class.completed]="
+              set.completed
+            "
+          >
+
+            <!-- SET NUMBER -->
+
+            <div class="set-number">
+
+              {{ setIndex + 1 }}
+
+            </div>
+
+
+            <!-- PREVIOUS -->
+
+            <div class="previous-value">
+
+              —
+
+            </div>
+
+
+            <!-- KG -->
+
+            <input
+              class="set-input"
+              type="number"
+              inputmode="decimal"
+              min="0"
+              step="0.5"
+              placeholder="0"
+              aria-label="Weight in kilograms"
+              [(ngModel)]="
+                set.weight
+              "
+              (ngModelChange)="
+                updateWorkoutState()
+              "
+            />
+
+
+            <!-- REPS -->
+
+            <input
+              class="set-input"
+              type="number"
+              inputmode="numeric"
+              min="0"
+              step="1"
+              placeholder="0"
+              aria-label="Repetitions"
+              [(ngModel)]="
+                set.reps
+              "
+              (ngModelChange)="
+                updateWorkoutState()
+              "
+            />
+
+
+            <!-- COMPLETE -->
+
+            <button
+              class="complete-set-button"
+              type="button"
+              aria-label="Complete set"
+              [class.completed]="
+                set.completed
+              "
+              (click)="
+                toggleSetCompleted(
+                  workoutExercise,
+                  set
+                )
+              "
+            >
+              ✓
+            </button>
+
+          </div>
+
+        }
+
+
+        <!-- ================================================
+             ADD SET
+             ================================================ -->
+
+        <button
+          class="add-set-button"
+          type="button"
+          (click)="
+            addSet(
+              workoutExercise
+            )
+          "
+        >
+
+          + Add Set
+
+        </button>
+
+      </section>
+
+    }
 
 
     <!-- ====================================================
@@ -162,9 +378,9 @@
       <button
         class="settings-button"
         type="button"
-        (click)="openSettings()"
+        (click)="addRoutine()"
       >
-        Settings
+        Add Routine
       </button>
 
 
