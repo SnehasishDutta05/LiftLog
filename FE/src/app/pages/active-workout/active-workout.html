@@ -2,7 +2,7 @@
 
   <!-- ======================================================
        HEADER
-       ====================================================== -->
+  ======================================================= -->
 
   <header class="workout-header">
 
@@ -16,7 +16,6 @@
       >
         <span class="chevron"></span>
       </button>
-
 
       <h1>
         Log Workout
@@ -42,7 +41,7 @@
 
   <!-- ======================================================
        WORKOUT STATS
-       ====================================================== -->
+  ======================================================= -->
 
   <section class="workout-stats">
 
@@ -52,7 +51,7 @@
         Duration
       </span>
 
-      <strong class="duration-value">
+      <strong>
         {{ formattedDuration }}
       </strong>
 
@@ -89,34 +88,26 @@
 
   <!-- ======================================================
        WORKOUT CONTENT
-       ====================================================== -->
+  ======================================================= -->
 
   <main class="workout-content">
 
 
     <!-- ====================================================
          EMPTY STATE
-         ==================================================== -->
+    ===================================================== -->
 
-    @if (
-      workoutExercises.length === 0
-    ) {
+    @if (workoutExercises.length === 0) {
 
       <div class="empty-state">
 
         <div class="dumbbell-icon">
 
-          <span
-            class="weight weight-left"
-          ></span>
+          <span class="weight"></span>
 
-          <span
-            class="bar"
-          ></span>
+          <span class="bar"></span>
 
-          <span
-            class="weight weight-right"
-          ></span>
+          <span class="weight"></span>
 
         </div>
 
@@ -136,12 +127,11 @@
 
 
     <!-- ====================================================
-         EXERCISES
-         ==================================================== -->
+         EXERCISE LIST
+    ===================================================== -->
 
     @for (
-      workoutExercise
-      of workoutExercises;
+      workoutExercise of workoutExercises;
       track workoutExercise.exercise.id;
       let exerciseIndex = $index
     ) {
@@ -151,7 +141,7 @@
 
         <!-- ================================================
              EXERCISE HEADER
-             ================================================ -->
+        ================================================= -->
 
         <div class="exercise-card-header">
 
@@ -163,20 +153,11 @@
           <div class="exercise-title">
 
             <h2>
-              {{
-                workoutExercise
-                  .exercise
-                  .n
-              }}
+              {{ workoutExercise.exercise.n }}
             </h2>
 
-
             <span>
-              {{
-                workoutExercise
-                  .exercise
-                  .tg
-              }}
+              {{ workoutExercise.exercise.tg }}
             </span>
 
           </div>
@@ -186,11 +167,7 @@
             class="exercise-menu-button"
             type="button"
             aria-label="Remove exercise"
-            (click)="
-              removeExercise(
-                exerciseIndex
-              )
-            "
+            (click)="removeExercise(exerciseIndex)"
           >
             ⋮
           </button>
@@ -200,7 +177,7 @@
 
         <!-- ================================================
              SET TABLE HEADER
-             ================================================ -->
+        ================================================= -->
 
         <div class="set-table-header">
 
@@ -229,41 +206,34 @@
 
         <!-- ================================================
              SET ROWS
-             ================================================ -->
+        ================================================= -->
 
         @for (
-          set
-          of workoutExercise.sets;
+          set of workoutExercise.sets;
           track $index;
           let setIndex = $index
         ) {
 
           <div
             class="set-row"
-            [class.completed]="
-              set.completed
-            "
+            [class.completed]="set.completed"
           >
 
             <!-- SET NUMBER -->
 
             <div class="set-number">
-
               {{ setIndex + 1 }}
-
             </div>
 
 
             <!-- PREVIOUS -->
 
             <div class="previous-value">
-
               —
-
             </div>
 
 
-            <!-- KG -->
+            <!-- WEIGHT -->
 
             <input
               class="set-input"
@@ -273,12 +243,8 @@
               step="0.5"
               placeholder="0"
               aria-label="Weight in kilograms"
-              [(ngModel)]="
-                set.weight
-              "
-              (ngModelChange)="
-                updateWorkoutState()
-              "
+              [(ngModel)]="set.weight"
+              (ngModelChange)="updateWorkoutState()"
             />
 
 
@@ -292,24 +258,18 @@
               step="1"
               placeholder="0"
               aria-label="Repetitions"
-              [(ngModel)]="
-                set.reps
-              "
-              (ngModelChange)="
-                updateWorkoutState()
-              "
+              [(ngModel)]="set.reps"
+              (ngModelChange)="updateWorkoutState()"
             />
 
 
-            <!-- COMPLETE -->
+            <!-- COMPLETE SET -->
 
             <button
               class="complete-set-button"
               type="button"
               aria-label="Complete set"
-              [class.completed]="
-                set.completed
-              "
+              [class.completed]="set.completed"
               (click)="
                 toggleSetCompleted(
                   workoutExercise,
@@ -327,20 +287,14 @@
 
         <!-- ================================================
              ADD SET
-             ================================================ -->
+        ================================================= -->
 
         <button
           class="add-set-button"
           type="button"
-          (click)="
-            addSet(
-              workoutExercise
-            )
-          "
+          (click)="addSet(workoutExercise)"
         >
-
           + Add Set
-
         </button>
 
       </section>
@@ -350,7 +304,7 @@
 
     <!-- ====================================================
          ADD EXERCISE
-         ==================================================== -->
+    ===================================================== -->
 
     <button
       class="add-exercise-button"
@@ -371,7 +325,7 @@
 
     <!-- ====================================================
          BOTTOM ACTIONS
-         ==================================================== -->
+    ===================================================== -->
 
     <div class="bottom-actions">
 
@@ -397,3 +351,154 @@
   </main>
 
 </div>
+
+
+<!-- ========================================================
+     ADD ROUTINE POPUP
+========================================================= -->
+
+@if (showRoutineModal) {
+
+  <div
+    class="routine-modal-backdrop"
+    (click)="closeRoutineModal()"
+  >
+
+    <div
+      class="routine-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="routineModalTitle"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- HEADER -->
+
+      <div class="routine-modal-header">
+
+        <div>
+
+          <h2 id="routineModalTitle">
+            Add Routine
+          </h2>
+
+          <p>
+            Save these exercises as a routine.
+          </p>
+
+        </div>
+
+
+        <button
+          class="routine-modal-close"
+          type="button"
+          aria-label="Close popup"
+          [disabled]="isCreatingRoutine"
+          (click)="closeRoutineModal()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- ROUTINE NAME -->
+
+      <div class="routine-field">
+
+        <label
+          for="routineName"
+          class="routine-name-label"
+        >
+          Routine Name
+        </label>
+
+
+        <input
+          id="routineName"
+          class="routine-name-input"
+          type="text"
+          maxlength="120"
+          autocomplete="off"
+          placeholder="e.g. Push Day"
+          [(ngModel)]="routineName"
+          (keyup.enter)="createRoutine()"
+        />
+
+      </div>
+
+
+      <!-- EXERCISE SUMMARY -->
+
+      @if (workoutExercises.length > 0) {
+
+        <div class="routine-exercises-summary">
+
+          <span class="routine-summary-label">
+            Exercises
+          </span>
+
+          <span class="routine-summary-count">
+            {{ workoutExercises.length }}
+          </span>
+
+        </div>
+
+      }
+
+
+      <!-- ERROR -->
+
+      @if (routineError) {
+
+        <div class="routine-error">
+          {{ routineError }}
+        </div>
+
+      }
+
+
+      <!-- ACTIONS -->
+
+      <div class="routine-modal-actions">
+
+        <button
+          class="routine-cancel-button"
+          type="button"
+          [disabled]="isCreatingRoutine"
+          (click)="closeRoutineModal()"
+        >
+          Cancel
+        </button>
+
+
+        <button
+          class="routine-create-button"
+          type="button"
+          [disabled]="
+            isCreatingRoutine ||
+            !routineName.trim() ||
+            workoutExercises.length === 0
+          "
+          (click)="createRoutine()"
+        >
+
+          @if (isCreatingRoutine) {
+
+            Creating...
+
+          } @else {
+
+            Create Routine
+
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

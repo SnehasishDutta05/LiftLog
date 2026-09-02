@@ -5,13 +5,11 @@ import {
   OnInit,
 } from '@angular/core';
 
-import {
-  FormsModule,
-} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
-import {
-  Router,
-} from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 
 interface ExerciseRecord {
@@ -41,6 +39,33 @@ interface WorkoutExercise {
 }
 
 
+interface RoutineExerciseRequest {
+  exercise_id: number;
+  target_sets: number;
+}
+
+
+interface CreateRoutineRequest {
+  name: string;
+  exercises: RoutineExerciseRequest[];
+}
+
+
+interface RoutineExerciseResponse {
+  exercise_id: number;
+  name: string;
+  target_sets: number | null;
+  order_index: number;
+}
+
+
+interface CreateRoutineResponse {
+  routine_id: number;
+  name: string;
+  exercises: RoutineExerciseResponse[];
+}
+
+
 @Component({
   selector: 'app-active-workout',
   imports: [
@@ -49,14 +74,33 @@ interface WorkoutExercise {
   templateUrl: './active-workout.html',
   styleUrl: './active-workout.css',
 })
-export class ActiveWorkout
-  implements OnInit, OnDestroy {
+export class ActiveWorkout implements OnInit, OnDestroy {
+
+  /* =========================================================
+     WORKOUT STATE
+  ========================================================= */
 
   elapsedSeconds = 0;
 
-  workoutExercises:
-    WorkoutExercise[] = [];
+  workoutExercises: WorkoutExercise[] = [];
 
+
+  /* =========================================================
+     ROUTINE POPUP STATE
+  ========================================================= */
+
+  showRoutineModal = false;
+
+  routineName = '';
+
+  routineError = '';
+
+  isCreatingRoutine = false;
+
+
+  /* =========================================================
+     STORAGE KEYS
+  ========================================================= */
 
   private readonly WORKOUT_START_KEY =
     'pulseos_workout_start_time';
@@ -68,14 +112,25 @@ export class ActiveWorkout
     'pulseos_workout_exercises';
 
 
-  private timer?:
-    ReturnType<typeof setInterval>;
+  /* =========================================================
+     API
+  ========================================================= */
+
+  private readonly apiBaseUrl =
+    environment.apiBaseUrl;
+
+
+  /* =========================================================
+     TIMER
+  ========================================================= */
+
+  private timer?: ReturnType<typeof setInterval>;
 
 
   constructor(
     private router: Router,
-    private changeDetector:
-      ChangeDetectorRef,
+    private changeDetector: ChangeDetectorRef,
+    private http: HttpClient,
   ) {}
 
 
@@ -95,7 +150,7 @@ export class ActiveWorkout
 
 
   /* =========================================================
-     TIMER
+     TIMER INITIALIZATION
   ========================================================= */
 
   private initializeWorkoutTimer(): void {
@@ -127,6 +182,10 @@ export class ActiveWorkout
   }
 
 
+  /* =========================================================
+     START TIMER
+  ========================================================= */
+
   private startTimer(): void {
 
     this.stopTimer();
@@ -144,6 +203,10 @@ export class ActiveWorkout
 
   }
 
+
+  /* =========================================================
+     UPDATE TIMER
+  ========================================================= */
 
   private updateElapsedTime(): void {
 
@@ -199,8 +262,11 @@ export class ActiveWorkout
   }
 
 
-  get formattedDuration():
-    string {
+  /* =========================================================
+     FORMATTED DURATION
+  ========================================================= */
+
+  get formattedDuration(): string {
 
     const hours =
       Math.floor(
@@ -250,6 +316,10 @@ export class ActiveWorkout
   }
 
 
+  /* =========================================================
+     STOP TIMER
+  ========================================================= */
+
   private stopTimer(): void {
 
     if (!this.timer) {
@@ -267,6 +337,10 @@ export class ActiveWorkout
 
   }
 
+
+  /* =========================================================
+     CLEAR TIMER
+  ========================================================= */
 
   private clearWorkoutTimer(): void {
 
@@ -287,8 +361,7 @@ export class ActiveWorkout
      LOAD WORKOUT EXERCISES
   ========================================================= */
 
-  private loadWorkoutExercises():
-    void {
+  private loadWorkoutExercises(): void {
 
     const stored =
       localStorage.getItem(
@@ -310,26 +383,30 @@ export class ActiveWorkout
       const parsed =
         JSON.parse(
           stored,
-        );
+        ) as WorkoutExercise[];
 
 
       this.workoutExercises =
         parsed.map(
-          (
-            item:
-              WorkoutExercise & {
-                notes?: string;
-              },
-          ) => ({
-            exercise:
-              item.exercise,
+          item => ({
+            exercise: item.exercise,
 
             sets:
-              item.sets ?? [],
+              Array.isArray(
+                item.sets,
+              )
+                ? item.sets
+                : [],
           }),
         );
 
-    } catch {
+    } catch (error) {
+
+      console.error(
+        'Failed to load workout exercises:',
+        error,
+      );
+
 
       this.workoutExercises = [];
 
@@ -342,8 +419,7 @@ export class ActiveWorkout
      IMPORT EXERCISES FROM PICKER
   ========================================================= */
 
-  private importSelectedExercises():
-    void {
+  private importSelectedExercises(): void {
 
     const stored =
       localStorage.getItem(
@@ -365,9 +441,20 @@ export class ActiveWorkout
       selectedExercises =
         JSON.parse(
           stored,
-        );
+        ) as ExerciseRecord[];
 
-    } catch {
+    } catch (error) {
+
+      console.error(
+        'Failed to import selected exercises:',
+        error,
+      );
+
+
+      localStorage.removeItem(
+        this.SELECTED_EXERCISES_KEY,
+      );
+
 
       return;
 
@@ -378,12 +465,11 @@ export class ActiveWorkout
       exercise => {
 
         const alreadyAdded =
-          this.workoutExercises
-            .some(
-              item =>
-                item.exercise.id ===
-                exercise.id,
-            );
+          this.workoutExercises.some(
+            workoutExercise =>
+              workoutExercise.exercise.id ===
+              exercise.id,
+          );
 
 
         if (alreadyAdded) {
@@ -421,11 +507,11 @@ export class ActiveWorkout
      SAVE WORKOUT
   ========================================================= */
 
-  private saveWorkoutExercises():
-    void {
+  private saveWorkoutExercises(): void {
 
     localStorage.setItem(
       this.WORKOUT_EXERCISES_KEY,
+
       JSON.stringify(
         this.workoutExercises,
       ),
@@ -434,8 +520,11 @@ export class ActiveWorkout
   }
 
 
-  updateWorkoutState():
-    void {
+  /* =========================================================
+     INPUT CHANGED
+  ========================================================= */
+
+  updateWorkoutState(): void {
 
     this.saveWorkoutExercises();
 
@@ -443,7 +532,7 @@ export class ActiveWorkout
 
 
   /* =========================================================
-     WORKOUT STATS
+     TOTAL COMPLETED SETS
   ========================================================= */
 
   get totalSets(): number {
@@ -451,27 +540,21 @@ export class ActiveWorkout
     let count = 0;
 
 
-    this.workoutExercises
-      .forEach(
-        workoutExercise => {
+    this.workoutExercises.forEach(
+      workoutExercise => {
 
-          workoutExercise.sets
-            .forEach(
-              set => {
+        workoutExercise.sets.forEach(
+          set => {
 
-                if (
-                  set.completed
-                ) {
+            if (set.completed) {
+              count++;
+            }
 
-                  count++;
+          },
+        );
 
-                }
-
-              },
-            );
-
-        },
-      );
+      },
+    );
 
 
     return count;
@@ -479,45 +562,46 @@ export class ActiveWorkout
   }
 
 
+  /* =========================================================
+     TOTAL VOLUME
+  ========================================================= */
+
   get totalVolume(): number {
 
     let volume = 0;
 
 
-    this.workoutExercises
-      .forEach(
-        workoutExercise => {
+    this.workoutExercises.forEach(
+      workoutExercise => {
 
-          workoutExercise.sets
-            .forEach(
-              set => {
+        workoutExercise.sets.forEach(
+          set => {
 
-                if (
-                  !set.completed
-                ) {
-
-                  return;
-
-                }
+            if (!set.completed) {
+              return;
+            }
 
 
-                const weight =
-                  set.weight ?? 0;
+            const weight =
+              Number(
+                set.weight ?? 0,
+              );
 
 
-                const reps =
-                  set.reps ?? 0;
+            const reps =
+              Number(
+                set.reps ?? 0,
+              );
 
 
-                volume +=
-                  weight *
-                  reps;
+            volume +=
+              weight * reps;
 
-              },
-            );
+          },
+        );
 
-        },
-      );
+      },
+    );
 
 
     return volume;
@@ -534,13 +618,11 @@ export class ActiveWorkout
       WorkoutExercise,
   ): void {
 
-    workoutExercise
-      .sets
-      .push({
-        weight: null,
-        reps: null,
-        completed: false,
-      });
+    workoutExercise.sets.push({
+      weight: null,
+      reps: null,
+      completed: false,
+    });
 
 
     this.saveWorkoutExercises();
@@ -549,12 +631,13 @@ export class ActiveWorkout
 
 
   /* =========================================================
-     COMPLETE SET
+     COMPLETE / UNCOMPLETE SET
   ========================================================= */
 
   toggleSetCompleted(
     workoutExercise:
       WorkoutExercise,
+
     set:
       WorkoutSet,
   ): void {
@@ -587,11 +670,10 @@ export class ActiveWorkout
     }
 
 
-    this.workoutExercises
-      .splice(
-        index,
-        1,
-      );
+    this.workoutExercises.splice(
+      index,
+      1,
+    );
 
 
     this.saveWorkoutExercises();
@@ -626,14 +708,312 @@ export class ActiveWorkout
 
 
   /* =========================================================
-     ADD ROUTINE
+     OPEN ADD ROUTINE POPUP
   ========================================================= */
 
   addRoutine(): void {
 
-    console.log(
-      'Add routine clicked',
-    );
+    this.routineName = '';
+
+    this.routineError = '';
+
+
+    if (
+      this.workoutExercises.length === 0
+    ) {
+
+      this.routineError =
+        'Add at least one exercise first.';
+
+    }
+
+
+    this.showRoutineModal = true;
+
+  }
+
+
+  /* =========================================================
+     CLOSE ROUTINE POPUP
+  ========================================================= */
+
+  closeRoutineModal(): void {
+
+    if (
+      this.isCreatingRoutine
+    ) {
+      return;
+    }
+
+
+    this.showRoutineModal = false;
+
+    this.routineName = '';
+
+    this.routineError = '';
+
+  }
+
+
+  /* =========================================================
+     CREATE ROUTINE
+  ========================================================= */
+
+  createRoutine(): void {
+
+    if (
+      this.isCreatingRoutine
+    ) {
+      return;
+    }
+
+
+    const name =
+      this.routineName.trim();
+
+
+    /* -------------------------------------------------------
+       VALIDATE NAME
+    -------------------------------------------------------- */
+
+    if (!name) {
+
+      this.routineError =
+        'Please enter a routine name.';
+
+      return;
+
+    }
+
+
+    /* -------------------------------------------------------
+       VALIDATE EXERCISES
+    -------------------------------------------------------- */
+
+    if (
+      this.workoutExercises.length === 0
+    ) {
+
+      this.routineError =
+        'Add at least one exercise before creating a routine.';
+
+      return;
+
+    }
+
+
+    /* -------------------------------------------------------
+       BUILD ROUTINE EXERCISES
+    -------------------------------------------------------- */
+
+    const exercises:
+      RoutineExerciseRequest[] =
+        this.workoutExercises.map(
+          workoutExercise => {
+
+            const exerciseId =
+              Number(
+                workoutExercise.exercise.id,
+              );
+
+
+            const targetSets =
+              Math.max(
+                1,
+                workoutExercise.sets.length,
+              );
+
+
+            return {
+              exercise_id:
+                exerciseId,
+
+              target_sets:
+                targetSets,
+            };
+
+          },
+        );
+
+
+    /* -------------------------------------------------------
+       VALIDATE EXERCISE IDS
+    -------------------------------------------------------- */
+
+    const invalidExercise =
+      exercises.some(
+        exercise =>
+          !Number.isInteger(
+            exercise.exercise_id,
+          ) ||
+          exercise.exercise_id <= 0,
+      );
+
+
+    if (invalidExercise) {
+
+      this.routineError =
+        'One or more exercises have an invalid exercise ID.';
+
+      return;
+
+    }
+
+
+    /* -------------------------------------------------------
+       REQUEST BODY
+    -------------------------------------------------------- */
+
+    const requestBody:
+      CreateRoutineRequest = {
+
+        name,
+
+        exercises,
+
+      };
+
+
+    /* -------------------------------------------------------
+       START API CALL
+    -------------------------------------------------------- */
+
+    this.isCreatingRoutine = true;
+
+    this.routineError = '';
+
+
+    this.http
+      .post<CreateRoutineResponse>(
+        `${this.apiBaseUrl}/routines`,
+        requestBody,
+      )
+      .subscribe({
+
+        /* ===================================================
+           SUCCESS
+
+           IMPORTANT:
+           We stay on ACTIVE WORKOUT.
+
+           We do NOT:
+           - navigate to dashboard
+           - navigate to login
+           - clear workout
+           - clear timer
+           - clear tokens
+        =================================================== */
+
+        next: response => {
+
+          console.log(
+            'Routine created successfully:',
+            response,
+          );
+
+
+          this.isCreatingRoutine = false;
+
+          this.showRoutineModal = false;
+
+          this.routineName = '';
+
+          this.routineError = '';
+
+
+          /*
+           * Nothing else happens here.
+           *
+           * User stays on:
+           *
+           * /active-workout
+           *
+           * Existing exercises remain.
+           * Existing sets remain.
+           * Timer continues.
+           */
+
+        },
+
+
+        /* ===================================================
+           ERROR
+        =================================================== */
+
+        error: error => {
+
+          console.error(
+            'Create routine failed:',
+            error,
+          );
+
+
+          this.isCreatingRoutine = false;
+
+
+          if (
+            error.status === 400
+          ) {
+
+            this.routineError =
+              error.error?.detail ||
+              'Unable to create this routine.';
+
+            return;
+
+          }
+
+
+          if (
+            error.status === 404
+          ) {
+
+            this.routineError =
+              error.error?.detail ||
+              'One of the selected exercises could not be found.';
+
+            return;
+
+          }
+
+
+          if (
+            error.status === 422
+          ) {
+
+            this.routineError =
+              'The routine information is invalid. Please check the exercises and try again.';
+
+            return;
+
+          }
+
+
+          if (
+            error.status === 401
+          ) {
+
+            /*
+             * Do NOT navigate from here.
+             *
+             * Your auth interceptor is responsible
+             * for refreshing the access token.
+             */
+
+            this.routineError =
+              'Your session could not be refreshed. Please try again.';
+
+            return;
+
+          }
+
+
+          this.routineError =
+            'Something went wrong while creating the routine. Please try again.';
+
+        },
+
+      });
 
   }
 
@@ -714,12 +1094,15 @@ export class ActiveWorkout
   ngOnDestroy(): void {
 
     /*
-     * Only stop the JavaScript interval.
+     * Stop only the JavaScript timer.
      *
-     * Do not remove the stored start timestamp.
-     * This allows the timer to continue while
-     * navigating to the Exercise Picker.
+     * Do NOT delete WORKOUT_START_KEY here.
+     *
+     * The stored timestamp allows the timer
+     * to keep counting when navigating to the
+     * exercise picker and coming back.
      */
+
     this.stopTimer();
 
   }

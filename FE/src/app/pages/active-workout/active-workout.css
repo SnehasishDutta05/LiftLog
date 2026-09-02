@@ -132,7 +132,7 @@
 
 
 /* =========================================================
-   FINISH BUTTON
+   FINISH
 ========================================================= */
 
 .finish-button {
@@ -209,7 +209,7 @@
 
 
 /* =========================================================
-   WORKOUT CONTENT
+   CONTENT
 ========================================================= */
 
 .workout-content {
@@ -260,8 +260,6 @@
 
 
 .dumbbell-icon {
-  position: relative;
-
   display: flex;
 
   align-items: center;
@@ -295,10 +293,7 @@
 
 
 /* =========================================================
-   EXERCISE SECTION
-
-   Square and edge-to-edge.
-   No floating rounded cards.
+   EXERCISE CARD
 ========================================================= */
 
 .exercise-card {
@@ -321,12 +316,6 @@
 }
 
 
-/*
- * Small divider between multiple exercises.
- *
- * This keeps them visually separated without
- * turning them into floating cards.
- */
 .exercise-card + .exercise-card {
   border-top:
     8px solid #f5f7f6;
@@ -463,10 +452,6 @@
 }
 
 
-/* =========================================================
-   SET TABLE HEADER
-========================================================= */
-
 .set-table-header {
   padding: 10px 12px;
 
@@ -537,7 +522,7 @@
 
 
 /* =========================================================
-   PREVIOUS VALUE
+   PREVIOUS
 ========================================================= */
 
 .previous-value {
@@ -594,8 +579,6 @@
     );
 }
 
-
-/* Remove number input arrows */
 
 .set-input::-webkit-inner-spin-button,
 .set-input::-webkit-outer-spin-button {
@@ -761,10 +744,6 @@
 }
 
 
-/* =========================================================
-   ADD ROUTINE
-========================================================= */
-
 .settings-button {
   border:
     1px solid #dce6e1;
@@ -774,10 +753,6 @@
   color: #154b3b;
 }
 
-
-/* =========================================================
-   DISCARD
-========================================================= */
 
 .discard-button {
   border:
@@ -790,12 +765,359 @@
 
 
 /* =========================================================
+   ROUTINE MODAL BACKDROP
+========================================================= */
+
+.routine-modal-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 500;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 18px;
+
+  background:
+    rgba(
+      16,
+      35,
+      29,
+      0.5
+    );
+
+  backdrop-filter:
+    blur(2px);
+}
+
+
+/* =========================================================
+   ROUTINE MODAL
+========================================================= */
+
+.routine-modal {
+  width: 100%;
+
+  max-width: 390px;
+
+  padding: 22px;
+
+  border:
+    1px solid #e1e9e5;
+
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  color: #10231d;
+
+  box-shadow:
+    0 20px 60px
+    rgba(
+      16,
+      35,
+      29,
+      0.2
+    );
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.routine-modal-header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 14px;
+}
+
+
+.routine-modal-header h2 {
+  margin: 0;
+
+  color: #10231d;
+
+  font-size: 20px;
+
+  font-weight: 800;
+}
+
+
+.routine-modal-header p {
+  margin: 6px 0 0;
+
+  color: #73847d;
+
+  font-size: 13px;
+
+  line-height: 1.45;
+}
+
+
+.routine-modal-close {
+  display: flex;
+
+  flex-shrink: 0;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 36px;
+
+  height: 36px;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: #edf3f0;
+
+  color: #10231d;
+
+  font-family: inherit;
+
+  font-size: 23px;
+
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+
+.routine-modal-close:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.55;
+}
+
+
+/* =========================================================
+   ROUTINE FIELD
+========================================================= */
+
+.routine-field {
+  margin-top: 22px;
+}
+
+
+.routine-name-label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #10231d;
+
+  font-size: 12px;
+
+  font-weight: 800;
+}
+
+
+.routine-name-input {
+  width: 100%;
+
+  min-height: 52px;
+
+  padding: 0 14px;
+
+  border:
+    1px solid #dce6e1;
+
+  border-radius: 12px;
+
+  outline: none;
+
+  background: #f8faf9;
+
+  color: #10231d;
+
+  font-family: inherit;
+
+  font-size: 15px;
+
+  font-weight: 600;
+}
+
+
+.routine-name-input::placeholder {
+  color: #9aa7a1;
+}
+
+
+.routine-name-input:focus {
+  border-color: #74d9a5;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(
+      116,
+      217,
+      165,
+      0.14
+    );
+}
+
+
+/* =========================================================
+   ROUTINE SUMMARY
+========================================================= */
+
+.routine-exercises-summary {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-top: 14px;
+
+  padding: 12px 14px;
+
+  border-radius: 11px;
+
+  background: #f0f6f3;
+}
+
+
+.routine-summary-label {
+  color: #65766f;
+
+  font-size: 12px;
+
+  font-weight: 700;
+}
+
+
+.routine-summary-count {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 28px;
+
+  height: 28px;
+
+  padding: 0 8px;
+
+  border-radius: 999px;
+
+  background: #dff5e9;
+
+  color: #154b3b;
+
+  font-size: 12px;
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.routine-error {
+  margin-top: 12px;
+
+  padding: 10px 12px;
+
+  border:
+    1px solid #efd8d8;
+
+  border-radius: 10px;
+
+  background: #fff7f7;
+
+  color: #a04747;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   MODAL ACTIONS
+========================================================= */
+
+.routine-modal-actions {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+
+  margin-top: 22px;
+}
+
+
+.routine-cancel-button,
+.routine-create-button {
+  min-height: 48px;
+
+  border-radius: 12px;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.routine-cancel-button {
+  border:
+    1px solid #dce6e1;
+
+  background: #ffffff;
+
+  color: #154b3b;
+}
+
+
+.routine-create-button {
+  border: 0;
+
+  background: #74d9a5;
+
+  color: #10231d;
+}
+
+
+.routine-cancel-button:disabled,
+.routine-create-button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.55;
+}
+
+
+/* =========================================================
    SMALL PHONES
 ========================================================= */
 
-@media (
-  max-width: 360px
-) {
+@media (max-width: 360px) {
 
   .workout-content {
     padding-left: 0;
@@ -862,6 +1184,23 @@
     margin-left: 12px;
 
     margin-right: 12px;
+  }
+
+
+  .routine-modal-backdrop {
+    padding: 14px;
+  }
+
+
+  .routine-modal {
+    padding: 18px;
+
+    border-radius: 18px;
+  }
+
+
+  .routine-modal-actions {
+    gap: 8px;
   }
 
 }
