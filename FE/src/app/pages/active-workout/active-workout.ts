@@ -5,12 +5,26 @@ import {
   OnInit,
 } from '@angular/core';
 
-import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import {
+  FormsModule,
+} from '@angular/forms';
 
-import { environment } from '../../../environments/environment';
+import {
+  HttpClient,
+} from '@angular/common/http';
 
+import {
+  Router,
+} from '@angular/router';
+
+import {
+  environment,
+} from '../../../environments/environment';
+
+
+/* =========================================================
+   EXERCISE MODELS
+========================================================= */
 
 interface ExerciseRecord {
   id: string;
@@ -39,6 +53,10 @@ interface WorkoutExercise {
 }
 
 
+/* =========================================================
+   ROUTINE API MODELS
+========================================================= */
+
 interface RoutineExerciseRequest {
   exercise_id: number;
   target_sets: number;
@@ -66,28 +84,89 @@ interface CreateRoutineResponse {
 }
 
 
+/* =========================================================
+   SAVE WORKOUT API MODELS
+========================================================= */
+
+interface WorkoutSetRequest {
+  weight: number;
+  reps: number;
+}
+
+
+interface WorkoutExerciseRequest {
+  exercise_id: number;
+  sets: WorkoutSetRequest[];
+}
+
+
+interface SaveWorkoutRequest {
+  routine_id: number;
+  started_at: string;
+  finished_at: string;
+  exercises: WorkoutExerciseRequest[];
+}
+
+
+interface SavedWorkoutSetResponse {
+  set_id: number;
+  set_number: number;
+  weight: number;
+  reps: number;
+}
+
+
+interface SavedWorkoutExerciseResponse {
+  workout_exercise_id: number;
+  exercise_id: number;
+  sets: SavedWorkoutSetResponse[];
+}
+
+
+interface SaveWorkoutResponse {
+  workout_id: number;
+  routine_id: number;
+  started_at: string;
+  finished_at: string;
+  duration_seconds: number;
+  exercises: SavedWorkoutExerciseResponse[];
+}
+
+
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 @Component({
   selector: 'app-active-workout',
+
   imports: [
     FormsModule,
   ],
-  templateUrl: './active-workout.html',
-  styleUrl: './active-workout.css',
-})
-export class ActiveWorkout implements OnInit, OnDestroy {
 
-  /* =========================================================
+  templateUrl:
+    './active-workout.html',
+
+  styleUrl:
+    './active-workout.css',
+})
+export class ActiveWorkout
+  implements OnInit, OnDestroy {
+
+
+  /* =====================================================
      WORKOUT STATE
-  ========================================================= */
+  ===================================================== */
 
   elapsedSeconds = 0;
 
-  workoutExercises: WorkoutExercise[] = [];
+  workoutExercises:
+    WorkoutExercise[] = [];
 
 
-  /* =========================================================
+  /* =====================================================
      ROUTINE POPUP STATE
-  ========================================================= */
+  ===================================================== */
 
   showRoutineModal = false;
 
@@ -98,9 +177,16 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   isCreatingRoutine = false;
 
 
-  /* =========================================================
-     STORAGE KEYS
-  ========================================================= */
+  /* =====================================================
+     FINISH WORKOUT STATE
+  ===================================================== */
+
+  isFinishingWorkout = false;
+
+
+  /* =====================================================
+     LOCAL STORAGE KEYS
+  ===================================================== */
 
   private readonly WORKOUT_START_KEY =
     'pulseos_workout_start_time';
@@ -112,31 +198,37 @@ export class ActiveWorkout implements OnInit, OnDestroy {
     'pulseos_workout_exercises';
 
 
-  /* =========================================================
+  /* =====================================================
      API
-  ========================================================= */
+  ===================================================== */
 
   private readonly apiBaseUrl =
     environment.apiBaseUrl;
 
 
-  /* =========================================================
+  /* =====================================================
      TIMER
-  ========================================================= */
+  ===================================================== */
 
-  private timer?: ReturnType<typeof setInterval>;
+  private timer?:
+    ReturnType<typeof setInterval>;
 
+
+  /* =====================================================
+     CONSTRUCTOR
+  ===================================================== */
 
   constructor(
     private router: Router,
-    private changeDetector: ChangeDetectorRef,
+    private changeDetector:
+      ChangeDetectorRef,
     private http: HttpClient,
   ) {}
 
 
-  /* =========================================================
+  /* =====================================================
      INITIALIZE
-  ========================================================= */
+  ===================================================== */
 
   ngOnInit(): void {
 
@@ -149,9 +241,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
-     TIMER INITIALIZATION
-  ========================================================= */
+  /* =====================================================
+     INITIALIZE WORKOUT TIMER
+  ===================================================== */
 
   private initializeWorkoutTimer(): void {
 
@@ -161,6 +253,10 @@ export class ActiveWorkout implements OnInit, OnDestroy {
       );
 
 
+    /*
+     * If this is a new workout,
+     * create the start timestamp.
+     */
     if (!startTime) {
 
       startTime =
@@ -182,9 +278,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      START TIMER
-  ========================================================= */
+  ===================================================== */
 
   private startTimer(): void {
 
@@ -204,9 +300,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      UPDATE TIMER
-  ========================================================= */
+  ===================================================== */
 
   private updateElapsedTime(): void {
 
@@ -247,6 +343,7 @@ export class ActiveWorkout implements OnInit, OnDestroy {
     this.elapsedSeconds =
       Math.max(
         0,
+
         Math.floor(
           (
             Date.now() -
@@ -262,9 +359,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      FORMATTED DURATION
-  ========================================================= */
+  ===================================================== */
 
   get formattedDuration(): string {
 
@@ -316,9 +413,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      STOP TIMER
-  ========================================================= */
+  ===================================================== */
 
   private stopTimer(): void {
 
@@ -338,9 +435,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      CLEAR TIMER
-  ========================================================= */
+  ===================================================== */
 
   private clearWorkoutTimer(): void {
 
@@ -357,9 +454,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      LOAD WORKOUT EXERCISES
-  ========================================================= */
+  ===================================================== */
 
   private loadWorkoutExercises(): void {
 
@@ -389,7 +486,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
       this.workoutExercises =
         parsed.map(
           item => ({
-            exercise: item.exercise,
+
+            exercise:
+              item.exercise,
 
             sets:
               Array.isArray(
@@ -397,6 +496,7 @@ export class ActiveWorkout implements OnInit, OnDestroy {
               )
                 ? item.sets
                 : [],
+
           }),
         );
 
@@ -415,9 +515,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
-     IMPORT EXERCISES FROM PICKER
-  ========================================================= */
+  /* =====================================================
+     IMPORT EXERCISES FROM EXERCISE PICKER
+  ===================================================== */
 
   private importSelectedExercises(): void {
 
@@ -478,6 +578,7 @@ export class ActiveWorkout implements OnInit, OnDestroy {
 
 
         this.workoutExercises.push({
+
           exercise,
 
           sets: [
@@ -487,6 +588,7 @@ export class ActiveWorkout implements OnInit, OnDestroy {
               completed: false,
             },
           ],
+
         });
 
       },
@@ -503,9 +605,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
-     SAVE WORKOUT
-  ========================================================= */
+  /* =====================================================
+     SAVE CURRENT WORKOUT LOCALLY
+  ===================================================== */
 
   private saveWorkoutExercises(): void {
 
@@ -520,9 +622,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      INPUT CHANGED
-  ========================================================= */
+  ===================================================== */
 
   updateWorkoutState(): void {
 
@@ -531,9 +633,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      TOTAL COMPLETED SETS
-  ========================================================= */
+  ===================================================== */
 
   get totalSets(): number {
 
@@ -562,9 +664,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      TOTAL VOLUME
-  ========================================================= */
+  ===================================================== */
 
   get totalVolume(): number {
 
@@ -609,9 +711,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      ADD SET
-  ========================================================= */
+  ===================================================== */
 
   addSet(
     workoutExercise:
@@ -619,9 +721,13 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   ): void {
 
     workoutExercise.sets.push({
+
       weight: null,
+
       reps: null,
+
       completed: false,
+
     });
 
 
@@ -630,9 +736,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      COMPLETE / UNCOMPLETE SET
-  ========================================================= */
+  ===================================================== */
 
   toggleSetCompleted(
     workoutExercise:
@@ -651,9 +757,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      REMOVE EXERCISE
-  ========================================================= */
+  ===================================================== */
 
   removeExercise(
     index: number,
@@ -681,11 +787,17 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      BACK
-  ========================================================= */
+  ===================================================== */
 
   goBack(): void {
+
+    /*
+     * Do not clear workout or timer.
+     *
+     * User can return to the workout later.
+     */
 
     this.router.navigate([
       '/dashboard',
@@ -694,11 +806,16 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      ADD EXERCISE
-  ========================================================= */
+  ===================================================== */
 
   addExercise(): void {
+
+    /*
+     * Timer and workout remain in localStorage
+     * while the exercise picker is open.
+     */
 
     this.router.navigate([
       '/exercise-picker',
@@ -707,9 +824,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      OPEN ADD ROUTINE POPUP
-  ========================================================= */
+  ===================================================== */
 
   addRoutine(): void {
 
@@ -733,9 +850,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      CLOSE ROUTINE POPUP
-  ========================================================= */
+  ===================================================== */
 
   closeRoutineModal(): void {
 
@@ -755,9 +872,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      CREATE ROUTINE
-  ========================================================= */
+  ===================================================== */
 
   createRoutine(): void {
 
@@ -772,9 +889,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
       this.routineName.trim();
 
 
-    /* -------------------------------------------------------
+    /* -----------------------------------------------------
        VALIDATE NAME
-    -------------------------------------------------------- */
+    ------------------------------------------------------ */
 
     if (!name) {
 
@@ -786,9 +903,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
     }
 
 
-    /* -------------------------------------------------------
+    /* -----------------------------------------------------
        VALIDATE EXERCISES
-    -------------------------------------------------------- */
+    ------------------------------------------------------ */
 
     if (
       this.workoutExercises.length === 0
@@ -802,9 +919,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
     }
 
 
-    /* -------------------------------------------------------
+    /* -----------------------------------------------------
        BUILD ROUTINE EXERCISES
-    -------------------------------------------------------- */
+    ------------------------------------------------------ */
 
     const exercises:
       RoutineExerciseRequest[] =
@@ -825,20 +942,22 @@ export class ActiveWorkout implements OnInit, OnDestroy {
 
 
             return {
+
               exercise_id:
                 exerciseId,
 
               target_sets:
                 targetSets,
+
             };
 
           },
         );
 
 
-    /* -------------------------------------------------------
+    /* -----------------------------------------------------
        VALIDATE EXERCISE IDS
-    -------------------------------------------------------- */
+    ------------------------------------------------------ */
 
     const invalidExercise =
       exercises.some(
@@ -860,9 +979,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
     }
 
 
-    /* -------------------------------------------------------
-       REQUEST BODY
-    -------------------------------------------------------- */
+    /* -----------------------------------------------------
+       BUILD ROUTINE REQUEST
+    ------------------------------------------------------ */
 
     const requestBody:
       CreateRoutineRequest = {
@@ -874,9 +993,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
       };
 
 
-    /* -------------------------------------------------------
-       START API CALL
-    -------------------------------------------------------- */
+    /* -----------------------------------------------------
+       CALL ROUTINE API
+    ------------------------------------------------------ */
 
     this.isCreatingRoutine = true;
 
@@ -890,19 +1009,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
       )
       .subscribe({
 
-        /* ===================================================
-           SUCCESS
-
-           IMPORTANT:
-           We stay on ACTIVE WORKOUT.
-
-           We do NOT:
-           - navigate to dashboard
-           - navigate to login
-           - clear workout
-           - clear timer
-           - clear tokens
-        =================================================== */
+        /* =================================================
+           ROUTINE SUCCESS
+        ================================================= */
 
         next: response => {
 
@@ -922,23 +1031,21 @@ export class ActiveWorkout implements OnInit, OnDestroy {
 
 
           /*
-           * Nothing else happens here.
+           * IMPORTANT:
            *
-           * User stays on:
+           * Do not clear workout.
+           * Do not clear timer.
+           * Do not navigate.
            *
-           * /active-workout
-           *
-           * Existing exercises remain.
-           * Existing sets remain.
-           * Timer continues.
+           * User stays on Active Workout.
            */
 
         },
 
 
-        /* ===================================================
-           ERROR
-        =================================================== */
+        /* =================================================
+           ROUTINE ERROR
+        ================================================= */
 
         error: error => {
 
@@ -994,14 +1101,14 @@ export class ActiveWorkout implements OnInit, OnDestroy {
           ) {
 
             /*
-             * Do NOT navigate from here.
+             * Do not navigate from here.
              *
-             * Your auth interceptor is responsible
-             * for refreshing the access token.
+             * Existing authentication/interceptor
+             * remains responsible for authentication.
              */
 
             this.routineError =
-              'Your session could not be refreshed. Please try again.';
+              'Your session could not be authenticated. Please try again.';
 
             return;
 
@@ -1018,9 +1125,9 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      DISCARD WORKOUT
-  ========================================================= */
+  ===================================================== */
 
   discardWorkout(): void {
 
@@ -1058,49 +1165,380 @@ export class ActiveWorkout implements OnInit, OnDestroy {
   }
 
 
-  /* =========================================================
+  /* =====================================================
      FINISH WORKOUT
-  ========================================================= */
+  ===================================================== */
 
   finishWorkout(): void {
 
-    this.clearWorkoutTimer();
+    /*
+     * Prevent double-clicking Finish from
+     * creating two workouts.
+     */
+    if (
+      this.isFinishingWorkout
+    ) {
+      return;
+    }
 
 
-    localStorage.removeItem(
-      this.SELECTED_EXERCISES_KEY,
+    /* -----------------------------------------------------
+       REQUIRE AT LEAST ONE EXERCISE
+    ------------------------------------------------------ */
+
+    if (
+      this.workoutExercises.length === 0
+    ) {
+
+      window.alert(
+        'Add at least one exercise before finishing the workout.',
+      );
+
+      return;
+
+    }
+
+
+    /* -----------------------------------------------------
+       GET ORIGINAL WORKOUT START TIME
+    ------------------------------------------------------ */
+
+    const storedStartTime =
+      localStorage.getItem(
+        this.WORKOUT_START_KEY,
+      );
+
+
+    if (!storedStartTime) {
+
+      window.alert(
+        'Workout start time could not be found.',
+      );
+
+      return;
+
+    }
+
+
+    const startTimestamp =
+      Number(
+        storedStartTime,
+      );
+
+
+    if (
+      Number.isNaN(
+        startTimestamp,
+      )
+    ) {
+
+      window.alert(
+        'Workout start time is invalid.',
+      );
+
+      return;
+
+    }
+
+
+    /* -----------------------------------------------------
+       BUILD WORKOUT EXERCISES
+    ------------------------------------------------------ */
+
+    const exercises:
+      WorkoutExerciseRequest[] =
+        this.workoutExercises.map(
+          workoutExercise => {
+
+            const exerciseId =
+              Number(
+                workoutExercise.exercise.id,
+              );
+
+
+            const sets:
+              WorkoutSetRequest[] =
+                workoutExercise.sets.map(
+                  set => ({
+
+                    weight:
+                      Number(
+                        set.weight ?? 0,
+                      ),
+
+                    reps:
+                      Number(
+                        set.reps ?? 0,
+                      ),
+
+                  }),
+                );
+
+
+            return {
+
+              exercise_id:
+                exerciseId,
+
+              sets,
+
+            };
+
+          },
+        );
+
+
+    /* -----------------------------------------------------
+       VALIDATE EXERCISE IDS
+    ------------------------------------------------------ */
+
+    const invalidExercise =
+      exercises.some(
+        exercise =>
+          !Number.isInteger(
+            exercise.exercise_id,
+          ) ||
+          exercise.exercise_id <= 0,
+      );
+
+
+    if (invalidExercise) {
+
+      window.alert(
+        'One or more exercises have an invalid exercise ID.',
+      );
+
+      return;
+
+    }
+
+
+    /* -----------------------------------------------------
+       BUILD API REQUEST BODY
+    ------------------------------------------------------ */
+
+    const requestBody:
+      SaveWorkoutRequest = {
+
+        /*
+         * 0 means this workout was started
+         * without choosing a saved routine.
+         */
+        routine_id: 0,
+
+
+        /*
+         * This is the timestamp created when
+         * Active Workout originally started.
+         */
+        started_at:
+          new Date(
+            startTimestamp,
+          ).toISOString(),
+
+
+        /*
+         * Finish time is generated only when
+         * the user presses Finish.
+         */
+        finished_at:
+          new Date().toISOString(),
+
+
+        exercises,
+
+      };
+
+
+    console.log(
+      'Saving workout:',
+      requestBody,
     );
 
 
-    localStorage.removeItem(
-      this.WORKOUT_EXERCISES_KEY,
-    );
+    /* -----------------------------------------------------
+       CALL WORKOUT API
+    ------------------------------------------------------ */
+
+    this.isFinishingWorkout = true;
 
 
-    this.workoutExercises = [];
+    this.http
+      .post<SaveWorkoutResponse>(
+        `${this.apiBaseUrl}/workouts`,
+        requestBody,
+      )
+      .subscribe({
+
+        /* =================================================
+           WORKOUT SAVE SUCCESS
+        ================================================= */
+
+        next: response => {
+
+          console.log(
+            'Workout saved successfully:',
+            response,
+          );
 
 
-    this.router.navigate([
-      '/dashboard',
-    ]);
+          this.isFinishingWorkout = false;
+
+
+          /*
+           * Only after the backend confirms that
+           * the workout has been saved do we
+           * delete local workout state.
+           */
+
+          this.clearWorkoutTimer();
+
+
+          localStorage.removeItem(
+            this.SELECTED_EXERCISES_KEY,
+          );
+
+
+          localStorage.removeItem(
+            this.WORKOUT_EXERCISES_KEY,
+          );
+
+
+          this.workoutExercises = [];
+
+
+          /*
+           * Workout successfully saved.
+           * Return to Dashboard.
+           */
+
+          this.router.navigate([
+            '/dashboard',
+          ]);
+
+        },
+
+
+        /* =================================================
+           WORKOUT SAVE ERROR
+        ================================================= */
+
+        error: error => {
+
+          console.error(
+            'Save workout failed:',
+            error,
+          );
+
+
+          this.isFinishingWorkout = false;
+
+
+          /*
+           * IMPORTANT:
+           *
+           * Do not clear:
+           * - timer
+           * - exercises
+           * - sets
+           * - localStorage
+           *
+           * The workout remains available
+           * so the user can retry Finish.
+           */
+
+
+          if (
+            error.status === 400
+          ) {
+
+            window.alert(
+              error.error?.detail ||
+              'Unable to save this workout.',
+            );
+
+            return;
+
+          }
+
+
+          if (
+            error.status === 404
+          ) {
+
+            window.alert(
+              error.error?.detail ||
+              'One of the exercises could not be found.',
+            );
+
+            return;
+
+          }
+
+
+          if (
+            error.status === 401
+          ) {
+
+            window.alert(
+              'Your session could not be authenticated. Please try again.',
+            );
+
+            return;
+
+          }
+
+
+          if (
+            error.status === 422
+          ) {
+
+            console.error(
+              'Workout validation response:',
+              error.error,
+            );
+
+
+            window.alert(
+              'The workout information is invalid. Please check your sets and try again.',
+            );
+
+            return;
+
+          }
+
+
+          window.alert(
+            'Unable to save the workout. Please try again.',
+          );
+
+        },
+
+      });
 
   }
 
 
-  /* =========================================================
+  /* =====================================================
      DESTROY
-  ========================================================= */
+  ===================================================== */
 
   ngOnDestroy(): void {
 
     /*
-     * Stop only the JavaScript timer.
+     * Stop only the JavaScript interval.
      *
-     * Do NOT delete WORKOUT_START_KEY here.
+     * Do NOT remove WORKOUT_START_KEY here.
      *
-     * The stored timestamp allows the timer
-     * to keep counting when navigating to the
-     * exercise picker and coming back.
+     * This means:
+     *
+     * Active Workout
+     *      ↓
+     * Exercise Picker
+     *      ↓
+     * Active Workout
+     *
+     * continues the same workout timer.
      */
 
     this.stopTimer();
