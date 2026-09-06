@@ -2,7 +2,6 @@ from datetime import date, datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from BE.app.api.deps import get_current_user
@@ -39,6 +38,20 @@ from BE.app.schemas import (
 
 router = APIRouter(prefix="/diet")
 MEAL_TYPES = {"breakfast", "lunch", "dinner", "snack", "other"}
+
+
+def _validate_query_date(value: str | None, *, required: bool = False) -> str | None:
+    if value is None:
+        if required:
+            raise HTTPException(status_code=422, detail="date needs to be in YYYY-MM-DD format")
+        return None
+    try:
+        parsed = datetime.strptime(value, "%Y-%m-%d")
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail="date needs to be in YYYY-MM-DD format") from exc
+    if parsed.strftime("%Y-%m-%d") != value:
+        raise HTTPException(status_code=422, detail="date needs to be in YYYY-MM-DD format")
+    return value
 
 
 def _nutrition(source: Any) -> FoodNutrition:
@@ -125,6 +138,7 @@ def _build_meal_response(db: Session, meal: Meal) -> MealRead:
         items.append(MealItemRead(
             food_id=item.food_id,
             custom_food_id=item.custom_food_id,
+            serving_id=item.serving_id,
             name=source.name,
             quantity_g=item.quantity_g,
         ))
@@ -149,6 +163,7 @@ def _build_log_response(log: DietLog) -> DietLogRead:
             items=[DietLogItemRead(
                 food_id=item.food_id,
                 custom_food_id=item.custom_food_id,
+                serving_id=item.serving_id,
                 food_name=item.food_name,
                 quantity_g=item.quantity_g,
                 calories=item.calories,
@@ -169,6 +184,13 @@ def _replace_log_items(db: Session, log: DietLog, payload: DietLogCreate, curren
         meal_type = _validate_meal_type(meal.meal_type)
         for item in meal.items:
             source, food_id, custom_food_id = _get_source(db, current_user, item)
+            if item.serving_id is not None:
+                serving = db.query(FoodServing).filter(
+                    FoodServing.id == item.serving_id,
+                    FoodServing.food_id == food_id,
+                ).first()
+                if serving is None:
+                    raise HTTPException(status_code=404, detail="Serving not found for food")
             values = _scaled_nutrition(source, item.quantity_g)
             totals = NutritionValues(
                 calories=totals.calories + values.calories,
@@ -183,6 +205,7 @@ def _replace_log_items(db: Session, log: DietLog, payload: DietLogCreate, curren
                 meal_type=meal_type,
                 food_id=food_id,
                 custom_food_id=custom_food_id,
+                serving_id=item.serving_id,
                 food_name=source.name,
                 quantity_g=item.quantity_g,
                 calories=values.calories,
@@ -198,7 +221,7 @@ def _replace_log_items(db: Session, log: DietLog, payload: DietLogCreate, curren
     log.fiber_g = totals.fiber_g
 
 
-@router.get("/foods", response_model=FoodListResponse, tags=["food"])
+@router.get("/foods", response_model=FoodListResponse, tags=["food"], summary="Search system foods", description="Search and paginate the shared food database.")
 def list_foods(
     search: str | None = None,
     category: str | None = None,
@@ -220,7 +243,7 @@ def list_foods(
     )
 
 
-@router.get("/foods/{food_id}", response_model=FoodDetail, tags=["food"])
+@router.get("/foods/{food_id}", response_model=FoodDetail, tags=["food"], summary="Get food details", description="Return nutrition per 100 grams and available servings for one food.")
 def get_food(food_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     food = db.query(Food).filter(Food.id == food_id).first()
     if food is None:
@@ -239,7 +262,7 @@ def get_food(food_id: int, db: Session = Depends(get_db), current_user: User = D
     )
 
 
-@router.post("/custom-foods", response_model=CustomFoodRead, status_code=status.HTTP_201_CREATED, tags=["custom-food"])
+@router.post("/custom-foods", response_model=CustomFoodRead, status_code=status.HTTP_201_CREATED, tags=["custom-food"], summary="Create custom food", description="Create a food owned by the authenticated user.")
 def create_custom_food(payload: CustomFoodCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     food = CustomFood(
         user_id=current_user.id,
@@ -259,7 +282,7 @@ def create_custom_food(payload: CustomFoodCreate, db: Session = Depends(get_db),
     return _custom_food_read(food)
 
 
-@router.get("/custom-foods", response_model=CustomFoodListResponse, tags=["custom-food"])
+@router.get("/custom-foods", response_model=CustomFoodListResponse, tags=["custom-food"], summary="List custom foods", description="List active custom foods belonging only to the authenticated user.")
 def list_custom_foods(
     search: str | None = None,
     page: int = Query(1, ge=1),
@@ -278,7 +301,7 @@ def list_custom_foods(
     )
 
 
-@router.patch("/custom-foods/{custom_food_id}", response_model=CustomFoodRead, tags=["custom-food"])
+@router.patch("/custom-foods/{custom_food_id}", response_model=CustomFoodRead, tags=["custom-food"], summary="Update custom food", description="Update one of the authenticated user's active custom foods.")
 def update_custom_food(custom_food_id: int, payload: CustomFoodUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     food = db.query(CustomFood).filter(CustomFood.id == custom_food_id, CustomFood.user_id == current_user.id, CustomFood.is_active.is_(True)).first()
     if food is None:
@@ -298,7 +321,7 @@ def update_custom_food(custom_food_id: int, payload: CustomFoodUpdate, db: Sessi
     return _custom_food_read(food)
 
 
-@router.delete("/custom-foods/{custom_food_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["custom-food"])
+@router.delete("/custom-foods/{custom_food_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["custom-food"], summary="Delete custom food", description="Soft-delete a custom food while preserving historical log data.")
 def delete_custom_food(custom_food_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     food = db.query(CustomFood).filter(CustomFood.id == custom_food_id, CustomFood.user_id == current_user.id, CustomFood.is_active.is_(True)).first()
     if food is None:
@@ -307,7 +330,7 @@ def delete_custom_food(custom_food_id: int, db: Session = Depends(get_db), curre
     db.commit()
 
 
-@router.post("/meals", response_model=MealRead, status_code=status.HTTP_201_CREATED, tags=["meals"])
+@router.post("/meals", response_model=MealRead, status_code=status.HTTP_201_CREATED, tags=["meals"], summary="Create saved meal", description="Save a reusable combination of system or custom foods.")
 def create_meal(payload: MealCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     meal = Meal(user_id=current_user.id, name=payload.name.strip(), description=payload.description)
     db.add(meal)
@@ -330,13 +353,13 @@ def _replace_meal_items(db: Session, meal: Meal, items: list[Any], current_user:
         db.add(MealItem(meal_id=meal.id, food_id=food_id, custom_food_id=custom_food_id, quantity_g=item.quantity_g, serving_id=serving_id))
 
 
-@router.get("/meals", response_model=MealListResponse, tags=["meals"])
+@router.get("/meals", response_model=MealListResponse, tags=["meals"], summary="List saved meals", description="List active saved meals belonging to the authenticated user.")
 def list_meals(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     meals = db.query(Meal).filter(Meal.user_id == current_user.id, Meal.is_active.is_(True)).order_by(Meal.name.asc()).all()
     return MealListResponse(meals=[_build_meal_response(db, meal) for meal in meals])
 
 
-@router.patch("/meals/{meal_id}", response_model=MealRead, tags=["meals"])
+@router.patch("/meals/{meal_id}", response_model=MealRead, tags=["meals"], summary="Update saved meal", description="Update meal details or replace its complete item composition.")
 def update_meal(meal_id: int, payload: MealUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     meal = db.query(Meal).filter(Meal.id == meal_id, Meal.user_id == current_user.id, Meal.is_active.is_(True)).first()
     if meal is None:
@@ -352,7 +375,7 @@ def update_meal(meal_id: int, payload: MealUpdate, db: Session = Depends(get_db)
     return _build_meal_response(db, meal)
 
 
-@router.delete("/meals/{meal_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["meals"])
+@router.delete("/meals/{meal_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["meals"], summary="Delete saved meal", description="Soft-delete a saved meal without changing historical food logs.")
 def delete_meal(meal_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     meal = db.query(Meal).filter(Meal.id == meal_id, Meal.user_id == current_user.id, Meal.is_active.is_(True)).first()
     if meal is None:
@@ -361,7 +384,7 @@ def delete_meal(meal_id: int, db: Session = Depends(get_db), current_user: User 
     db.commit()
 
 
-@router.post("/logs", response_model=DietLogRead, status_code=status.HTTP_201_CREATED, tags=["logs"])
+@router.post("/logs", response_model=DietLogRead, status_code=status.HTTP_201_CREATED, tags=["logs"], summary="Create or replace daily log", description="Create or replace the authenticated user's food log; omitted date defaults to today.")
 def create_diet_log(payload: DietLogCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     log_date = payload.date or date.today().isoformat()
     log = db.query(DietLog).filter(DietLog.user_id == current_user.id, DietLog.date == log_date).first()
@@ -375,15 +398,16 @@ def create_diet_log(payload: DietLogCreate, db: Session = Depends(get_db), curre
     return _build_log_response(log)
 
 
-@router.get("/logs", response_model=DietLogRead, tags=["logs"])
-def get_diet_log(log_date: str = Query(..., alias="date"), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+@router.get("/logs", response_model=DietLogRead, tags=["logs"], summary="Get daily food log", description="Get a food log by date; omitted date defaults to today.")
+def get_diet_log(log_date: str | None = Query(None, alias="date"), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    log_date = _validate_query_date(log_date) or date.today().isoformat()
     log = db.query(DietLog).filter(DietLog.user_id == current_user.id, DietLog.date == log_date).first()
     if log is None:
         raise HTTPException(status_code=404, detail="Diet log not found")
     return _build_log_response(log)
 
 
-@router.patch("/logs/{log_id}", response_model=DietLogRead, tags=["logs"])
+@router.patch("/logs/{log_id}", response_model=DietLogRead, tags=["logs"], summary="Edit daily food log", description="Replace a daily log's meals and recalculate all nutrition totals.")
 def update_diet_log(log_id: int, payload: DietLogUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     log = db.query(DietLog).filter(DietLog.id == log_id, DietLog.user_id == current_user.id).first()
     if log is None:
@@ -395,7 +419,7 @@ def update_diet_log(log_id: int, payload: DietLogUpdate, db: Session = Depends(g
     return _build_log_response(log)
 
 
-@router.delete("/logs/{log_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["logs"])
+@router.delete("/logs/{log_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["logs"], summary="Delete daily food log", description="Permanently delete the authenticated user's food log.")
 def delete_diet_log(log_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     log = db.query(DietLog).filter(DietLog.id == log_id, DietLog.user_id == current_user.id).first()
     if log is None:
@@ -404,9 +428,9 @@ def delete_diet_log(log_id: int, db: Session = Depends(get_db), current_user: Us
     db.commit()
 
 
-@router.get("/summary", response_model=DietSummary, tags=["summary/history"])
+@router.get("/summary", response_model=DietSummary, tags=["summary/history"], summary="Get daily nutrition summary", description="Return consumed, target, remaining, and meal-level nutrition totals for a date.")
 def get_diet_summary(log_date: str | None = Query(None, alias="date"), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    target_date = log_date or date.today().isoformat()
+    target_date = _validate_query_date(log_date) or date.today().isoformat()
     log = db.query(DietLog).filter(DietLog.user_id == current_user.id, DietLog.date == target_date).first()
     goal = db.query(DietGoal).filter(DietGoal.user_id == current_user.id).first()
     targets = goal or DietGoal(calorie_target=0, protein_target_g=0, carbs_target_g=0, fat_target_g=0)
@@ -440,8 +464,10 @@ def get_diet_summary(log_date: str | None = Query(None, alias="date"), db: Sessi
     )
 
 
-@router.get("/history", response_model=DietHistoryResponse, tags=["summary/history"])
+@router.get("/history", response_model=DietHistoryResponse, tags=["summary/history"], summary="Get diet history", description="Return daily nutrition totals and averages between two YYYY-MM-DD dates.")
 def get_diet_history(start_date: str, end_date: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    start_date = _validate_query_date(start_date, required=True)
+    end_date = _validate_query_date(end_date, required=True)
     logs = db.query(DietLog).filter(DietLog.user_id == current_user.id, DietLog.date >= start_date, DietLog.date <= end_date).order_by(DietLog.date.asc()).all()
     days = [DietHistoryDay(date=log.date, calories=log.calories, protein_g=log.protein_g, carbs_g=log.carbs_g, fat_g=log.fat_g) for log in logs]
     count = len(days) or 1
@@ -458,7 +484,7 @@ def get_diet_history(start_date: str, end_date: str, db: Session = Depends(get_d
     )
 
 
-@router.get("/goals", response_model=DietGoalRead, tags=["goals"])
+@router.get("/goals", response_model=DietGoalRead, tags=["goals"], summary="Get nutrition goals", description="Return the authenticated user's calorie and macro targets.")
 def get_diet_goals(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     goal = db.query(DietGoal).filter(DietGoal.user_id == current_user.id).first()
     if goal is None:
@@ -466,7 +492,7 @@ def get_diet_goals(db: Session = Depends(get_db), current_user: User = Depends(g
     return DietGoalRead(calories=goal.calorie_target, protein_g=goal.protein_target_g, carbs_g=goal.carbs_target_g, fat_g=goal.fat_target_g)
 
 
-@router.put("/goals", response_model=DietGoalRead, tags=["goals"])
+@router.put("/goals", response_model=DietGoalRead, tags=["goals"], summary="Update nutrition goals", description="Create or replace the authenticated user's calorie and macro targets.")
 def update_diet_goals(payload: DietGoalRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     goal = db.query(DietGoal).filter(DietGoal.user_id == current_user.id).first()
     if goal is None:

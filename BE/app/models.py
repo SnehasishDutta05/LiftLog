@@ -264,6 +264,7 @@ class DietLogItem(Base):
     meal_type = Column(String, nullable=False, index=True)
     food_id = Column(Integer, nullable=True)
     custom_food_id = Column(Integer, nullable=True)
+    serving_id = Column(Integer, ForeignKey("food_servings.id"), nullable=True)
     food_name = Column(String, nullable=False)
     quantity_g = Column(Float, nullable=False)
     calories = Column(Float, nullable=False, default=0)

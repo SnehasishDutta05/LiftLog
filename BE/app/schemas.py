@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
 
 
 class UserPublic(BaseModel):
@@ -396,10 +396,10 @@ class CustomFoodListResponse(BaseModel):
 
 
 class MealItemInput(BaseModel):
-    food_id: Optional[int] = None
-    custom_food_id: Optional[int] = None
+    food_id: Optional[int] = Field(default=None)
+    custom_food_id: Optional[int] = Field(default=None)
     quantity_g: float = Field(gt=0)
-    serving_id: Optional[int] = None
+    serving_id: Optional[int] = Field(default=None)
 
     @classmethod
     def validate_reference(cls, values):
@@ -421,6 +421,7 @@ class MealUpdate(BaseModel):
 class MealItemRead(BaseModel):
     food_id: Optional[int] = None
     custom_food_id: Optional[int] = None
+    serving_id: Optional[int] = None
     name: str
     quantity_g: float
 
@@ -439,8 +440,9 @@ class MealListResponse(BaseModel):
 
 
 class LogItemInput(BaseModel):
-    food_id: Optional[int] = None
-    custom_food_id: Optional[int] = None
+    food_id: Optional[int] = Field(default=None)
+    custom_food_id: Optional[int] = Field(default=None)
+    serving_id: Optional[int] = Field(default=None)
     quantity_g: float = Field(gt=0)
 
 
@@ -453,6 +455,17 @@ class DietLogCreate(BaseModel):
     date: Optional[str] = None
     meals: list[LogMealInput]
 
+    @field_validator("date")
+    @classmethod
+    def validate_date(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        try:
+            datetime.strptime(value, "%Y-%m-%d")
+        except ValueError as exc:
+            raise ValueError("date needs to be in YYYY-MM-DD format") from exc
+        return value
+
 
 class DietLogUpdate(DietLogCreate):
     date: str
@@ -461,6 +474,7 @@ class DietLogUpdate(DietLogCreate):
 class DietLogItemRead(BaseModel):
     food_id: Optional[int] = None
     custom_food_id: Optional[int] = None
+    serving_id: Optional[int] = None
     food_name: str
     quantity_g: float
     calories: float
