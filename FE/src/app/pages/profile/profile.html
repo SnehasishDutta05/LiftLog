@@ -1,0 +1,631 @@
+<div class="profile-shell">
+
+  <main class="profile-main">
+
+    <div class="profile-content">
+
+
+      <!-- ==================================================
+           HEADER
+      =================================================== -->
+
+      <header class="profile-header">
+
+        <h1>
+          Profile
+        </h1>
+
+
+        <button
+          class="settings-icon-button"
+          type="button"
+          aria-label="Open settings"
+          (click)="openSettings()"
+        >
+          ⚙
+        </button>
+
+      </header>
+
+
+      <!-- ==================================================
+           USER
+      =================================================== -->
+
+      <section class="profile-user">
+
+        <div class="profile-avatar">
+          {{ profileInitial }}
+        </div>
+
+
+        <div class="profile-user-copy">
+
+          <h2>
+            {{ fullName }}
+          </h2>
+
+
+          <p>
+            {{ email || 'No email available' }}
+          </p>
+
+
+          <button
+            class="edit-profile-button"
+            type="button"
+            (click)="editProfile()"
+          >
+            Edit Profile
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           YOUR PROGRESS
+      =================================================== -->
+
+      <section class="profile-section">
+
+        <div class="section-heading-row">
+
+          <h2>
+            Your Progress
+          </h2>
+
+
+          <span class="section-filter">
+            This Week
+          </span>
+
+        </div>
+
+
+        <div class="progress-grid">
+
+          <article class="progress-card">
+
+            <span class="progress-label">
+              Workouts
+            </span>
+
+            <strong>
+              {{ workoutsThisWeek }}
+            </strong>
+
+            <span class="progress-subtext">
+              This week
+            </span>
+
+          </article>
+
+
+          <article class="progress-card">
+
+            <span class="progress-label">
+              Volume
+            </span>
+
+            <strong>
+              {{ volumeThisWeek }} kg
+            </strong>
+
+            <span class="progress-subtext">
+              This week
+            </span>
+
+          </article>
+
+
+          <article class="progress-card">
+
+            <span class="progress-label">
+              Streak
+            </span>
+
+            <strong>
+              {{ streakDays }} days
+            </strong>
+
+            <span class="progress-subtext">
+              Keep it going!
+            </span>
+
+          </article>
+
+
+          <article class="progress-card">
+
+            <span class="progress-label">
+              Exercises
+            </span>
+
+            <strong>
+              {{ exercisesThisWeek }}
+            </strong>
+
+            <span class="progress-subtext">
+              This week
+            </span>
+
+          </article>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           RECENT ACTIVITY
+      =================================================== -->
+
+      <section class="profile-section">
+
+        <div class="section-heading-row">
+
+          <h2>
+            Recent Activity
+          </h2>
+
+
+          <button
+            class="text-action"
+            type="button"
+          >
+            View All
+          </button>
+
+        </div>
+
+
+        <div class="activity-card">
+
+          <div class="empty-activity">
+
+            <strong>
+              No recent workouts yet
+            </strong>
+
+
+            <span>
+              Completed workouts will appear here.
+            </span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           PERSONAL DETAILS
+      =================================================== -->
+
+      <section class="profile-section">
+
+        <div class="section-heading-row">
+
+          <h2>
+            Personal Details
+          </h2>
+
+
+          <button
+            class="text-action"
+            type="button"
+            (click)="editProfile()"
+          >
+            Edit
+          </button>
+
+        </div>
+
+
+        <div class="details-card">
+
+          <div class="detail-row">
+
+            <span>
+              Age
+            </span>
+
+            <strong>
+              {{ age }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span>
+              Height
+            </span>
+
+            <strong>
+              {{ height }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span>
+              Weight
+            </span>
+
+            <strong>
+              {{ weight }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span>
+              Fitness Level
+            </span>
+
+            <strong>
+              {{ fitnessLevel }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-row">
+
+            <span>
+              Goal
+            </span>
+
+            <strong>
+              {{ goal }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           SETTINGS
+      =================================================== -->
+
+      <section class="profile-section">
+
+        <h2 class="standalone-section-title">
+          Settings
+        </h2>
+
+
+        <div class="settings-card">
+
+          <button
+            class="settings-row"
+            type="button"
+            (click)="openAppearance()"
+          >
+
+            <span>
+              Appearance
+            </span>
+
+            <span class="settings-chevron">
+              ›
+            </span>
+
+          </button>
+
+
+          <button
+            class="settings-row"
+            type="button"
+            (click)="openAccount()"
+          >
+
+            <span>
+              Account
+            </span>
+
+            <span class="settings-chevron">
+              ›
+            </span>
+
+          </button>
+
+
+          <button
+            class="settings-row logout-row"
+            type="button"
+            (click)="logout()"
+          >
+
+            <span>
+              Logout
+            </span>
+
+            <span class="settings-chevron">
+              ›
+            </span>
+
+          </button>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+  <!-- =====================================================
+       BOTTOM NAVIGATION
+  ====================================================== -->
+
+  <nav class="mobile-bottom-nav">
+
+
+    <!-- HOME -->
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+    >
+
+      <span class="nav-icon-circle">
+
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+
+          <path
+            d="M3.5 10.5L12 3.5l8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"
+          ></path>
+
+        </svg>
+
+      </span>
+
+      <span class="nav-label">
+        Home
+      </span>
+
+    </button>
+
+
+    <!-- WORKOUTS -->
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToWorkouts()"
+    >
+
+      <span class="nav-icon-circle">
+
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+
+          <path d="M6 8v8"></path>
+          <path d="M9 6v12"></path>
+          <path d="M15 6v12"></path>
+          <path d="M18 8v8"></path>
+          <path d="M9 12h6"></path>
+          <path d="M3.5 10v4"></path>
+          <path d="M20.5 10v4"></path>
+
+        </svg>
+
+      </span>
+
+      <span class="nav-label">
+        Workouts
+      </span>
+
+    </button>
+
+
+    <!-- PROGRESS -->
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+    >
+
+      <span class="nav-icon-circle">
+
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+
+          <rect
+            x="4"
+            y="14"
+            width="3"
+            height="6"
+            rx="1"
+          ></rect>
+
+          <rect
+            x="10.5"
+            y="10"
+            width="3"
+            height="10"
+            rx="1"
+          ></rect>
+
+          <rect
+            x="17"
+            y="5"
+            width="3"
+            height="15"
+            rx="1"
+          ></rect>
+
+        </svg>
+
+      </span>
+
+      <span class="nav-label">
+        Progress
+      </span>
+
+    </button>
+
+
+    <!-- PROFILE -->
+
+    <button
+      class="mobile-nav-item active"
+      type="button"
+    >
+
+      <span class="nav-icon-circle">
+
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+
+          <circle
+            cx="12"
+            cy="8"
+            r="3.5"
+          ></circle>
+
+          <path
+            d="M5 20c.7-4 3.1-6 7-6s6.3 2 7 6"
+          ></path>
+
+        </svg>
+
+      </span>
+
+      <span class="nav-label">
+        Profile
+      </span>
+
+    </button>
+
+  </nav>
+
+</div>
+
+
+<!-- ========================================================
+     SETTINGS POPUP
+========================================================= -->
+
+@if (showSettings) {
+
+  <div
+    class="settings-backdrop"
+    (click)="closeSettings()"
+  >
+
+    <div
+      class="settings-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settingsTitle"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div class="settings-modal-header">
+
+        <div>
+
+          <h2 id="settingsTitle">
+            Settings
+          </h2>
+
+          <p>
+            Manage your PulseOS preferences.
+          </p>
+
+        </div>
+
+
+        <button
+          class="settings-close-button"
+          type="button"
+          aria-label="Close settings"
+          (click)="closeSettings()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="settings-modal-list">
+
+        <button
+          type="button"
+          (click)="openAppearance()"
+        >
+
+          <span>
+            Appearance
+          </span>
+
+          <span>
+            ›
+          </span>
+
+        </button>
+
+
+        <button
+          type="button"
+          (click)="openAccount()"
+        >
+
+          <span>
+            Account
+          </span>
+
+          <span>
+            ›
+          </span>
+
+        </button>
+
+
+        <button
+          class="modal-logout"
+          type="button"
+          (click)="logout()"
+        >
+
+          <span>
+            Logout
+          </span>
+
+          <span>
+            ›
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

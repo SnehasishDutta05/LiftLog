@@ -1,0 +1,842 @@
+:host {
+  display: block;
+
+  width: 100%;
+
+  min-height: 100vh;
+
+  background: #f5f7f6;
+}
+
+
+button {
+  font: inherit;
+}
+
+
+.profile-shell {
+  width: 100%;
+
+  min-height: 100vh;
+
+  display: flex;
+
+  justify-content: center;
+
+  background: #f5f7f6;
+
+  color: #10231d;
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+.profile-main {
+  width: 100%;
+
+  max-width: 444px;
+
+  min-height: 100vh;
+
+  padding-bottom: 100px;
+
+  background: #ffffff;
+}
+
+
+.profile-content {
+  padding:
+    max(24px, env(safe-area-inset-top))
+    18px
+    30px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.profile-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 24px;
+}
+
+
+.profile-header h1 {
+  margin: 0;
+
+  font-size: 34px;
+
+  line-height: 1;
+
+  font-weight: 800;
+
+  letter-spacing: -1px;
+
+  color: #10231d;
+}
+
+
+.settings-icon-button {
+  width: 42px;
+
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #f2f7f4;
+
+  color: #10231d;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   USER
+========================================================= */
+
+.profile-user {
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+
+  margin-bottom: 30px;
+}
+
+
+.profile-avatar {
+  width: 84px;
+
+  height: 84px;
+
+  flex: 0 0 84px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e4f7ee;
+
+  color: #166c4c;
+
+  font-size: 34px;
+
+  font-weight: 800;
+}
+
+
+.profile-user-copy {
+  min-width: 0;
+}
+
+
+.profile-user-copy h2 {
+  margin: 0;
+
+  font-size: 20px;
+
+  font-weight: 800;
+
+  color: #10231d;
+}
+
+
+.profile-user-copy p {
+  margin: 4px 0 10px;
+
+  color: #74847e;
+
+  font-size: 13px;
+
+  overflow-wrap: anywhere;
+}
+
+
+.edit-profile-button {
+  min-height: 34px;
+
+  padding: 7px 14px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  background: #e7f7ef;
+
+  color: #146644;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.profile-section {
+  margin-top: 28px;
+}
+
+
+.section-heading-row {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 12px;
+}
+
+
+.section-heading-row h2,
+.standalone-section-title {
+  margin: 0;
+
+  color: #10231d;
+
+  font-size: 21px;
+
+  font-weight: 800;
+
+  letter-spacing: -0.3px;
+}
+
+
+.section-filter {
+  color: #72817c;
+
+  font-size: 12px;
+}
+
+
+.text-action {
+  border: none;
+
+  background: transparent;
+
+  color: #198754;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.progress-grid {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+}
+
+
+.progress-card {
+  min-height: 104px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  padding: 15px;
+
+  border: 1px solid #e3e9e6;
+
+  border-radius: 16px;
+
+  background: #ffffff;
+}
+
+
+.progress-label {
+  color: #5c6d66;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+
+.progress-card strong {
+  margin-top: 6px;
+
+  color: #10231d;
+
+  font-size: 24px;
+
+  line-height: 1;
+
+  font-weight: 800;
+}
+
+
+.progress-subtext {
+  margin-top: 7px;
+
+  color: #8a9892;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   ACTIVITY / DETAILS / SETTINGS
+========================================================= */
+
+.activity-card,
+.details-card,
+.settings-card {
+  overflow: hidden;
+
+  border: 1px solid #e3e9e6;
+
+  border-radius: 16px;
+
+  background: #ffffff;
+}
+
+
+.empty-activity {
+  min-height: 110px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  padding: 18px;
+}
+
+
+.empty-activity strong {
+  color: #10231d;
+
+  font-size: 14px;
+}
+
+
+.empty-activity span {
+  margin-top: 5px;
+
+  color: #8a9892;
+
+  font-size: 12px;
+}
+
+
+.detail-row {
+  min-height: 50px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 0 16px;
+
+  border-bottom: 1px solid #edf1ef;
+}
+
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+
+.detail-row span {
+  color: #596a63;
+
+  font-size: 13px;
+}
+
+
+.detail-row strong {
+  color: #10231d;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  text-align: right;
+}
+
+
+.settings-card {
+  margin-top: 12px;
+}
+
+
+.settings-row {
+  width: 100%;
+
+  min-height: 52px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 0 16px;
+
+  border: none;
+
+  border-bottom: 1px solid #edf1ef;
+
+  background: #ffffff;
+
+  color: #10231d;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+
+.settings-chevron {
+  color: #8b9893;
+
+  font-size: 22px;
+}
+
+
+.logout-row {
+  color: #ad4141;
+}
+
+
+/* =========================================================
+   BOTTOM NAVIGATION
+========================================================= */
+
+.mobile-bottom-nav {
+  position: fixed;
+
+  left: 50%;
+
+  bottom: 0;
+
+  z-index: 100;
+
+  width: 100%;
+
+  max-width: 444px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  padding:
+    8px
+    8px
+    max(8px, env(safe-area-inset-bottom));
+
+  border-top: 1px solid #edf1ef;
+
+  background:
+    rgba(255, 255, 255, 0.98);
+
+  transform:
+    translateX(-50%);
+}
+
+
+.mobile-nav-item {
+  appearance: none;
+
+  min-width: 0;
+
+  min-height: 64px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 3px 2px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #8b9793;
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   NAV ICON CIRCLE
+========================================================= */
+
+.nav-icon-circle {
+  width: 38px;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eef3f1;
+
+  color: #8b9793;
+
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+
+.nav-icon-circle svg {
+  width: 22px;
+
+  height: 22px;
+
+  fill: none;
+
+  stroke: currentColor;
+
+  stroke-width: 1.9;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+}
+
+
+.nav-label {
+  font-size: 11px;
+
+  line-height: 1.1;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   ACTIVE TAB
+========================================================= */
+
+.mobile-nav-item.active {
+  color: #128458;
+}
+
+
+.mobile-nav-item.active
+.nav-icon-circle {
+  background: #bff2da;
+
+  color: #0f8a59;
+}
+
+
+.mobile-nav-item.active
+.nav-label {
+  color: #128458;
+
+  font-weight: 700;
+}
+
+
+.mobile-nav-item:active
+.nav-icon-circle {
+  transform: scale(0.94);
+}
+
+
+/* =========================================================
+   SETTINGS MODAL
+========================================================= */
+
+.settings-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 500;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: center;
+
+  padding: 18px;
+
+  background:
+    rgba(16, 35, 29, 0.28);
+}
+
+
+.settings-modal {
+  width: 100%;
+
+  max-width: 410px;
+
+  overflow: hidden;
+
+  border-radius: 22px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 24px 60px
+    rgba(16, 35, 29, 0.18);
+}
+
+
+.settings-modal-header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 20px;
+
+  border-bottom:
+    1px solid #edf1ef;
+}
+
+
+.settings-modal-header h2 {
+  margin: 0;
+
+  color: #10231d;
+
+  font-size: 22px;
+
+  font-weight: 800;
+}
+
+
+.settings-modal-header p {
+  margin: 5px 0 0;
+
+  color: #7e8d87;
+
+  font-size: 12px;
+}
+
+
+.settings-close-button {
+  width: 36px;
+
+  height: 36px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #f2f6f4;
+
+  color: #10231d;
+
+  font-size: 24px;
+
+  cursor: pointer;
+}
+
+
+.settings-modal-list button {
+  width: 100%;
+
+  min-height: 56px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 0 20px;
+
+  border: none;
+
+  border-bottom:
+    1px solid #edf1ef;
+
+  background: #ffffff;
+
+  color: #10231d;
+
+  text-align: left;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.settings-modal-list button:last-child {
+  border-bottom: none;
+}
+
+
+.settings-modal-list
+.modal-logout {
+  color: #ad4141;
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+
+  .profile-content {
+    padding:
+      22px
+      14px
+      28px;
+  }
+
+
+  .profile-header h1 {
+    font-size: 31px;
+  }
+
+
+  .profile-avatar {
+    width: 72px;
+
+    height: 72px;
+
+    flex-basis: 72px;
+
+    font-size: 30px;
+  }
+
+
+  .profile-user-copy h2 {
+    font-size: 18px;
+  }
+
+
+  .progress-card {
+    min-height: 96px;
+
+    padding: 13px;
+  }
+
+
+  .progress-card strong {
+    font-size: 21px;
+  }
+
+
+  .nav-icon-circle {
+    width: 36px;
+
+    height: 36px;
+  }
+
+
+  .nav-icon-circle svg {
+    width: 21px;
+
+    height: 21px;
+  }
+
+}
+
+
+/* =========================================================
+   DESKTOP
+
+   Still keeps PulseOS portrait/mobile-first.
+========================================================= */
+
+@media (min-width: 445px) {
+
+  :host {
+    padding: 28px 0;
+  }
+
+
+  .profile-main {
+    min-height:
+      calc(100vh - 56px);
+
+    box-shadow:
+      0 16px 50px
+      rgba(7, 21, 45, 0.08);
+  }
+
+}

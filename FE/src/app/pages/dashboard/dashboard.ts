@@ -89,15 +89,23 @@ interface StoredWorkoutSet {
 
 
 interface StoredWorkoutExercise {
+
   exercise: {
+
     id: string;
+
     n: string;
+
     bp: string;
+
     eq: string;
+
     tg: string;
+
   };
 
   sets: StoredWorkoutSet[];
+
 }
 
 
@@ -107,18 +115,26 @@ interface StoredWorkoutExercise {
 
 @Component({
   selector: 'app-dashboard',
+
   imports: [],
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+
+  templateUrl:
+    './dashboard.html',
+
+  styleUrl:
+    './dashboard.css',
 })
-export class Dashboard implements OnInit {
+export class Dashboard
+  implements OnInit {
 
 
   /* =====================================================
      DASHBOARD ROUTINES
   ===================================================== */
 
-  routines: DashboardRoutine[] = [];
+  routines:
+    DashboardRoutine[] = [];
+
 
   isLoadingRoutines = false;
 
@@ -130,11 +146,14 @@ export class Dashboard implements OnInit {
   private readonly WORKOUT_START_KEY =
     'pulseos_workout_start_time';
 
+
   private readonly SELECTED_EXERCISES_KEY =
     'pulseos_selected_exercises';
 
+
   private readonly WORKOUT_EXERCISES_KEY =
     'pulseos_workout_exercises';
+
 
   private readonly ACTIVE_ROUTINE_ID_KEY =
     'pulseos_active_routine_id';
@@ -153,9 +172,14 @@ export class Dashboard implements OnInit {
   ===================================================== */
 
   constructor(
-    private router: Router,
-    private http: HttpClient,
-    private changeDetector: ChangeDetectorRef,
+    private router:
+      Router,
+
+    private http:
+      HttpClient,
+
+    private changeDetector:
+      ChangeDetectorRef,
   ) {}
 
 
@@ -176,7 +200,8 @@ export class Dashboard implements OnInit {
 
   private loadRoutines(): void {
 
-    this.isLoadingRoutines = true;
+    this.isLoadingRoutines =
+      true;
 
 
     this.http
@@ -188,18 +213,27 @@ export class Dashboard implements OnInit {
         next: response => {
 
           const summaries =
-            Array.isArray(response.routines)
+            Array.isArray(
+              response.routines,
+            )
               ? response.routines
               : [];
 
 
-          if (summaries.length === 0) {
+          if (
+            summaries.length ===
+            0
+          ) {
 
             this.routines = [];
 
-            this.isLoadingRoutines = false;
+            this.isLoadingRoutines =
+              false;
 
-            this.changeDetector.detectChanges();
+
+            this.changeDetector
+              .detectChanges();
+
 
             return;
 
@@ -243,7 +277,9 @@ export class Dashboard implements OnInit {
             );
 
 
-          forkJoin(detailRequests)
+          forkJoin(
+            detailRequests,
+          )
             .subscribe({
 
               next: details => {
@@ -264,13 +300,19 @@ export class Dashboard implements OnInit {
 
 
                       const name =
-                        summary.name?.trim() ||
-                        detail?.name?.trim() ||
+                        summary
+                          .name
+                          ?.trim() ||
+                        detail
+                          ?.name
+                          ?.trim() ||
                         'Routine';
 
 
                       const exerciseCount =
-                        detail?.exercises?.length ??
+                        detail
+                          ?.exercises
+                          ?.length ??
                         0;
 
 
@@ -345,9 +387,12 @@ export class Dashboard implements OnInit {
           );
 
 
-          this.routines = [];
+          this.routines =
+            [];
 
-          this.isLoadingRoutines = false;
+
+          this.isLoadingRoutines =
+            false;
 
 
           this.changeDetector
@@ -387,15 +432,21 @@ export class Dashboard implements OnInit {
 
   /* =====================================================
      DELETE ROUTINE
+
      DELETE /api/v1/routines/{routine_id}
   ===================================================== */
 
   deleteRoutine(
-    routine: DashboardRoutine,
+    routine:
+      DashboardRoutine,
   ): void {
 
-    if (routine.isDeleting) {
+    if (
+      routine.isDeleting
+    ) {
+
       return;
+
     }
 
 
@@ -405,12 +456,18 @@ export class Dashboard implements OnInit {
       );
 
 
-    if (!shouldDelete) {
+    if (
+      !shouldDelete
+    ) {
+
       return;
+
     }
 
 
-    routine.isDeleting = true;
+    routine.isDeleting =
+      true;
+
 
     this.changeDetector
       .detectChanges();
@@ -427,9 +484,10 @@ export class Dashboard implements OnInit {
           /*
            * DELETE returned 204.
            *
-           * Remove the card immediately
-           * without refreshing the page.
+           * Remove the routine immediately
+           * from the UI.
            */
+
           this.routines =
             this.routines.filter(
               item =>
@@ -446,7 +504,9 @@ export class Dashboard implements OnInit {
 
           if (
             activeRoutineId &&
-            Number(activeRoutineId) ===
+            Number(
+              activeRoutineId,
+            ) ===
               routine.routine_id
           ) {
 
@@ -471,19 +531,26 @@ export class Dashboard implements OnInit {
           );
 
 
-          routine.isDeleting = false;
+          routine.isDeleting =
+            false;
 
 
           this.changeDetector
             .detectChanges();
 
 
-          if (error.status === 404) {
+          if (
+            error.status ===
+            404
+          ) {
 
             /*
-             * Backend already doesn't have it.
-             * Remove it from UI as well.
+             * Backend already does not
+             * have this routine.
+             *
+             * Remove it locally too.
              */
+
             this.routines =
               this.routines.filter(
                 item =>
@@ -501,11 +568,15 @@ export class Dashboard implements OnInit {
           }
 
 
-          if (error.status === 401) {
+          if (
+            error.status ===
+            401
+          ) {
 
             window.alert(
               'Your session could not be authenticated. Please try again.',
             );
+
 
             return;
 
@@ -528,7 +599,8 @@ export class Dashboard implements OnInit {
      CLEAR EXISTING WORKOUT STATE
   ===================================================== */
 
-  private clearPreviousWorkout(): void {
+  private clearPreviousWorkout():
+    void {
 
     localStorage.removeItem(
       this.WORKOUT_START_KEY,
@@ -556,14 +628,17 @@ export class Dashboard implements OnInit {
      START EMPTY WORKOUT
   ===================================================== */
 
-  startEmptyWorkout(): void {
+  startEmptyWorkout():
+    void {
 
     this.clearPreviousWorkout();
 
 
     localStorage.setItem(
       this.WORKOUT_START_KEY,
-      Date.now().toString(),
+
+      Date.now()
+        .toString(),
     );
 
 
@@ -579,11 +654,16 @@ export class Dashboard implements OnInit {
   ===================================================== */
 
   startRoutine(
-    routine: DashboardRoutine,
+    routine:
+      DashboardRoutine,
   ): void {
 
-    if (routine.isDeleting) {
+    if (
+      routine.isDeleting
+    ) {
+
       return;
+
     }
 
 
@@ -599,7 +679,9 @@ export class Dashboard implements OnInit {
 
 
           const orderedExercises =
-            [...response.exercises]
+            [
+              ...response.exercises,
+            ]
               .sort(
                 (
                   first,
@@ -618,7 +700,9 @@ export class Dashboard implements OnInit {
                   const setCount =
                     Math.max(
                       1,
-                      routineExercise.target_sets ??
+
+                      routineExercise
+                        .target_sets ??
                       1,
                     );
 
@@ -626,15 +710,25 @@ export class Dashboard implements OnInit {
                   const sets:
                     StoredWorkoutSet[] =
                       Array.from(
+
                         {
                           length:
                             setCount,
                         },
+
                         () => ({
-                          weight: null,
-                          reps: null,
-                          completed: false,
+
+                          weight:
+                            null,
+
+                          reps:
+                            null,
+
+                          completed:
+                            false,
+
                         }),
+
                       );
 
 
@@ -644,20 +738,25 @@ export class Dashboard implements OnInit {
 
                       id:
                         String(
-                          routineExercise.exercise_id,
+                          routineExercise
+                            .exercise_id,
                         ),
 
                       n:
-                        routineExercise.name,
+                        routineExercise
+                          .name,
 
-                      bp: '',
+                      bp:
+                        '',
 
-                      eq: '',
+                      eq:
+                        '',
 
                       tg:
                         'Saved routine',
 
                     },
+
 
                     sets,
 
@@ -688,7 +787,8 @@ export class Dashboard implements OnInit {
           localStorage.setItem(
             this.WORKOUT_START_KEY,
 
-            Date.now().toString(),
+            Date.now()
+              .toString(),
           );
 
 
@@ -714,6 +814,19 @@ export class Dashboard implements OnInit {
         },
 
       });
+
+  }
+
+
+  /* =====================================================
+     BOTTOM NAVIGATION
+  ===================================================== */
+
+  goToProfile(): void {
+
+    this.router.navigate([
+      '/profile',
+    ]);
 
   }
 

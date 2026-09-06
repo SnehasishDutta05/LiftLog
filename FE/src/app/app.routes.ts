@@ -6,6 +6,7 @@ import { Onboarding } from './pages/onboarding/onboarding';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { ActiveWorkout } from './pages/active-workout/active-workout';
 import { ExercisePicker } from './pages/exercise-picker/exercise-picker';
+import { Profile } from './pages/profile/profile';
 
 export const routes: Routes = [
   {
@@ -23,6 +24,10 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: Dashboard,
+  },
+  {
+    path: 'profile',
+    component: Profile,
   },
   {
     path: 'active-workout',
