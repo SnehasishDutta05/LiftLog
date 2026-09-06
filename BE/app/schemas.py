@@ -51,8 +51,8 @@ class RefreshTokenRequest(BaseModel):
 class UserProfileRequest(BaseModel):
     # Physical data
     dob: Optional[str] = None
-    height: Optional[float] = None
-    weight: Optional[float] = None
+    height: Optional[str] = None
+    weight: Optional[str] = None
     sex: Optional[str] = None
 
     # Lifestyle
@@ -65,7 +65,7 @@ class UserProfileRequest(BaseModel):
 
     # Training
     experience: Optional[str] = None
-    training_days: Optional[int] = None
+    training_days: Optional[str] = None
     preferred_time: Optional[str] = None
     preferred_exercises: Optional[str] = None
     disliked_exercises: Optional[str] = None
@@ -73,7 +73,7 @@ class UserProfileRequest(BaseModel):
 
     # Nutrition
     typical_foods: Optional[str] = None
-    meals_per_day: Optional[int] = None
+    meals_per_day: Optional[str] = None
     eating_out_frequency: Optional[str] = None
     favorite_foods: Optional[str] = None
     favorite_snacks: Optional[str] = None
@@ -82,7 +82,7 @@ class UserProfileRequest(BaseModel):
 
     # Goals
     primary_goal: Optional[str] = None
-    target_weight: Optional[float] = None
+    target_weight: Optional[str] = None
     goal_description: Optional[str] = None
     lifestyle_change_tolerance: Optional[str] = None
 

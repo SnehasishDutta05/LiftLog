@@ -114,8 +114,8 @@ class UserProfile(Base):
 
     # Physical data
     dob = Column(String, nullable=True)
-    height = Column(Float, nullable=True)
-    weight = Column(Float, nullable=True)
+    height = Column(String, nullable=True)
+    weight = Column(String, nullable=True)
     sex = Column(String, nullable=True)
 
     # Lifestyle
@@ -128,7 +128,7 @@ class UserProfile(Base):
 
     # Training
     experience = Column(String, nullable=True)
-    training_days = Column(Integer, nullable=True)
+    training_days = Column(String, nullable=True)
     preferred_time = Column(String, nullable=True)
     preferred_exercises = Column(String, nullable=True)
     disliked_exercises = Column(String, nullable=True)
@@ -136,7 +136,7 @@ class UserProfile(Base):
 
     # Nutrition
     typical_foods = Column(String, nullable=True)
-    meals_per_day = Column(Integer, nullable=True)
+    meals_per_day = Column(String, nullable=True)
     eating_out_frequency = Column(String, nullable=True)
     favorite_foods = Column(String, nullable=True)
     favorite_snacks = Column(String, nullable=True)
@@ -145,7 +145,7 @@ class UserProfile(Base):
 
     # Goals
     primary_goal = Column(String, nullable=True)
-    target_weight = Column(Float, nullable=True)
+    target_weight = Column(String, nullable=True)
     goal_description = Column(String, nullable=True)
     lifestyle_change_tolerance = Column(String, nullable=True)
 
