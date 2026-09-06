@@ -43,7 +43,6 @@
   display: flex;
 
   align-items: center;
-
   justify-content: space-between;
 
   min-height: 68px;
@@ -87,24 +86,21 @@
 
 
 /* =========================================================
-   BACK BUTTON
+   BACK
 ========================================================= */
 
 .collapse-button {
   display: flex;
 
   align-items: center;
-
   justify-content: center;
 
   width: 38px;
-
   height: 38px;
 
   padding: 0;
 
   border: 0;
-
   border-radius: 50%;
 
   background: #edf3f0;
@@ -115,7 +111,6 @@
 
 .chevron {
   width: 9px;
-
   height: 9px;
 
   margin-left: 4px;
@@ -141,7 +136,6 @@
   padding: 0 18px;
 
   border: 0;
-
   border-radius: 12px;
 
   background: #74d9a5;
@@ -151,15 +145,21 @@
   font-family: inherit;
 
   font-size: 14px;
-
   font-weight: 800;
 
   cursor: pointer;
 }
 
 
+.finish-button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+}
+
+
 /* =========================================================
-   WORKOUT STATS
+   STATS
 ========================================================= */
 
 .workout-stats {
@@ -213,14 +213,17 @@
 ========================================================= */
 
 .workout-content {
-  padding: 0 0 40px;
+  padding:
+    0
+    0
+    40px;
 
   background: #f5f7f6;
 }
 
 
 /* =========================================================
-   EMPTY STATE
+   EMPTY
 ========================================================= */
 
 .empty-state {
@@ -230,7 +233,10 @@
 
   align-items: center;
 
-  padding: 56px 20px 36px;
+  padding:
+    56px
+    20px
+    36px;
 
   background: #ffffff;
 
@@ -242,7 +248,10 @@
 
 
 .empty-state h2 {
-  margin: 15px 0 6px;
+  margin:
+    15px
+    0
+    6px;
 
   color: #10231d;
 
@@ -265,7 +274,6 @@
   align-items: center;
 
   width: 78px;
-
   height: 44px;
 }
 
@@ -283,7 +291,6 @@
 
 .weight {
   width: 18px;
-
   height: 36px;
 
   border-radius: 5px;
@@ -313,12 +320,35 @@
   background: #ffffff;
 
   box-shadow: none;
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 
-.exercise-card + .exercise-card {
+.exercise-card +
+.exercise-card {
   border-top:
     8px solid #f5f7f6;
+}
+
+
+.exercise-card.dragging {
+  position: relative;
+
+  z-index: 20;
+
+  opacity: 0.72;
+
+  box-shadow:
+    0 8px 22px
+    rgba(
+      16,
+      35,
+      29,
+      0.12
+    );
 }
 
 
@@ -332,13 +362,29 @@
   grid-template-columns:
     48px
     minmax(0, 1fr)
-    34px;
+    auto;
 
   gap: 11px;
 
   align-items: center;
 
   padding: 16px 14px;
+
+  user-select: none;
+
+  -webkit-user-select: none;
+
+  -webkit-touch-callout: none;
+
+  touch-action: none;
+
+  cursor: grab;
+}
+
+
+.exercise-card.dragging
+.exercise-card-header {
+  cursor: grabbing;
 }
 
 
@@ -346,11 +392,9 @@
   display: flex;
 
   align-items: center;
-
   justify-content: center;
 
   width: 46px;
-
   height: 46px;
 
   border-radius: 50%;
@@ -394,40 +438,52 @@
 
   margin-top: 4px;
 
+  overflow: hidden;
+
   color: #73847d;
 
   font-size: 12px;
 
   font-weight: 600;
 
+  text-overflow: ellipsis;
+
   text-transform: capitalize;
+
+  white-space: nowrap;
 }
 
 
-.exercise-menu-button {
-  display: flex;
+/* =========================================================
+   DELETE
+========================================================= */
 
-  align-items: center;
+.exercise-delete-button {
+  min-width: 54px;
+  min-height: 34px;
 
-  justify-content: center;
+  padding:
+    0
+    9px;
 
-  width: 34px;
+  border:
+    1px solid #eadada;
 
-  height: 34px;
+  border-radius: 9px;
 
-  padding: 0;
+  background: #fffafa;
 
-  border: 0;
+  color: #a04747;
 
-  border-radius: 50%;
+  font-family: inherit;
 
-  background: transparent;
+  font-size: 11px;
 
-  color: #75847f;
-
-  font-size: 22px;
+  font-weight: 800;
 
   cursor: pointer;
+
+  touch-action: manipulation;
 }
 
 
@@ -500,11 +556,9 @@
   display: flex;
 
   align-items: center;
-
   justify-content: center;
 
   width: 29px;
-
   height: 29px;
 
   margin: auto;
@@ -535,15 +589,16 @@
 
 
 /* =========================================================
-   KG / REPS INPUT
+   INPUT
 ========================================================= */
 
 .set-input {
   width: 100%;
-
   height: 38px;
 
-  padding: 0 6px;
+  padding:
+    0
+    6px;
 
   border:
     1px solid #dfe7e3;
@@ -601,11 +656,9 @@
   display: flex;
 
   align-items: center;
-
   justify-content: center;
 
   width: 34px;
-
   height: 34px;
 
   margin: auto;
@@ -646,7 +699,10 @@
 
   min-height: 42px;
 
-  margin: 12px 14px 14px;
+  margin:
+    12px
+    14px
+    14px;
 
   border:
     1px solid #cae8d9;
@@ -675,7 +731,6 @@
   display: flex;
 
   align-items: center;
-
   justify-content: center;
 
   gap: 8px;
@@ -685,7 +740,10 @@
 
   min-height: 52px;
 
-  margin: 18px 14px 0;
+  margin:
+    18px
+    14px
+    0;
 
   border: 0;
 
@@ -724,7 +782,10 @@
 
   gap: 10px;
 
-  margin: 13px 14px 0;
+  margin:
+    13px
+    14px
+    0;
 }
 
 
@@ -765,7 +826,7 @@
 
 
 /* =========================================================
-   ROUTINE MODAL BACKDROP
+   ROUTINE MODAL
 ========================================================= */
 
 .routine-modal-backdrop {
@@ -778,7 +839,6 @@
   display: flex;
 
   align-items: center;
-
   justify-content: center;
 
   padding: 18px;
@@ -795,10 +855,6 @@
     blur(2px);
 }
 
-
-/* =========================================================
-   ROUTINE MODAL
-========================================================= */
 
 .routine-modal {
   width: 100%;
@@ -827,15 +883,10 @@
 }
 
 
-/* =========================================================
-   MODAL HEADER
-========================================================= */
-
 .routine-modal-header {
   display: flex;
 
   align-items: flex-start;
-
   justify-content: space-between;
 
   gap: 14px;
@@ -854,7 +905,10 @@
 
 
 .routine-modal-header p {
-  margin: 6px 0 0;
+  margin:
+    6px
+    0
+    0;
 
   color: #73847d;
 
@@ -870,17 +924,14 @@
   flex-shrink: 0;
 
   align-items: center;
-
   justify-content: center;
 
   width: 36px;
-
   height: 36px;
 
   padding: 0;
 
   border: 0;
-
   border-radius: 50%;
 
   background: #edf3f0;
@@ -903,10 +954,6 @@
   opacity: 0.55;
 }
 
-
-/* =========================================================
-   ROUTINE FIELD
-========================================================= */
 
 .routine-field {
   margin-top: 22px;
@@ -931,7 +978,9 @@
 
   min-height: 52px;
 
-  padding: 0 14px;
+  padding:
+    0
+    14px;
 
   border:
     1px solid #dce6e1;
@@ -973,15 +1022,10 @@
 }
 
 
-/* =========================================================
-   ROUTINE SUMMARY
-========================================================= */
-
 .routine-exercises-summary {
   display: flex;
 
   align-items: center;
-
   justify-content: space-between;
 
   margin-top: 14px;
@@ -1007,14 +1051,14 @@
   display: flex;
 
   align-items: center;
-
   justify-content: center;
 
   min-width: 28px;
-
   height: 28px;
 
-  padding: 0 8px;
+  padding:
+    0
+    8px;
 
   border-radius: 999px;
 
@@ -1027,10 +1071,6 @@
   font-weight: 800;
 }
 
-
-/* =========================================================
-   ERROR
-========================================================= */
 
 .routine-error {
   margin-top: 12px;
@@ -1053,10 +1093,6 @@
   line-height: 1.4;
 }
 
-
-/* =========================================================
-   MODAL ACTIONS
-========================================================= */
 
 .routine-modal-actions {
   display: grid;
@@ -1114,22 +1150,38 @@
 
 
 /* =========================================================
-   SMALL PHONES
+   SMALL PHONE
 ========================================================= */
 
 @media (max-width: 360px) {
 
-  .workout-content {
-    padding-left: 0;
+  .exercise-card-header {
+    grid-template-columns:
+      44px
+      minmax(0, 1fr)
+      auto;
 
-    padding-right: 0;
+    gap: 8px;
+
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
 
-  .exercise-card-header {
-    padding-left: 12px;
+  .exercise-avatar {
+    width: 42px;
+    height: 42px;
+  }
 
-    padding-right: 12px;
+
+  .exercise-delete-button {
+    min-width: 50px;
+
+    padding:
+      0
+      7px;
+
+    font-size: 10px;
   }
 
 
@@ -1148,14 +1200,12 @@
 
   .set-table-header {
     padding-left: 8px;
-
     padding-right: 8px;
   }
 
 
   .set-row {
     padding-left: 8px;
-
     padding-right: 8px;
   }
 
@@ -1165,7 +1215,6 @@
       calc(100% - 24px);
 
     margin-left: 12px;
-
     margin-right: 12px;
   }
 
@@ -1175,14 +1224,12 @@
       calc(100% - 24px);
 
     margin-left: 12px;
-
     margin-right: 12px;
   }
 
 
   .bottom-actions {
     margin-left: 12px;
-
     margin-right: 12px;
   }
 
@@ -1201,6 +1248,29 @@
 
   .routine-modal-actions {
     gap: 8px;
+  }
+
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .exercise-delete-button:hover {
+    background: #fff1f1;
+  }
+
+
+  .add-set-button:hover {
+    background: #e5f6ed;
+  }
+
+
+  .add-exercise-button:hover {
+    background: #68cf99;
   }
 
 }

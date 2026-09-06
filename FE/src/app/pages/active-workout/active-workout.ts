@@ -84,8 +84,15 @@ interface CreateRoutineResponse {
 }
 
 
+interface RoutineDetailResponse {
+  routine_id: number;
+  name: string;
+  exercises: RoutineExerciseResponse[];
+}
+
+
 /* =========================================================
-   SAVE WORKOUT API MODELS
+   WORKOUT API MODELS
 ========================================================= */
 
 interface WorkoutSetRequest {
@@ -101,7 +108,7 @@ interface WorkoutExerciseRequest {
 
 
 interface SaveWorkoutRequest {
-  routine_id: number;
+  routine_id: number | null;
   started_at: string;
   finished_at: string;
   exercises: WorkoutExerciseRequest[];
@@ -125,7 +132,7 @@ interface SavedWorkoutExerciseResponse {
 
 interface SaveWorkoutResponse {
   workout_id: number;
-  routine_id: number;
+  routine_id: number | null;
   started_at: string;
   finished_at: string;
   duration_seconds: number;
@@ -165,7 +172,7 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     ROUTINE POPUP STATE
+     ROUTINE MODAL
   ===================================================== */
 
   showRoutineModal = false;
@@ -178,14 +185,38 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     FINISH WORKOUT STATE
+     FINISH
   ===================================================== */
 
   isFinishingWorkout = false;
 
 
   /* =====================================================
-     LOCAL STORAGE KEYS
+     DRAG
+  ===================================================== */
+
+  draggingExerciseIndex:
+    number | null = null;
+
+  private pendingDragIndex:
+    number | null = null;
+
+  private dragPointerId:
+    number | null = null;
+
+  private dragElement:
+    HTMLElement | null = null;
+
+  private dragTimer:
+    ReturnType<typeof setTimeout> |
+    undefined;
+
+  private readonly DRAG_DELAY_MS =
+    400;
+
+
+  /* =====================================================
+     STORAGE
   ===================================================== */
 
   private readonly WORKOUT_START_KEY =
@@ -196,6 +227,15 @@ export class ActiveWorkout
 
   private readonly WORKOUT_EXERCISES_KEY =
     'pulseos_workout_exercises';
+
+  private readonly ACTIVE_ROUTINE_ID_KEY =
+    'pulseos_active_routine_id';
+
+  private readonly ROUTINES_CHANGED_KEY =
+    'pulseos_routines_changed';
+
+  private readonly LAST_CREATED_ROUTINE_KEY =
+    'pulseos_last_created_routine';
 
 
   /* =====================================================
@@ -210,8 +250,9 @@ export class ActiveWorkout
      TIMER
   ===================================================== */
 
-  private timer?:
-    ReturnType<typeof setInterval>;
+  private timer:
+    ReturnType<typeof setInterval> |
+    undefined;
 
 
   /* =====================================================
@@ -227,7 +268,7 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     INITIALIZE
+     INIT
   ===================================================== */
 
   ngOnInit(): void {
@@ -242,7 +283,7 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     INITIALIZE WORKOUT TIMER
+     TIMER
   ===================================================== */
 
   private initializeWorkoutTimer(): void {
@@ -253,10 +294,6 @@ export class ActiveWorkout
       );
 
 
-    /*
-     * If this is a new workout,
-     * create the start timestamp.
-     */
     if (!startTime) {
 
       startTime =
@@ -278,10 +315,6 @@ export class ActiveWorkout
   }
 
 
-  /* =====================================================
-     START TIMER
-  ===================================================== */
-
   private startTimer(): void {
 
     this.stopTimer();
@@ -299,10 +332,6 @@ export class ActiveWorkout
 
   }
 
-
-  /* =====================================================
-     UPDATE TIMER
-  ===================================================== */
 
   private updateElapsedTime(): void {
 
@@ -359,10 +388,6 @@ export class ActiveWorkout
   }
 
 
-  /* =====================================================
-     FORMATTED DURATION
-  ===================================================== */
-
   get formattedDuration(): string {
 
     const hours =
@@ -413,10 +438,6 @@ export class ActiveWorkout
   }
 
 
-  /* =====================================================
-     STOP TIMER
-  ===================================================== */
-
   private stopTimer(): void {
 
     if (!this.timer) {
@@ -435,10 +456,6 @@ export class ActiveWorkout
   }
 
 
-  /* =====================================================
-     CLEAR TIMER
-  ===================================================== */
-
   private clearWorkoutTimer(): void {
 
     this.stopTimer();
@@ -455,7 +472,7 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     LOAD WORKOUT EXERCISES
+     LOAD WORKOUT
   ===================================================== */
 
   private loadWorkoutExercises(): void {
@@ -503,7 +520,7 @@ export class ActiveWorkout
     } catch (error) {
 
       console.error(
-        'Failed to load workout exercises:',
+        'Failed to load workout:',
         error,
       );
 
@@ -516,7 +533,7 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     IMPORT EXERCISES FROM EXERCISE PICKER
+     PICKER IMPORT
   ===================================================== */
 
   private importSelectedExercises(): void {
@@ -546,7 +563,7 @@ export class ActiveWorkout
     } catch (error) {
 
       console.error(
-        'Failed to import selected exercises:',
+        'Failed to import exercises:',
         error,
       );
 
@@ -564,15 +581,24 @@ export class ActiveWorkout
     selectedExercises.forEach(
       exercise => {
 
-        const alreadyAdded =
-          this.workoutExercises.some(
-            workoutExercise =>
-              workoutExercise.exercise.id ===
-              exercise.id,
+        const incomingId =
+          Number(
+            exercise.id,
           );
 
 
-        if (alreadyAdded) {
+        const exists =
+          this.workoutExercises.some(
+            workoutExercise =>
+              Number(
+                workoutExercise
+                  .exercise
+                  .id,
+              ) === incomingId,
+          );
+
+
+        if (exists) {
           return;
         }
 
@@ -606,7 +632,7 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     SAVE CURRENT WORKOUT LOCALLY
+     SAVE LOCALLY
   ===================================================== */
 
   private saveWorkoutExercises(): void {
@@ -622,10 +648,6 @@ export class ActiveWorkout
   }
 
 
-  /* =====================================================
-     INPUT CHANGED
-  ===================================================== */
-
   updateWorkoutState(): void {
 
     this.saveWorkoutExercises();
@@ -634,12 +656,12 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     TOTAL COMPLETED SETS
+     TOTAL SETS
   ===================================================== */
 
   get totalSets(): number {
 
-    let count = 0;
+    let total = 0;
 
 
     this.workoutExercises.forEach(
@@ -649,7 +671,7 @@ export class ActiveWorkout
           set => {
 
             if (set.completed) {
-              count++;
+              total++;
             }
 
           },
@@ -659,7 +681,7 @@ export class ActiveWorkout
     );
 
 
-    return count;
+    return total;
 
   }
 
@@ -670,7 +692,7 @@ export class ActiveWorkout
 
   get totalVolume(): number {
 
-    let volume = 0;
+    let total = 0;
 
 
     this.workoutExercises.forEach(
@@ -684,20 +706,13 @@ export class ActiveWorkout
             }
 
 
-            const weight =
+            total +=
               Number(
                 set.weight ?? 0,
-              );
-
-
-            const reps =
+              ) *
               Number(
                 set.reps ?? 0,
               );
-
-
-            volume +=
-              weight * reps;
 
           },
         );
@@ -706,13 +721,13 @@ export class ActiveWorkout
     );
 
 
-    return volume;
+    return total;
 
   }
 
 
   /* =====================================================
-     ADD SET
+     SETS
   ===================================================== */
 
   addSet(
@@ -736,10 +751,6 @@ export class ActiveWorkout
   }
 
 
-  /* =====================================================
-     COMPLETE / UNCOMPLETE SET
-  ===================================================== */
-
   toggleSetCompleted(
     workoutExercise:
       WorkoutExercise,
@@ -758,7 +769,7 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     REMOVE EXERCISE
+     DELETE EXERCISE
   ===================================================== */
 
   removeExercise(
@@ -788,16 +799,336 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     BACK
+     LONG PRESS DRAG
+  ===================================================== */
+
+  onExercisePointerDown(
+    event: PointerEvent,
+    index: number,
+  ): void {
+
+    const target =
+      event.target;
+
+
+    if (
+      !(target instanceof HTMLElement)
+    ) {
+      return;
+    }
+
+
+    if (
+      target.closest(
+        'button, input, textarea, select, a',
+      )
+    ) {
+      return;
+    }
+
+
+    this.cancelPendingDrag();
+
+
+    this.pendingDragIndex =
+      index;
+
+    this.dragPointerId =
+      event.pointerId;
+
+
+    const currentTarget =
+      event.currentTarget;
+
+
+    if (
+      currentTarget instanceof HTMLElement
+    ) {
+
+      this.dragElement =
+        currentTarget;
+
+    } else {
+
+      this.dragElement =
+        null;
+
+    }
+
+
+    this.dragTimer =
+      setTimeout(
+        () => {
+
+          if (
+            this.pendingDragIndex === null
+          ) {
+            return;
+          }
+
+
+          this.draggingExerciseIndex =
+            this.pendingDragIndex;
+
+
+          if (
+            this.dragElement &&
+            this.dragPointerId !== null
+          ) {
+
+            try {
+
+              this.dragElement
+                .setPointerCapture(
+                  this.dragPointerId,
+                );
+
+            } catch {
+
+              // Pointer capture optional.
+
+            }
+
+          }
+
+
+          this.changeDetector
+            .detectChanges();
+
+        },
+        this.DRAG_DELAY_MS,
+      );
+
+  }
+
+
+  onExercisePointerMove(
+    event: PointerEvent,
+  ): void {
+
+    if (
+      this.draggingExerciseIndex === null
+    ) {
+      return;
+    }
+
+
+    event.preventDefault();
+
+
+    const cards =
+      Array.from(
+        document.querySelectorAll<HTMLElement>(
+          '.exercise-card',
+        ),
+      );
+
+
+    if (
+      cards.length < 2
+    ) {
+      return;
+    }
+
+
+    let targetIndex =
+      this.draggingExerciseIndex;
+
+
+    for (
+      let index = 0;
+      index < cards.length;
+      index++
+    ) {
+
+      const rect =
+        cards[index]
+          .getBoundingClientRect();
+
+
+      const middle =
+        rect.top +
+        rect.height / 2;
+
+
+      if (
+        event.clientY <
+        middle
+      ) {
+
+        targetIndex =
+          index;
+
+        break;
+
+      }
+
+
+      targetIndex =
+        index;
+
+    }
+
+
+    if (
+      targetIndex ===
+      this.draggingExerciseIndex
+    ) {
+      return;
+    }
+
+
+    const oldIndex =
+      this.draggingExerciseIndex;
+
+
+    const moved =
+      this.workoutExercises.splice(
+        oldIndex,
+        1,
+      )[0];
+
+
+    if (!moved) {
+      return;
+    }
+
+
+    const newIndex =
+      Math.min(
+        targetIndex,
+        this.workoutExercises.length,
+      );
+
+
+    this.workoutExercises.splice(
+      newIndex,
+      0,
+      moved,
+    );
+
+
+    this.draggingExerciseIndex =
+      newIndex;
+
+
+    this.saveWorkoutExercises();
+
+
+    this.changeDetector
+      .detectChanges();
+
+  }
+
+
+  onExercisePointerUp(
+    event: PointerEvent,
+  ): void {
+
+    this.endExerciseDrag(
+      event,
+    );
+
+  }
+
+
+  onExercisePointerCancel(
+    event: PointerEvent,
+  ): void {
+
+    this.endExerciseDrag(
+      event,
+    );
+
+  }
+
+
+  private endExerciseDrag(
+    event?: PointerEvent,
+  ): void {
+
+    this.cancelPendingDrag();
+
+
+    if (
+      this.dragElement &&
+      this.dragPointerId !== null
+    ) {
+
+      try {
+
+        if (
+          this.dragElement
+            .hasPointerCapture(
+              this.dragPointerId,
+            )
+        ) {
+
+          this.dragElement
+            .releasePointerCapture(
+              this.dragPointerId,
+            );
+
+        }
+
+      } catch {
+
+        // Nothing required.
+
+      }
+
+    }
+
+
+    if (event) {
+      event.preventDefault();
+    }
+
+
+    this.draggingExerciseIndex =
+      null;
+
+    this.pendingDragIndex =
+      null;
+
+    this.dragPointerId =
+      null;
+
+    this.dragElement =
+      null;
+
+
+    this.saveWorkoutExercises();
+
+  }
+
+
+  private cancelPendingDrag(): void {
+
+    if (
+      this.dragTimer ===
+      undefined
+    ) {
+      return;
+    }
+
+
+    clearTimeout(
+      this.dragTimer,
+    );
+
+
+    this.dragTimer =
+      undefined;
+
+  }
+
+
+  /* =====================================================
+     NAVIGATION
   ===================================================== */
 
   goBack(): void {
-
-    /*
-     * Do not clear workout or timer.
-     *
-     * User can return to the workout later.
-     */
 
     this.router.navigate([
       '/dashboard',
@@ -806,16 +1137,7 @@ export class ActiveWorkout
   }
 
 
-  /* =====================================================
-     ADD EXERCISE
-  ===================================================== */
-
   addExercise(): void {
-
-    /*
-     * Timer and workout remain in localStorage
-     * while the exercise picker is open.
-     */
 
     this.router.navigate([
       '/exercise-picker',
@@ -825,7 +1147,7 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     OPEN ADD ROUTINE POPUP
+     ROUTINE MODAL
   ===================================================== */
 
   addRoutine(): void {
@@ -849,10 +1171,6 @@ export class ActiveWorkout
 
   }
 
-
-  /* =====================================================
-     CLOSE ROUTINE POPUP
-  ===================================================== */
 
   closeRoutineModal(): void {
 
@@ -889,10 +1207,6 @@ export class ActiveWorkout
       this.routineName.trim();
 
 
-    /* -----------------------------------------------------
-       VALIDATE NAME
-    ------------------------------------------------------ */
-
     if (!name) {
 
       this.routineError =
@@ -902,10 +1216,6 @@ export class ActiveWorkout
 
     }
 
-
-    /* -----------------------------------------------------
-       VALIDATE EXERCISES
-    ------------------------------------------------------ */
 
     if (
       this.workoutExercises.length === 0
@@ -919,45 +1229,29 @@ export class ActiveWorkout
     }
 
 
-    /* -----------------------------------------------------
-       BUILD ROUTINE EXERCISES
-    ------------------------------------------------------ */
-
     const exercises:
       RoutineExerciseRequest[] =
         this.workoutExercises.map(
-          workoutExercise => {
+          workoutExercise => ({
 
-            const exerciseId =
+            exercise_id:
               Number(
-                workoutExercise.exercise.id,
-              );
+                workoutExercise
+                  .exercise
+                  .id,
+              ),
 
-
-            const targetSets =
+            target_sets:
               Math.max(
                 1,
-                workoutExercise.sets.length,
-              );
+                workoutExercise
+                  .sets
+                  .length,
+              ),
 
-
-            return {
-
-              exercise_id:
-                exerciseId,
-
-              target_sets:
-                targetSets,
-
-            };
-
-          },
+          }),
         );
 
-
-    /* -----------------------------------------------------
-       VALIDATE EXERCISE IDS
-    ------------------------------------------------------ */
 
     const invalidExercise =
       exercises.some(
@@ -979,10 +1273,6 @@ export class ActiveWorkout
     }
 
 
-    /* -----------------------------------------------------
-       BUILD ROUTINE REQUEST
-    ------------------------------------------------------ */
-
     const requestBody:
       CreateRoutineRequest = {
 
@@ -993,14 +1283,15 @@ export class ActiveWorkout
       };
 
 
-    /* -----------------------------------------------------
-       CALL ROUTINE API
-    ------------------------------------------------------ */
-
     this.isCreatingRoutine = true;
 
     this.routineError = '';
 
+
+    /* =====================================================
+       STEP 1
+       POST /api/v1/routines
+    ===================================================== */
 
     this.http
       .post<CreateRoutineResponse>(
@@ -1009,43 +1300,86 @@ export class ActiveWorkout
       )
       .subscribe({
 
-        /* =================================================
-           ROUTINE SUCCESS
-        ================================================= */
-
-        next: response => {
+        next: createdRoutine => {
 
           console.log(
-            'Routine created successfully:',
-            response,
+            'Routine created:',
+            createdRoutine,
           );
 
 
-          this.isCreatingRoutine = false;
-
-          this.showRoutineModal = false;
-
-          this.routineName = '';
-
-          this.routineError = '';
-
-
           /*
-           * IMPORTANT:
-           *
-           * Do not clear workout.
-           * Do not clear timer.
-           * Do not navigate.
-           *
-           * User stays on Active Workout.
+           * Mark routine data as changed.
            */
+          localStorage.setItem(
+            this.ROUTINES_CHANGED_KEY,
+            'true',
+          );
+
+
+          /* =================================================
+             STEP 2
+             GET /api/v1/routines/{routine_id}
+          ================================================= */
+
+          this.http
+            .get<RoutineDetailResponse>(
+              `${this.apiBaseUrl}/routines/${createdRoutine.routine_id}`,
+            )
+            .subscribe({
+
+              next: routine => {
+
+                console.log(
+                  'Created routine fetched:',
+                  routine,
+                );
+
+
+                /*
+                 * Keep the freshly fetched
+                 * backend routine available locally.
+                 *
+                 * Dashboard still does a fresh GET
+                 * /routines when it loads.
+                 */
+                localStorage.setItem(
+                  this.LAST_CREATED_ROUTINE_KEY,
+
+                  JSON.stringify(
+                    routine,
+                  ),
+                );
+
+
+                this.finishRoutineCreation();
+
+              },
+
+
+              error: error => {
+
+                console.error(
+                  'Routine was created but could not be fetched:',
+                  error,
+                );
+
+
+                /*
+                 * POST succeeded, so do NOT tell
+                 * the user creation failed.
+                 *
+                 * Dashboard GET /routines will
+                 * still retrieve it.
+                 */
+                this.finishRoutineCreation();
+
+              },
+
+            });
 
         },
 
-
-        /* =================================================
-           ROUTINE ERROR
-        ================================================= */
 
         error: error => {
 
@@ -1055,7 +1389,8 @@ export class ActiveWorkout
           );
 
 
-          this.isCreatingRoutine = false;
+          this.isCreatingRoutine =
+            false;
 
 
           if (
@@ -1100,13 +1435,6 @@ export class ActiveWorkout
             error.status === 401
           ) {
 
-            /*
-             * Do not navigate from here.
-             *
-             * Existing authentication/interceptor
-             * remains responsible for authentication.
-             */
-
             this.routineError =
               'Your session could not be authenticated. Please try again.';
 
@@ -1126,7 +1454,105 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     DISCARD WORKOUT
+     ROUTINE CREATED
+  ===================================================== */
+
+  private finishRoutineCreation(): void {
+
+    this.isCreatingRoutine = false;
+
+    this.showRoutineModal = false;
+
+    this.routineName = '';
+
+    this.routineError = '';
+
+
+    /*
+     * IMPORTANT:
+     *
+     * Do NOT set ACTIVE_ROUTINE_ID_KEY here.
+     *
+     * Creating a reusable routine from an empty
+     * workout must NOT attach that routine to
+     * the workout currently being performed.
+     */
+
+  }
+
+
+  /* =====================================================
+     GET ACTIVE ROUTINE ID
+  ===================================================== */
+
+  private getActiveRoutineId():
+    number | null {
+
+    const stored =
+      localStorage.getItem(
+        this.ACTIVE_ROUTINE_ID_KEY,
+      );
+
+
+    if (!stored) {
+      return null;
+    }
+
+
+    const routineId =
+      Number(
+        stored,
+      );
+
+
+    if (
+      !Number.isInteger(
+        routineId,
+      ) ||
+      routineId <= 0
+    ) {
+
+      return null;
+
+    }
+
+
+    return routineId;
+
+  }
+
+
+  /* =====================================================
+     CLEAR WORKOUT
+  ===================================================== */
+
+  private clearWorkoutState(): void {
+
+    this.clearWorkoutTimer();
+
+
+    localStorage.removeItem(
+      this.SELECTED_EXERCISES_KEY,
+    );
+
+
+    localStorage.removeItem(
+      this.WORKOUT_EXERCISES_KEY,
+    );
+
+
+    localStorage.removeItem(
+      this.ACTIVE_ROUTINE_ID_KEY,
+    );
+
+
+    this.workoutExercises = [];
+
+  }
+
+
+  /* =====================================================
+     DISCARD
   ===================================================== */
 
   discardWorkout(): void {
@@ -1142,20 +1568,7 @@ export class ActiveWorkout
     }
 
 
-    this.clearWorkoutTimer();
-
-
-    localStorage.removeItem(
-      this.SELECTED_EXERCISES_KEY,
-    );
-
-
-    localStorage.removeItem(
-      this.WORKOUT_EXERCISES_KEY,
-    );
-
-
-    this.workoutExercises = [];
+    this.clearWorkoutState();
 
 
     this.router.navigate([
@@ -1171,20 +1584,12 @@ export class ActiveWorkout
 
   finishWorkout(): void {
 
-    /*
-     * Prevent double-clicking Finish from
-     * creating two workouts.
-     */
     if (
       this.isFinishingWorkout
     ) {
       return;
     }
 
-
-    /* -----------------------------------------------------
-       REQUIRE AT LEAST ONE EXERCISE
-    ------------------------------------------------------ */
 
     if (
       this.workoutExercises.length === 0
@@ -1198,10 +1603,6 @@ export class ActiveWorkout
 
     }
 
-
-    /* -----------------------------------------------------
-       GET ORIGINAL WORKOUT START TIME
-    ------------------------------------------------------ */
 
     const storedStartTime =
       localStorage.getItem(
@@ -1241,24 +1642,22 @@ export class ActiveWorkout
     }
 
 
-    /* -----------------------------------------------------
-       BUILD WORKOUT EXERCISES
-    ------------------------------------------------------ */
-
     const exercises:
       WorkoutExerciseRequest[] =
         this.workoutExercises.map(
-          workoutExercise => {
+          workoutExercise => ({
 
-            const exerciseId =
+            exercise_id:
               Number(
-                workoutExercise.exercise.id,
-              );
+                workoutExercise
+                  .exercise
+                  .id,
+              ),
 
-
-            const sets:
-              WorkoutSetRequest[] =
-                workoutExercise.sets.map(
+            sets:
+              workoutExercise
+                .sets
+                .map(
                   set => ({
 
                     weight:
@@ -1272,25 +1671,11 @@ export class ActiveWorkout
                       ),
 
                   }),
-                );
+                ),
 
-
-            return {
-
-              exercise_id:
-                exerciseId,
-
-              sets,
-
-            };
-
-          },
+          }),
         );
 
-
-    /* -----------------------------------------------------
-       VALIDATE EXERCISE IDS
-    ------------------------------------------------------ */
 
     const invalidExercise =
       exercises.some(
@@ -1313,37 +1698,27 @@ export class ActiveWorkout
     }
 
 
-    /* -----------------------------------------------------
-       BUILD API REQUEST BODY
-    ------------------------------------------------------ */
-
     const requestBody:
       SaveWorkoutRequest = {
 
         /*
-         * 0 means this workout was started
-         * without choosing a saved routine.
+         * Empty/ad-hoc workout:
+         * null
+         *
+         * Workout started from saved routine:
+         * actual routine ID
          */
-        routine_id: 0,
+        routine_id:
+          this.getActiveRoutineId(),
 
-
-        /*
-         * This is the timestamp created when
-         * Active Workout originally started.
-         */
         started_at:
           new Date(
             startTimestamp,
           ).toISOString(),
 
-
-        /*
-         * Finish time is generated only when
-         * the user presses Finish.
-         */
         finished_at:
-          new Date().toISOString(),
-
+          new Date()
+            .toISOString(),
 
         exercises,
 
@@ -1356,10 +1731,6 @@ export class ActiveWorkout
     );
 
 
-    /* -----------------------------------------------------
-       CALL WORKOUT API
-    ------------------------------------------------------ */
-
     this.isFinishingWorkout = true;
 
 
@@ -1370,14 +1741,10 @@ export class ActiveWorkout
       )
       .subscribe({
 
-        /* =================================================
-           WORKOUT SAVE SUCCESS
-        ================================================= */
-
         next: response => {
 
           console.log(
-            'Workout saved successfully:',
+            'Workout saved:',
             response,
           );
 
@@ -1385,43 +1752,25 @@ export class ActiveWorkout
           this.isFinishingWorkout = false;
 
 
-          /*
-           * Only after the backend confirms that
-           * the workout has been saved do we
-           * delete local workout state.
-           */
-
-          this.clearWorkoutTimer();
-
-
-          localStorage.removeItem(
-            this.SELECTED_EXERCISES_KEY,
-          );
-
-
-          localStorage.removeItem(
-            this.WORKOUT_EXERCISES_KEY,
-          );
-
-
-          this.workoutExercises = [];
+          this.clearWorkoutState();
 
 
           /*
-           * Workout successfully saved.
-           * Return to Dashboard.
+           * Dashboard is created again.
+           *
+           * Its ngOnInit() immediately calls:
+           *
+           * GET /api/v1/routines
+           *
+           * so any routine we created above
+           * will appear under My Routines.
            */
-
           this.router.navigate([
             '/dashboard',
           ]);
 
         },
 
-
-        /* =================================================
-           WORKOUT SAVE ERROR
-        ================================================= */
 
         error: error => {
 
@@ -1432,20 +1781,6 @@ export class ActiveWorkout
 
 
           this.isFinishingWorkout = false;
-
-
-          /*
-           * IMPORTANT:
-           *
-           * Do not clear:
-           * - timer
-           * - exercises
-           * - sets
-           * - localStorage
-           *
-           * The workout remains available
-           * so the user can retry Finish.
-           */
 
 
           if (
@@ -1468,7 +1803,7 @@ export class ActiveWorkout
 
             window.alert(
               error.error?.detail ||
-              'One of the exercises could not be found.',
+              'One of the exercises or the selected routine could not be found.',
             );
 
             return;
@@ -1525,21 +1860,7 @@ export class ActiveWorkout
 
   ngOnDestroy(): void {
 
-    /*
-     * Stop only the JavaScript interval.
-     *
-     * Do NOT remove WORKOUT_START_KEY here.
-     *
-     * This means:
-     *
-     * Active Workout
-     *      ↓
-     * Exercise Picker
-     *      ↓
-     * Active Workout
-     *
-     * continues the same workout timer.
-     */
+    this.cancelPendingDrag();
 
     this.stopTimer();
 

@@ -29,9 +29,16 @@
       <button
         class="finish-button"
         type="button"
+        [disabled]="isFinishingWorkout"
         (click)="finishWorkout()"
       >
-        Finish
+
+        @if (isFinishingWorkout) {
+          Saving...
+        } @else {
+          Finish
+        }
+
       </button>
 
     </div>
@@ -127,7 +134,7 @@
 
 
     <!-- ====================================================
-         EXERCISE LIST
+         EXERCISES
     ===================================================== -->
 
     @for (
@@ -136,14 +143,45 @@
       let exerciseIndex = $index
     ) {
 
-      <section class="exercise-card">
+      <section
+        class="exercise-card"
+        [class.dragging]="
+          draggingExerciseIndex === exerciseIndex
+        "
+      >
 
 
         <!-- ================================================
              EXERCISE HEADER
         ================================================= -->
 
-        <div class="exercise-card-header">
+        <div
+          class="exercise-card-header"
+          (pointerdown)="
+            onExercisePointerDown(
+              $event,
+              exerciseIndex
+            )
+          "
+          (pointermove)="
+            onExercisePointerMove(
+              $event
+            )
+          "
+          (pointerup)="
+            onExercisePointerUp(
+              $event
+            )
+          "
+          (pointercancel)="
+            onExercisePointerCancel(
+              $event
+            )
+          "
+          (contextmenu)="
+            $event.preventDefault()
+          "
+        >
 
           <div class="exercise-avatar">
             P
@@ -164,12 +202,12 @@
 
 
           <button
-            class="exercise-menu-button"
+            class="exercise-delete-button"
             type="button"
-            aria-label="Remove exercise"
+            aria-label="Delete exercise"
             (click)="removeExercise(exerciseIndex)"
           >
-            ⋮
+            Delete
           </button>
 
         </div>
@@ -372,6 +410,7 @@
       (click)="$event.stopPropagation()"
     >
 
+
       <!-- HEADER -->
 
       <div class="routine-modal-header">
@@ -484,13 +523,9 @@
         >
 
           @if (isCreatingRoutine) {
-
             Creating...
-
           } @else {
-
             Create Routine
-
           }
 
         </button>

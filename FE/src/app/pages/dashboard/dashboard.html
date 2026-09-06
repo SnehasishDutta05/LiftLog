@@ -1,147 +1,27 @@
 <div class="dashboard-shell">
 
-  <!-- =====================================================
-       DESKTOP SIDEBAR
-  ====================================================== -->
-
-  <aside class="sidebar">
-
-    <div class="brand">
-
-      <div class="brand-logo">
-        P
-      </div>
-
-      <div class="brand-copy">
-        <strong>PulseOS</strong>
-        <span>Your fitness companion</span>
-      </div>
-
-    </div>
-
-
-    <nav class="desktop-nav">
-
-      <button
-        class="desktop-nav-item active"
-        type="button"
-      >
-        <span class="nav-symbol home-symbol"></span>
-        <span>Home</span>
-      </button>
-
-      <button
-        class="desktop-nav-item"
-        type="button"
-      >
-        <span class="nav-symbol workout-symbol"></span>
-        <span>Workouts</span>
-      </button>
-
-      <button
-        class="desktop-nav-item"
-        type="button"
-      >
-        <span class="nav-symbol progress-symbol"></span>
-        <span>Progress</span>
-      </button>
-
-      <button
-        class="desktop-nav-item"
-        type="button"
-      >
-        <span class="nav-symbol goals-symbol"></span>
-        <span>Goals</span>
-      </button>
-
-      <button
-        class="desktop-nav-item"
-        type="button"
-      >
-        <span class="nav-symbol profile-symbol"></span>
-        <span>Profile</span>
-      </button>
-
-    </nav>
-
-  </aside>
-
-
-  <!-- =====================================================
-       MAIN CONTENT
-  ====================================================== -->
-
   <main class="dashboard-main">
-
-    <!-- MOBILE HEADER -->
-
-    <header class="mobile-header">
-
-      <div class="mobile-brand">
-
-        <div class="mobile-logo">
-          P
-        </div>
-
-        <div>
-          <strong>PulseOS</strong>
-          <span>Your fitness companion</span>
-        </div>
-
-      </div>
-
-      <button
-        class="profile-avatar"
-        type="button"
-        aria-label="Profile"
-      >
-        P
-      </button>
-
-    </header>
-
-
-    <!-- DESKTOP AVATAR -->
-
-    <div class="desktop-profile-row">
-
-      <button
-        class="profile-avatar"
-        type="button"
-        aria-label="Profile"
-      >
-        P
-      </button>
-
-    </div>
-
 
     <div class="dashboard-content">
 
-      <!-- =================================================
-           WORKOUT TITLE
-      ================================================== -->
-
       <section class="workout-section">
+
+        <!-- ===============================================
+             WORKOUT TITLE
+        ================================================ -->
 
         <div class="workout-title-row">
 
-          <h1>Workout</h1>
-
-          <button
-            class="dropdown-button"
-            type="button"
-            aria-label="Workout options"
-          >
-            <span></span>
-          </button>
+          <h1>
+            Workout
+          </h1>
 
         </div>
 
 
-        <!-- =================================================
+        <!-- ===============================================
              START EMPTY WORKOUT
-        ================================================== -->
+        ================================================ -->
 
         <button
           class="start-empty-workout"
@@ -150,9 +30,17 @@
         >
 
           <span class="plus-icon">
-            <span class="plus-horizontal"></span>
-            <span class="plus-vertical"></span>
+
+            <span
+              class="plus-horizontal"
+            ></span>
+
+            <span
+              class="plus-vertical"
+            ></span>
+
           </span>
+
 
           <span class="start-empty-label">
             Start Empty Workout
@@ -161,18 +49,25 @@
         </button>
 
 
-        <!-- =================================================
-             ROUTINES
-        ================================================== -->
+        <!-- ===============================================
+             MY ROUTINES
+        ================================================ -->
 
         <div class="section-title">
-          <h2>My Routines</h2>
+
+          <h2>
+            My Routines
+          </h2>
+
         </div>
 
 
         <div class="routine-list">
 
-          @for (routine of routines; track routine.name) {
+          @for (
+            routine of routines;
+            track routine.routine_id
+          ) {
 
             <article class="routine-card">
 
@@ -185,29 +80,64 @@
                   {{ routine.shortName }}
                 </div>
 
+
                 <div class="routine-copy">
-                  <h3>{{ routine.name }}</h3>
-                  <p>{{ routine.description }}</p>
+
+                  <h3>
+                    {{ routine.name }}
+                  </h3>
+
+                  <p>
+                    {{ routine.description }}
+                  </p>
+
                 </div>
 
               </div>
 
 
-              <button
-                class="start-routine-button"
-                type="button"
-                (click)="startRoutine(routine)"
-              >
+              <!-- ONLY NEW UI:
+                   Start now moved slightly left because
+                   Delete sits beside it.
+              -->
 
-                <span class="routine-plus">
-                  +
-                </span>
+              <div class="routine-actions-inline">
 
-                <span>
-                  Start now
-                </span>
+                <button
+                  class="start-routine-button"
+                  type="button"
+                  [disabled]="routine.isDeleting"
+                  (click)="startRoutine(routine)"
+                >
 
-              </button>
+                  <span class="routine-plus">
+                    +
+                  </span>
+
+                  <span>
+                    Start now
+                  </span>
+
+                </button>
+
+
+                <button
+                  class="delete-routine-button"
+                  type="button"
+                  aria-label="Delete routine"
+                  [disabled]="routine.isDeleting"
+                  (click)="deleteRoutine(routine)"
+                >
+
+                  @if (routine.isDeleting) {
+                    ...
+                  } @else {
+                    Delete
+                  }
+
+                </button>
+
+              </div>
 
             </article>
 
@@ -218,14 +148,18 @@
       </section>
 
 
-      <!-- =================================================
+      <!-- ===============================================
            PROGRESS
-      ================================================== -->
+      ================================================ -->
 
       <section class="progress-section">
 
         <div class="section-title">
-          <h2>Progress</h2>
+
+          <h2>
+            Progress
+          </h2>
+
         </div>
 
 
@@ -274,7 +208,7 @@
 
 
   <!-- =====================================================
-       MOBILE BOTTOM NAV
+       BOTTOM NAVIGATION
   ====================================================== -->
 
   <nav class="mobile-bottom-nav">
@@ -283,32 +217,63 @@
       class="mobile-nav-item active"
       type="button"
     >
-      <span class="mobile-nav-icon home-symbol"></span>
-      <span>Home</span>
+
+      <span
+        class="mobile-nav-icon home-symbol"
+      ></span>
+
+      <span>
+        Home
+      </span>
+
     </button>
+
 
     <button
       class="mobile-nav-item"
       type="button"
     >
-      <span class="mobile-nav-icon workout-symbol"></span>
-      <span>Workouts</span>
+
+      <span
+        class="mobile-nav-icon workout-symbol"
+      ></span>
+
+      <span>
+        Workouts
+      </span>
+
     </button>
+
 
     <button
       class="mobile-nav-item"
       type="button"
     >
-      <span class="mobile-nav-icon progress-symbol"></span>
-      <span>Progress</span>
+
+      <span
+        class="mobile-nav-icon progress-symbol"
+      ></span>
+
+      <span>
+        Progress
+      </span>
+
     </button>
+
 
     <button
       class="mobile-nav-item"
       type="button"
     >
-      <span class="mobile-nav-icon profile-symbol"></span>
-      <span>Profile</span>
+
+      <span
+        class="mobile-nav-icon profile-symbol"
+      ></span>
+
+      <span>
+        Profile
+      </span>
+
     </button>
 
   </nav>
