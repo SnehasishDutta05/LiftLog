@@ -910,7 +910,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 Available endpoints:
 
-- POST /api/v1/auth/demo-login
+- POST /api/v1/auth/login
 - GET /api/v1/auth/me
 - GET /api/v1/routines
 - POST /api/v1/routines

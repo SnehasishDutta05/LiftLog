@@ -71,31 +71,31 @@ def signup(payload: SignupRequest, db: Session = Depends(get_db)):
     return response
 
 
-@router.post("/demo-login", response_model=SignupResponse)
+@router.post("/login", response_model=SignupResponse)
 def demo_login(payload: LoginRequest, db: Session = Depends(get_db)):
-    logger.info("AUTH /demo-login called with payload=%s", payload.model_dump())
+    logger.info("AUTH /login called with payload=%s", payload.model_dump())
 
     email = payload.email.strip().lower()
-    logger.info("AUTH /demo-login checking DB for email=%s", email)
+    logger.info("AUTH /login checking DB for email=%s", email)
     user = db.query(User).filter(User.email == email).first()
     if user is None:
-        logger.warning("AUTH /demo-login failed: user not found for email=%s", email)
+        logger.warning("AUTH /login failed: user not found for email=%s", email)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
 
     password_valid = verify_password(payload.password, user.password_hash)
-    logger.info("AUTH /demo-login password check for user_id=%s result=%s", user.id, password_valid)
+    logger.info("AUTH /login password check for user_id=%s result=%s", user.id, password_valid)
     if not password_valid:
-        logger.warning("AUTH /demo-login failed: password mismatch for user_id=%s", user.id)
+        logger.warning("AUTH /login failed: password mismatch for user_id=%s", user.id)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
 
     access_token, refresh_token = issue_tokens_for_user(db, user.id)
-    logger.info("AUTH /demo-login issued JWT tokens for user_id=%s", user.id)
+    logger.info("AUTH /login issued JWT tokens for user_id=%s", user.id)
 
     response = SignupResponse(
         message="Loged in successfully",
@@ -106,7 +106,7 @@ def demo_login(payload: LoginRequest, db: Session = Depends(get_db)):
             "full_name": user.full_name,
         },
     )
-    logger.info("AUTH /demo-login response=%s", response.model_dump())
+    logger.info("AUTH /login response=%s", response.model_dump())
     return response
 
 
