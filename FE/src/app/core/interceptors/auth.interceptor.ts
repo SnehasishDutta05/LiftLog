@@ -50,7 +50,7 @@ export function authInterceptor(
 
   const isLoginRequest =
     request.url.includes(
-      '/auth/demo-login',
+      '/auth/login',
     );
 
 

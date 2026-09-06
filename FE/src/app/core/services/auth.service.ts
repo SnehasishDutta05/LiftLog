@@ -173,7 +173,7 @@ export class AuthService {
 
     return this.http
       .post<AuthResponse>(
-        `${this.apiUrl}/demo-login`,
+        `${this.apiUrl}/login`,
         body,
       )
       .pipe(

@@ -264,10 +264,27 @@
             </div>
 
 
-            <!-- PREVIOUS -->
+            <!-- ============================================
+                 PREVIOUS WORKOUT
+            ============================================= -->
 
             <div class="previous-value">
-              —
+
+              @if (
+                set.previousWeight !== null &&
+                set.previousWeight !== undefined &&
+                set.previousReps !== null &&
+                set.previousReps !== undefined
+              ) {
+
+                {{ set.previousWeight }}kg × {{ set.previousReps }}
+
+              } @else {
+
+                —
+
+              }
+
             </div>
 
 

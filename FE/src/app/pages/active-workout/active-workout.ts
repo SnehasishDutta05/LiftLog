@@ -44,6 +44,9 @@ interface WorkoutSet {
   weight: number | null;
   reps: number | null;
   completed: boolean;
+
+  previousWeight?: number | null;
+  previousReps?: number | null;
 }
 
 
@@ -137,6 +140,32 @@ interface SaveWorkoutResponse {
   finished_at: string;
   duration_seconds: number;
   exercises: SavedWorkoutExerciseResponse[];
+}
+
+
+/* =========================================================
+   EXERCISE HISTORY API MODELS
+========================================================= */
+
+interface ExerciseHistorySet {
+  set_number: number;
+  weight: number;
+  reps: number;
+}
+
+
+interface ExerciseHistoryLastWorkout {
+  workout_id: number;
+  date: string;
+  sets: ExerciseHistorySet[];
+}
+
+
+interface ExerciseHistoryResponse {
+  exercise_id: number;
+  exercise_name: string;
+  last_workout:
+    ExerciseHistoryLastWorkout | null;
 }
 
 
@@ -278,6 +307,8 @@ export class ActiveWorkout
     this.loadWorkoutExercises();
 
     this.importSelectedExercises();
+
+    this.loadHistoryForAllExercises();
 
   }
 
@@ -511,7 +542,32 @@ export class ActiveWorkout
               Array.isArray(
                 item.sets,
               )
-                ? item.sets
+                ? item.sets.map(
+                    set => ({
+
+                      weight:
+                        set.weight ??
+                        null,
+
+                      reps:
+                        set.reps ??
+                        null,
+
+                      completed:
+                        Boolean(
+                          set.completed,
+                        ),
+
+                      previousWeight:
+                        set.previousWeight ??
+                        null,
+
+                      previousReps:
+                        set.previousReps ??
+                        null,
+
+                    }),
+                  )
                 : [],
 
           }),
@@ -603,19 +659,40 @@ export class ActiveWorkout
         }
 
 
-        this.workoutExercises.push({
+        const workoutExercise:
+          WorkoutExercise = {
 
-          exercise,
+            exercise,
 
-          sets: [
-            {
-              weight: null,
-              reps: null,
-              completed: false,
-            },
-          ],
+            sets: [
+              {
 
-        });
+                weight: null,
+
+                reps: null,
+
+                completed: false,
+
+                previousWeight:
+                  null,
+
+                previousReps:
+                  null,
+
+              },
+            ],
+
+          };
+
+
+        this.workoutExercises.push(
+          workoutExercise,
+        );
+
+
+        this.loadExerciseHistory(
+          workoutExercise,
+        );
 
       },
     );
@@ -627,6 +704,330 @@ export class ActiveWorkout
     localStorage.removeItem(
       this.SELECTED_EXERCISES_KEY,
     );
+
+  }
+
+
+  /* =====================================================
+     EXERCISE HISTORY
+  ===================================================== */
+
+  private loadHistoryForAllExercises():
+    void {
+
+    this.workoutExercises.forEach(
+      workoutExercise => {
+
+        this.loadExerciseHistory(
+          workoutExercise,
+        );
+
+      },
+    );
+
+  }
+
+
+  private loadExerciseHistory(
+    workoutExercise:
+      WorkoutExercise,
+  ): void {
+
+    const exerciseId =
+      Number(
+        workoutExercise
+          .exercise
+          .id,
+      );
+
+
+    if (
+      !Number.isInteger(
+        exerciseId,
+      ) ||
+      exerciseId <= 0
+    ) {
+
+      return;
+
+    }
+
+
+    this.http
+      .get<ExerciseHistoryResponse>(
+        `${this.apiBaseUrl}/exercises/${exerciseId}/history`,
+      )
+      .subscribe({
+
+        next: response => {
+
+          console.log(
+            `Exercise ${exerciseId} history:`,
+            response,
+          );
+
+
+          const previousSets =
+            response
+              .last_workout
+              ?.sets ?? [];
+
+
+          /*
+           * No previous completed workout.
+           *
+           * Keep the exercise exactly
+           * as it currently is.
+           */
+          if (
+            previousSets.length === 0
+          ) {
+
+            workoutExercise
+              .sets
+              .forEach(
+                set => {
+
+                  set.previousWeight =
+                    null;
+
+                  set.previousReps =
+                    null;
+
+                },
+              );
+
+
+            this.saveWorkoutExercises();
+
+
+            this.changeDetector
+              .detectChanges();
+
+
+            return;
+
+          }
+
+
+          /*
+           * Sort previous sets by their
+           * original set number.
+           */
+          const sortedPreviousSets =
+            [...previousSets]
+              .sort(
+                (
+                  first,
+                  second,
+                ) =>
+                  first.set_number -
+                  second.set_number,
+              );
+
+
+          /*
+           * =================================================
+           * IMPORTANT
+           *
+           * Recreate every set from the last workout.
+           *
+           * Example:
+           *
+           * Previous:
+           * 1 -> 20kg x 10
+           * 2 -> 30kg x 8
+           * 3 -> 45kg x 6
+           *
+           * New workout automatically gets
+           * three rows.
+           * =================================================
+           */
+
+
+          while (
+            workoutExercise
+              .sets
+              .length <
+            sortedPreviousSets.length
+          ) {
+
+            workoutExercise
+              .sets
+              .push({
+
+                weight: null,
+
+                reps: null,
+
+                completed: false,
+
+                previousWeight:
+                  null,
+
+                previousReps:
+                  null,
+
+              });
+
+          }
+
+
+          /*
+           * Do NOT automatically remove
+           * additional sets that the user
+           * already added manually.
+           *
+           * Only ensure that at least the
+           * previous workout's number of
+           * sets exists.
+           */
+
+
+          sortedPreviousSets.forEach(
+            (
+              previousSet,
+              index,
+            ) => {
+
+              const currentSet =
+                workoutExercise
+                  .sets[index];
+
+
+              if (!currentSet) {
+                return;
+              }
+
+
+              /*
+               * PREVIOUS column
+               */
+              currentSet.previousWeight =
+                previousSet.weight;
+
+              currentSet.previousReps =
+                previousSet.reps;
+
+
+              /*
+               * KG input
+               *
+               * Fill only if the user has
+               * not already entered something.
+               */
+              if (
+                currentSet.weight ===
+                  null ||
+                currentSet.weight ===
+                  undefined
+              ) {
+
+                currentSet.weight =
+                  previousSet.weight;
+
+              }
+
+
+              /*
+               * REPS input
+               *
+               * Fill only if the user has
+               * not already entered something.
+               */
+              if (
+                currentSet.reps ===
+                  null ||
+                currentSet.reps ===
+                  undefined
+              ) {
+
+                currentSet.reps =
+                  previousSet.reps;
+
+              }
+
+            },
+          );
+
+
+          /*
+           * Any current sets beyond the
+           * previous workout's count have
+           * no historical equivalent.
+           */
+          workoutExercise
+            .sets
+            .forEach(
+              (
+                set,
+                index,
+              ) => {
+
+                if (
+                  index <
+                  sortedPreviousSets.length
+                ) {
+                  return;
+                }
+
+
+                set.previousWeight =
+                  null;
+
+                set.previousReps =
+                  null;
+
+              },
+            );
+
+
+          this.saveWorkoutExercises();
+
+
+          this.changeDetector
+            .detectChanges();
+
+        },
+
+
+        error: error => {
+
+          console.error(
+            `Unable to load history for exercise ${exerciseId}:`,
+            error,
+          );
+
+
+          /*
+           * History failure should never
+           * prevent the workout from being
+           * used normally.
+           */
+          workoutExercise
+            .sets
+            .forEach(
+              set => {
+
+                set.previousWeight =
+                  null;
+
+                set.previousReps =
+                  null;
+
+              },
+            );
+
+
+          this.saveWorkoutExercises();
+
+
+          this.changeDetector
+            .detectChanges();
+
+        },
+
+      });
 
   }
 
@@ -743,10 +1144,24 @@ export class ActiveWorkout
 
       completed: false,
 
+      previousWeight: null,
+
+      previousReps: null,
+
     });
 
 
     this.saveWorkoutExercises();
+
+
+    /*
+     * Reload history so if the newly
+     * created set has a matching previous
+     * set, PREVIOUS/KG/REPS are filled.
+     */
+    this.loadExerciseHistory(
+      workoutExercise,
+    );
 
   }
 
@@ -1308,9 +1723,6 @@ export class ActiveWorkout
           );
 
 
-          /*
-           * Mark routine data as changed.
-           */
           localStorage.setItem(
             this.ROUTINES_CHANGED_KEY,
             'true',
@@ -1336,13 +1748,6 @@ export class ActiveWorkout
                 );
 
 
-                /*
-                 * Keep the freshly fetched
-                 * backend routine available locally.
-                 *
-                 * Dashboard still does a fresh GET
-                 * /routines when it loads.
-                 */
                 localStorage.setItem(
                   this.LAST_CREATED_ROUTINE_KEY,
 
@@ -1365,13 +1770,6 @@ export class ActiveWorkout
                 );
 
 
-                /*
-                 * POST succeeded, so do NOT tell
-                 * the user creation failed.
-                 *
-                 * Dashboard GET /routines will
-                 * still retrieve it.
-                 */
                 this.finishRoutineCreation();
 
               },
@@ -1466,17 +1864,6 @@ export class ActiveWorkout
     this.routineName = '';
 
     this.routineError = '';
-
-
-    /*
-     * IMPORTANT:
-     *
-     * Do NOT set ACTIVE_ROUTINE_ID_KEY here.
-     *
-     * Creating a reusable routine from an empty
-     * workout must NOT attach that routine to
-     * the workout currently being performed.
-     */
 
   }
 
@@ -1702,11 +2089,11 @@ export class ActiveWorkout
       SaveWorkoutRequest = {
 
         /*
-         * Empty/ad-hoc workout:
-         * null
+         * Empty workout:
+         * routine_id = null
          *
-         * Workout started from saved routine:
-         * actual routine ID
+         * Saved routine workout:
+         * routine_id = actual routine ID
          */
         routine_id:
           this.getActiveRoutineId(),
@@ -1755,16 +2142,6 @@ export class ActiveWorkout
           this.clearWorkoutState();
 
 
-          /*
-           * Dashboard is created again.
-           *
-           * Its ngOnInit() immediately calls:
-           *
-           * GET /api/v1/routines
-           *
-           * so any routine we created above
-           * will appear under My Routines.
-           */
           this.router.navigate([
             '/dashboard',
           ]);

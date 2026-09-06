@@ -61,7 +61,7 @@ export class LiftlogApiService {
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/demo-login`, { email, password });
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, { email, password });
   }
 
   getMe(token: string): Observable<UserPublic> {
