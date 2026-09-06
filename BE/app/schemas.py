@@ -307,3 +307,210 @@ class RoutineReadWithExercises(BaseModel):
 
 class RoutineListResponse(BaseModel):
     routines: list[RoutineRead]
+
+
+class NutritionValues(BaseModel):
+    calories: float = 0
+    protein_g: float = 0
+    carbs_g: float = 0
+    fat_g: float = 0
+    fiber_g: float = 0
+
+
+class FoodNutrition(BaseModel):
+    calories: float = 0
+    protein_g: float = 0
+    carbs_g: float = 0
+    fat_g: float = 0
+    fiber_g: float = 0
+
+
+class FoodListItem(BaseModel):
+    food_id: int
+    name: str
+    nutrition_per_100g: FoodNutrition
+
+
+class FoodServingRead(BaseModel):
+    serving_id: int
+    name: str
+    quantity_g: float
+    calories: float
+    protein_g: float
+    carbs_g: float
+    fat_g: float
+    fiber_g: float
+
+
+class FoodDetail(FoodListItem):
+    category: Optional[str] = None
+    servings: list[FoodServingRead] = Field(default_factory=list)
+
+
+class Pagination(BaseModel):
+    page: int
+    page_size: int
+    total: int
+
+
+class FoodListResponse(BaseModel):
+    items: list[FoodListItem]
+    pagination: Pagination
+
+
+class NutritionInput(BaseModel):
+    calories: float = Field(ge=0)
+    protein_g: float = Field(ge=0)
+    carbs_g: float = Field(ge=0)
+    fat_g: float = Field(ge=0)
+    fiber_g: float = Field(default=0, ge=0)
+
+
+class CustomFoodCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    description: Optional[str] = None
+    category: Optional[str] = None
+    nutrition_per_100g: NutritionInput
+    is_active: bool = True
+
+
+class CustomFoodUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    description: Optional[str] = None
+    category: Optional[str] = None
+    nutrition_per_100g: Optional[NutritionInput] = None
+
+
+class CustomFoodRead(BaseModel):
+    custom_food_id: int
+    name: str
+    description: Optional[str] = None
+    category: Optional[str] = None
+    nutrition_per_100g: FoodNutrition
+    is_active: bool
+
+
+class CustomFoodListResponse(BaseModel):
+    items: list[CustomFoodRead]
+    pagination: Pagination
+
+
+class MealItemInput(BaseModel):
+    food_id: Optional[int] = None
+    custom_food_id: Optional[int] = None
+    quantity_g: float = Field(gt=0)
+    serving_id: Optional[int] = None
+
+    @classmethod
+    def validate_reference(cls, values):
+        return values
+
+
+class MealCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    description: Optional[str] = None
+    items: list[MealItemInput] = Field(default_factory=list)
+
+
+class MealUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    description: Optional[str] = None
+    items: Optional[list[MealItemInput]] = None
+
+
+class MealItemRead(BaseModel):
+    food_id: Optional[int] = None
+    custom_food_id: Optional[int] = None
+    name: str
+    quantity_g: float
+
+
+class MealRead(BaseModel):
+    meal_id: int
+    name: str
+    description: Optional[str] = None
+    nutrition: NutritionValues
+    item_count: int
+    items: list[MealItemRead]
+
+
+class MealListResponse(BaseModel):
+    meals: list[MealRead]
+
+
+class LogItemInput(BaseModel):
+    food_id: Optional[int] = None
+    custom_food_id: Optional[int] = None
+    quantity_g: float = Field(gt=0)
+
+
+class LogMealInput(BaseModel):
+    meal_type: str
+    items: list[LogItemInput] = Field(default_factory=list)
+
+
+class DietLogCreate(BaseModel):
+    date: Optional[str] = None
+    meals: list[LogMealInput]
+
+
+class DietLogUpdate(DietLogCreate):
+    date: str
+
+
+class DietLogItemRead(BaseModel):
+    food_id: Optional[int] = None
+    custom_food_id: Optional[int] = None
+    food_name: str
+    quantity_g: float
+    calories: float
+    protein_g: float
+    carbs_g: float
+    fat_g: float
+    fiber_g: float
+
+
+class DietLogMealRead(BaseModel):
+    meal_name: str
+    items: list[DietLogItemRead]
+    nutrition: NutritionValues
+
+
+class DietLogRead(BaseModel):
+    log_id: int
+    date: str
+    last_updated: datetime
+    meals: list[DietLogMealRead]
+
+
+class DietSummary(BaseModel):
+    date: str
+    calories: dict[str, float]
+    macros: dict[str, dict[str, float]]
+    meals: dict[str, NutritionValues]
+
+
+class DietHistoryDay(BaseModel):
+    date: str
+    calories: float
+    protein_g: float
+    carbs_g: float
+    fat_g: float
+
+
+class DietHistoryResponse(BaseModel):
+    start_date: str
+    end_date: str
+    days: list[DietHistoryDay]
+    average: NutritionValues
+
+
+class DietGoalRequest(BaseModel):
+    calories: float = Field(ge=0)
+    protein_g: float = Field(ge=0)
+    carbs_g: float = Field(ge=0)
+    fat_g: float = Field(ge=0)
+
+
+class DietGoalRead(DietGoalRequest):
+    pass
