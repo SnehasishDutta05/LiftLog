@@ -1,0 +1,1008 @@
+:host {
+  display: block;
+
+  width: 100%;
+
+  min-height: 100vh;
+
+  background: #f3f8f5;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+button,
+input {
+  font: inherit;
+}
+
+
+.healthify-shell {
+  width: 100%;
+
+  min-height: 100vh;
+
+  display: flex;
+
+  justify-content: center;
+
+  color: #10231d;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f3f8f5 0%,
+      #f7faf8 100%
+    );
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+.healthify-main {
+  width: 100%;
+
+  max-width: 444px;
+
+  min-height: 100vh;
+
+  padding-bottom: 100px;
+
+  background: #f7fbf9;
+}
+
+
+.healthify-content {
+  padding:
+    max(22px, env(safe-area-inset-top))
+    16px
+    30px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.healthify-header {
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 46px;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+
+.healthify-heading h1 {
+  margin: 0;
+
+  color: #12352b;
+
+  font-size: 29px;
+
+  line-height: 1;
+
+  font-weight: 850;
+
+  letter-spacing: -0.8px;
+}
+
+
+.healthify-heading p {
+  margin: 6px 0 0;
+
+  color: #7f8d88;
+
+  font-size: 12px;
+}
+
+
+.date-block {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+}
+
+
+.date-block strong {
+  color: #10231d;
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+
+.date-block span {
+  margin-top: 4px;
+
+  color: #87948f;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+}
+
+
+.settings-button {
+  width: 44px;
+
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #edf7f2;
+
+  font-size: 19px;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   CALORIE CARD
+========================================================= */
+
+.calorie-card {
+  padding: 18px;
+
+  border: 1px solid #edf2ef;
+
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 12px 32px
+    rgba(22, 84, 61, 0.06);
+}
+
+
+.calorie-main-row {
+  display: grid;
+
+  grid-template-columns:
+    112px 1fr;
+
+  gap: 14px;
+
+  align-items: center;
+}
+
+
+/* =========================================================
+   CALORIE RING
+========================================================= */
+
+.calorie-ring {
+  --progress: 0%;
+
+  position: relative;
+
+  width: 112px;
+
+  height: 112px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    conic-gradient(
+      #17a36a var(--progress),
+      #dfe9e4 var(--progress)
+    );
+}
+
+
+.calorie-ring::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 9px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+}
+
+
+.calorie-ring-inner {
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+}
+
+
+.calorie-ring-inner strong {
+  color: #10231d;
+
+  font-size: 28px;
+
+  line-height: 1;
+
+  font-weight: 850;
+}
+
+
+.calorie-ring-inner span {
+  margin-top: 4px;
+
+  color: #5e6e68;
+
+  font-size: 12px;
+
+  font-weight: 700;
+}
+
+
+.calorie-ring-inner small {
+  margin-top: 2px;
+
+  color: #899690;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   MACROS
+========================================================= */
+
+.macro-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 7px;
+}
+
+
+.macro-card {
+  min-width: 0;
+
+  min-height: 76px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 15px;
+}
+
+
+.macro-card strong {
+  font-size: 17px;
+
+  font-weight: 850;
+}
+
+
+.macro-card span {
+  margin-top: 5px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+
+.macro-card.protein {
+  color: #107647;
+
+  background: #e7f8ef;
+}
+
+
+.macro-card.carbs {
+  color: #246dd5;
+
+  background: #eaf3ff;
+}
+
+
+.macro-card.fats {
+  color: #d05a24;
+
+  background: #fff0e7;
+}
+
+
+/* =========================================================
+   SET GOAL
+========================================================= */
+
+.set-goal-button {
+  min-height: 40px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  margin-top: 15px;
+
+  padding: 8px 15px;
+
+  border: 1px solid #98e6bf;
+
+  border-radius: 13px;
+
+  background: #eafff4;
+
+  color: #087b4b;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   CALORIES LEFT
+========================================================= */
+
+.calories-left-row {
+  min-height: 48px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-top: 15px;
+
+  padding: 10px 13px;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #effaf5,
+      #f3faf7
+    );
+}
+
+
+.calories-left-copy {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  color: #667770;
+
+  font-size: 11px;
+}
+
+
+.calories-left-copy strong {
+  color: #176640;
+
+  font-size: 14px;
+}
+
+
+.leaf-icon {
+  margin-right: 2px;
+}
+
+
+.motivation {
+  color: #75857f;
+
+  font-size: 10px;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   MEALS
+========================================================= */
+
+.meals-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+
+  margin-top: 14px;
+}
+
+
+.meal-card {
+  padding: 15px;
+
+  border: 1px solid #edf1ef;
+
+  border-radius: 22px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 24px
+    rgba(24, 91, 65, 0.045);
+}
+
+
+.meal-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+
+.meal-title-area {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.meal-icon {
+  width: 46px;
+
+  height: 46px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f0f7f3;
+
+  font-size: 21px;
+}
+
+
+.meal-title-area h2 {
+  margin: 0;
+
+  color: #10231d;
+
+  font-size: 17px;
+
+  font-weight: 850;
+}
+
+
+.meal-title-area p {
+  margin: 4px 0 0;
+
+  color: #87948f;
+
+  font-size: 11px;
+}
+
+
+.add-food-button {
+  width: 42px;
+
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #17a36a,
+      #078c56
+    );
+
+  color: #ffffff;
+
+  font-size: 27px;
+
+  font-weight: 300;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 7px 16px
+    rgba(11, 142, 87, 0.18);
+}
+
+
+.meal-empty-state {
+  min-height: 78px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  margin-top: 13px;
+
+  padding: 13px;
+
+  border: 1px dashed #d8e2dd;
+
+  border-radius: 16px;
+}
+
+
+.empty-bowl {
+  font-size: 24px;
+}
+
+
+.meal-empty-state div {
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+.meal-empty-state strong {
+  color: #52625c;
+
+  font-size: 11px;
+}
+
+
+.meal-empty-state div span {
+  margin-top: 4px;
+
+  color: #929e99;
+
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   BOTTOM NAVIGATION
+========================================================= */
+
+.mobile-bottom-nav {
+  position: fixed;
+
+  left: 50%;
+
+  bottom: 0;
+
+  z-index: 100;
+
+  width: 100%;
+
+  max-width: 444px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  padding:
+    8px
+    8px
+    max(8px, env(safe-area-inset-bottom));
+
+  border-top:
+    1px solid #edf1ef;
+
+  background:
+    rgba(255, 255, 255, 0.98);
+
+  transform:
+    translateX(-50%);
+}
+
+
+.mobile-nav-item {
+  appearance: none;
+
+  min-width: 0;
+
+  min-height: 64px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 3px 2px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #8b9793;
+
+  cursor: pointer;
+}
+
+
+.nav-icon-circle {
+  width: 38px;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eef3f1;
+}
+
+
+.emoji-icon {
+  font-size: 20px;
+
+  line-height: 1;
+
+  font-family:
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji",
+    sans-serif;
+}
+
+
+.nav-label {
+  color: #8b9793;
+
+  font-size: 11px;
+
+  line-height: 1.1;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+.mobile-nav-item.active
+.nav-icon-circle {
+  background: #bff2da;
+}
+
+
+.mobile-nav-item.active
+.nav-label {
+  color: #128458;
+
+  font-weight: 750;
+}
+
+
+/* =========================================================
+   GOAL MODAL
+========================================================= */
+
+.goal-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 500;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: center;
+
+  padding: 18px;
+
+  background:
+    rgba(16, 35, 29, 0.28);
+}
+
+
+.goal-modal {
+  width: 100%;
+
+  max-width: 410px;
+
+  padding: 20px;
+
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 24px 60px
+    rgba(16, 35, 29, 0.18);
+}
+
+
+.goal-modal-header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 14px;
+}
+
+
+.goal-modal-header h2 {
+  margin: 0;
+
+  color: #10231d;
+
+  font-size: 20px;
+
+  font-weight: 850;
+}
+
+
+.goal-modal-header p {
+  margin: 5px 0 0;
+
+  color: #899690;
+
+  font-size: 11px;
+}
+
+
+.goal-close-button {
+  width: 34px;
+
+  height: 34px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #f1f5f3;
+
+  color: #10231d;
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+
+.goal-input-area {
+  margin-top: 20px;
+}
+
+
+.goal-input-area label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #5c6d66;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+
+.goal-input-wrapper {
+  min-height: 50px;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 14px;
+
+  border: 1px solid #dbe5e0;
+
+  border-radius: 14px;
+
+  background: #f9fbfa;
+}
+
+
+.goal-input-wrapper input {
+  width: 100%;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  color: #10231d;
+
+  font-size: 18px;
+
+  font-weight: 800;
+}
+
+
+.goal-input-wrapper span {
+  color: #899690;
+
+  font-size: 12px;
+}
+
+
+.save-goal-button {
+  width: 100%;
+
+  min-height: 48px;
+
+  margin-top: 16px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #128458;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+
+  .healthify-content {
+    padding-left: 12px;
+
+    padding-right: 12px;
+  }
+
+
+  .healthify-header {
+    grid-template-columns:
+      1fr auto 42px;
+  }
+
+
+  .healthify-heading h1 {
+    font-size: 25px;
+  }
+
+
+  .calorie-card {
+    padding: 14px;
+  }
+
+
+  .calorie-main-row {
+    grid-template-columns:
+      94px 1fr;
+  }
+
+
+  .calorie-ring {
+    width: 94px;
+
+    height: 94px;
+  }
+
+
+  .macro-card {
+    min-height: 65px;
+  }
+
+
+  .macro-card strong {
+    font-size: 15px;
+  }
+
+
+  .macro-card span {
+    font-size: 9px;
+  }
+
+
+  .motivation {
+    display: none;
+  }
+
+}
+
+
+/* =========================================================
+   DESKTOP — KEEP PORTRAIT MOBILE DESIGN
+========================================================= */
+
+@media (min-width: 445px) {
+
+  :host {
+    padding: 28px 0;
+  }
+
+
+  .healthify-main {
+    min-height:
+      calc(100vh - 56px);
+
+    box-shadow:
+      0 16px 50px
+      rgba(7, 21, 45, 0.08);
+  }
+
+}

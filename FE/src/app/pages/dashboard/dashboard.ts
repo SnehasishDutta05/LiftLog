@@ -821,7 +821,13 @@ export class Dashboard
   /* =====================================================
      BOTTOM NAVIGATION
   ===================================================== */
+  goToHealthify(): void {
 
+  this.router.navigate([
+    '/healthify',
+  ]);
+
+}
   goToProfile(): void {
 
     this.router.navigate([

@@ -152,171 +152,71 @@
 
   <nav class="mobile-bottom-nav">
 
+  <button
+    class="mobile-nav-item"
+    type="button"
+  >
 
-    <!-- HOME -->
+    <span class="nav-icon-circle emoji-icon">
+      🏠
+    </span>
 
-    <button
-      class="mobile-nav-item"
-      type="button"
-    >
+    <span class="nav-label">
+      Home
+    </span>
 
-      <span class="nav-icon-circle">
-
-        <svg
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            d="M3.5 10.5L12 3.5l8.5 7v9a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"
-          ></path>
-        </svg>
-
-      </span>
-
-      <span class="nav-label">
-        Home
-      </span>
-
-    </button>
+  </button>
 
 
-    <!-- WORKOUTS -->
+  <button
+    class="mobile-nav-item active"
+    type="button"
+  >
 
-    <button
-      class="mobile-nav-item active"
-      type="button"
-    >
+    <span class="nav-icon-circle emoji-icon">
+      🏋️
+    </span>
 
-      <span class="nav-icon-circle">
+    <span class="nav-label">
+      Workouts
+    </span>
 
-        <svg
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-
-          <path
-            d="M6 8v8"
-          ></path>
-
-          <path
-            d="M9 6v12"
-          ></path>
-
-          <path
-            d="M15 6v12"
-          ></path>
-
-          <path
-            d="M18 8v8"
-          ></path>
-
-          <path
-            d="M9 12h6"
-          ></path>
-
-          <path
-            d="M3.5 10v4"
-          ></path>
-
-          <path
-            d="M20.5 10v4"
-          ></path>
-
-        </svg>
-
-      </span>
-
-      <span class="nav-label">
-        Workouts
-      </span>
-
-    </button>
+  </button>
 
 
-    <!-- PROGRESS -->
+  <button
+    class="mobile-nav-item"
+    type="button"
+    (click)="goToHealthify()"
+  >
 
-    <button
-      class="mobile-nav-item"
-      type="button"
-    >
+    <span class="nav-icon-circle emoji-icon">
+      🥗
+    </span>
 
-      <span class="nav-icon-circle">
+    <span class="nav-label">
+      Nutrition
+    </span>
 
-        <svg
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-
-          <rect
-            x="4"
-            y="14"
-            width="3"
-            height="6"
-            rx="1"
-          ></rect>
-
-          <rect
-            x="10.5"
-            y="10"
-            width="3"
-            height="10"
-            rx="1"
-          ></rect>
-
-          <rect
-            x="17"
-            y="5"
-            width="3"
-            height="15"
-            rx="1"
-          ></rect>
-
-        </svg>
-
-      </span>
-
-      <span class="nav-label">
-        Progress
-      </span>
-
-    </button>
+  </button>
 
 
-    <!-- PROFILE -->
+  <button
+    class="mobile-nav-item"
+    type="button"
+    (click)="goToProfile()"
+  >
 
-    <button
-      class="mobile-nav-item"
-      type="button"
-      (click)="goToProfile()"
-    >
+    <span class="nav-icon-circle emoji-icon">
+      👤
+    </span>
 
-      <span class="nav-icon-circle">
+    <span class="nav-label">
+      Profile
+    </span>
 
-        <svg
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
+  </button>
 
-          <circle
-            cx="12"
-            cy="8"
-            r="3.5"
-          ></circle>
-
-          <path
-            d="M5 20c.7-4 3.1-6 7-6s6.3 2 7 6"
-          ></path>
-
-        </svg>
-
-      </span>
-
-      <span class="nav-label">
-        Profile
-      </span>
-
-    </button>
-
-  </nav>
+</nav>
 
 </div>

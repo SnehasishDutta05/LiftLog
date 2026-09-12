@@ -1,0 +1,457 @@
+<div class="healthify-shell">
+
+  <main class="healthify-main">
+
+    <div class="healthify-content">
+
+
+      <!-- =================================================
+           HEADER
+      ================================================== -->
+
+      <header class="healthify-header">
+
+        <div class="healthify-heading">
+
+          <h1>
+            Nutrition
+          </h1>
+
+          <p>
+            Fuel your progress
+          </p>
+
+        </div>
+
+
+        <div class="date-block">
+
+          <strong>
+            Today
+          </strong>
+
+          <span>
+            {{ todayLabel }}
+          </span>
+
+        </div>
+
+
+        <button
+          class="settings-button"
+          type="button"
+          aria-label="Nutrition settings"
+          (click)="openSettings()"
+        >
+          ⚙️
+        </button>
+
+      </header>
+
+
+      <!-- =================================================
+           CALORIE SUMMARY
+      ================================================== -->
+
+      <section class="calorie-card">
+
+
+        <div class="calorie-main-row">
+
+
+          <!-- =============================================
+               CALORIE RING
+          ============================================== -->
+
+          <div
+            class="calorie-ring"
+            [style.--progress]="calorieProgress + '%'"
+          >
+
+            <div class="calorie-ring-inner">
+
+              <strong>
+                {{ caloriesEaten }}
+              </strong>
+
+              <span>
+                of {{ calorieGoal }}
+              </span>
+
+              <small>
+                Cal Eaten
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <!-- =============================================
+               MACROS
+          ============================================== -->
+
+          <div class="macro-grid">
+
+
+            <div class="macro-card protein">
+
+              <strong>
+                {{ protein }}g
+              </strong>
+
+              <span>
+                Protein
+              </span>
+
+            </div>
+
+
+            <div class="macro-card carbs">
+
+              <strong>
+                {{ carbs }}g
+              </strong>
+
+              <span>
+                Carbs
+              </span>
+
+            </div>
+
+
+            <div class="macro-card fats">
+
+              <strong>
+                {{ fats }}g
+              </strong>
+
+              <span>
+                Fats
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ===============================================
+             SET GOAL
+        ================================================ -->
+
+        <button
+          class="set-goal-button"
+          type="button"
+          (click)="openGoalModal()"
+        >
+
+          <span>
+            🎯
+          </span>
+
+          <span>
+            Set Goal
+          </span>
+
+        </button>
+
+
+        <!-- ===============================================
+             CALORIES LEFT
+        ================================================ -->
+
+        <div class="calories-left-row">
+
+          <div class="calories-left-copy">
+
+            <span class="leaf-icon">
+              🌱
+            </span>
+
+            <strong>
+              {{ caloriesLeft }}
+            </strong>
+
+            <span>
+              calories left
+            </span>
+
+          </div>
+
+
+          <span class="motivation">
+            Small steps. Big results. 🌿
+          </span>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           MEALS
+      ================================================== -->
+
+      <section class="meals-list">
+
+        @for (
+          meal of meals;
+          track meal.name
+        ) {
+
+          <article class="meal-card">
+
+
+            <div class="meal-header">
+
+              <div class="meal-title-area">
+
+
+                <div class="meal-icon">
+
+                  {{ meal.icon }}
+
+                </div>
+
+
+                <div>
+
+                  <h2>
+                    {{ meal.name }}
+                  </h2>
+
+
+                  <p>
+
+                    {{ meal.eatenCalories }}
+                    of
+                    {{ meal.targetCalories }}
+                    Cal
+
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <button
+                class="add-food-button"
+                type="button"
+                [attr.aria-label]="'Add food to ' + meal.name"
+                (click)="addFood(meal)"
+              >
+                +
+              </button>
+
+            </div>
+
+
+            <div class="meal-empty-state">
+
+              <span class="empty-bowl">
+                🥣
+              </span>
+
+
+              <div>
+
+                <strong>
+                  No foods added yet
+                </strong>
+
+                <span>
+                  Tap the + button to add food
+                </span>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        }
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+  <!-- =====================================================
+       BOTTOM NAVIGATION
+  ====================================================== -->
+
+  <nav class="mobile-bottom-nav">
+
+
+    <!-- HOME -->
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        🏠
+      </span>
+
+      <span class="nav-label">
+        Home
+      </span>
+
+    </button>
+
+
+    <!-- WORKOUT -->
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToWorkouts()"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        🏋️
+      </span>
+
+      <span class="nav-label">
+        Workouts
+      </span>
+
+    </button>
+
+
+    <!-- NUTRITION -->
+
+    <button
+      class="mobile-nav-item active"
+      type="button"
+      (click)="goToHealthify()"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        🥗
+      </span>
+
+      <span class="nav-label">
+        Nutrition
+      </span>
+
+    </button>
+
+
+    <!-- PROFILE -->
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToProfile()"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        👤
+      </span>
+
+      <span class="nav-label">
+        Profile
+      </span>
+
+    </button>
+
+  </nav>
+
+</div>
+
+
+<!-- ========================================================
+     CALORIE GOAL MODAL
+========================================================= -->
+
+@if (showGoalModal) {
+
+  <div
+    class="goal-backdrop"
+    (click)="closeGoalModal()"
+  >
+
+    <section
+      class="goal-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="goalTitle"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div class="goal-modal-header">
+
+        <div>
+
+          <h2 id="goalTitle">
+            Daily Calorie Goal
+          </h2>
+
+          <p>
+            Set your target for each day.
+          </p>
+
+        </div>
+
+
+        <button
+          class="goal-close-button"
+          type="button"
+          aria-label="Close calorie goal"
+          (click)="closeGoalModal()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="goal-input-area">
+
+        <label for="calorieGoal">
+          Calories
+        </label>
+
+
+        <div class="goal-input-wrapper">
+
+          <input
+            id="calorieGoal"
+            type="number"
+            min="500"
+            max="10000"
+            step="50"
+            inputmode="numeric"
+            [(ngModel)]="calorieGoalInput"
+          >
+
+
+          <span>
+            kcal
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="save-goal-button"
+        type="button"
+        (click)="saveCalorieGoal()"
+      >
+        Save Goal
+      </button>
+
+    </section>
+
+  </div>
+
+}

@@ -117,7 +117,13 @@ export class Profile implements OnInit {
     ]);
 
   }
+  goToHealthify(): void {
 
+  this.router.navigate([
+    '/healthify',
+  ]);
+
+}
 
   goToProfile(): void {
 
@@ -193,5 +199,6 @@ export class Profile implements OnInit {
     ]);
 
   }
+  
 
 }

@@ -940,3 +940,19 @@ button {
 .nav-icon-circle {
   transform: scale(0.94);
 }
+
+
+/* =========================================================
+   EMOJI NAVIGATION ICONS
+========================================================= */
+
+.emoji-icon {
+  font-size: 20px;
+  line-height: 1;
+
+  font-family:
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji",
+    sans-serif;
+}
