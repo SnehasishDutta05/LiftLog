@@ -1,5 +1,10 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {
+  Injectable,
+} from '@angular/core';
+
+import {
+  HttpClient,
+} from '@angular/common/http';
 
 import {
   Observable,
@@ -12,10 +17,6 @@ import {
   environment,
 } from '../../../environments/environment';
 
-
-/* =========================================================
-   REQUEST MODELS
-========================================================= */
 
 export interface SignupRequest {
   full_name: string;
@@ -30,9 +31,10 @@ export interface LoginRequest {
 }
 
 
-/* =========================================================
-   RESPONSE MODELS
-========================================================= */
+export interface RefreshTokenRequest {
+  refresh_token: string;
+}
+
 
 export interface AuthUser {
   access_token: string;
@@ -47,10 +49,6 @@ export interface AuthResponse {
   user: AuthUser;
 }
 
-
-/* =========================================================
-   AUTH SERVICE
-========================================================= */
 
 @Injectable({
   providedIn: 'root',
@@ -75,18 +73,25 @@ export class AuthService {
 
 
   /*
-   * Access token expires after 15 minutes.
+   * Backend access token lifetime:
+   * approximately 15 minutes.
    *
-   * Refresh slightly before expiry so we don't
-   * race against the backend expiration time.
+   * Refresh slightly before expiration.
    */
   private readonly TOKEN_REFRESH_INTERVAL =
-  14 * 60 * 1000;
+    14 * 60 * 1000;
 
 
-  private refreshTimer?: ReturnType<typeof setInterval>;
+  private refreshTimer?:
+    ReturnType<typeof setInterval>;
 
-  private refreshRequest$?: Observable<AuthResponse>;
+
+  /*
+   * Prevent several simultaneous 401 responses
+   * from creating several refresh requests.
+   */
+  private refreshRequest$?:
+    Observable<AuthResponse>;
 
 
   constructor(
@@ -94,11 +99,13 @@ export class AuthService {
   ) {
 
     /*
-     * If the browser is refreshed and tokens already
-     * exist in localStorage, restart automatic refresh.
+     * Browser reload:
+     *
+     * localStorage survives the reload, so if the
+     * refresh token still exists we restart the
+     * proactive refresh timer.
      */
     if (
-      this.getAccessToken() &&
       this.getRefreshToken()
     ) {
 
@@ -108,10 +115,6 @@ export class AuthService {
 
   }
 
-
-  /* =====================================================
-     SIGNUP
-  ===================================================== */
 
   signup(
     fullName: string,
@@ -139,22 +142,20 @@ export class AuthService {
       )
       .pipe(
 
-        tap((response) => {
+        tap(
+          (response) => {
 
-          this.handleSuccessfulAuthentication(
-            response,
-          );
+            this.handleSuccessfulAuthentication(
+              response,
+            );
 
-        }),
+          },
+        ),
 
       );
 
   }
 
-
-  /* =====================================================
-     LOGIN
-  ===================================================== */
 
   login(
     email: string,
@@ -171,6 +172,11 @@ export class AuthService {
     };
 
 
+    /*
+     * Current backend Swagger:
+     *
+     * POST /api/v1/auth/login
+     */
     return this.http
       .post<AuthResponse>(
         `${this.apiUrl}/login`,
@@ -178,30 +184,31 @@ export class AuthService {
       )
       .pipe(
 
-        tap((response) => {
+        tap(
+          (response) => {
 
-          this.handleSuccessfulAuthentication(
-            response,
-          );
+            this.handleSuccessfulAuthentication(
+              response,
+            );
 
-        }),
+          },
+        ),
 
       );
 
   }
 
 
-  /* =====================================================
-     REFRESH TOKENS
-  ===================================================== */
-
-  refreshAccessToken(): Observable<AuthResponse> {
+  refreshAccessToken():
+    Observable<AuthResponse> {
 
     /*
-     * If several protected API calls fail at the same time,
-     * only make one refresh request.
+     * If a refresh is already in progress,
+     * reuse the same request.
      */
-    if (this.refreshRequest$) {
+    if (
+      this.refreshRequest$
+    ) {
 
       return this.refreshRequest$;
 
@@ -221,55 +228,62 @@ export class AuthService {
     }
 
 
+    const body:
+      RefreshTokenRequest = {
+
+      refresh_token:
+        refreshToken,
+
+    };
+
+
+    /*
+     * Current backend contract:
+     *
+     * POST /api/v1/auth/refresh
+     *
+     * {
+     *   "refresh_token": "..."
+     * }
+     *
+     * Response contains BOTH:
+     * access_token
+     * refresh_token
+     */
     this.refreshRequest$ =
       this.http
         .post<AuthResponse>(
           `${this.apiUrl}/refresh`,
-          {
-
-            refresh_token:
-              refreshToken,
-
-          },
+          body,
         )
         .pipe(
 
-          tap((response) => {
+          tap(
+            (response) => {
 
-            /*
-             * Your refresh API returns BOTH:
-             *
-             * access_token
-             * refresh_token
-             *
-             * So replace BOTH stored tokens.
-             */
-            this.saveTokens(
-
-              response.user.access_token,
-
-              response.user.refresh_token,
-
-            );
+              this.saveTokens(
+                response.user.access_token,
+                response.user.refresh_token,
+              );
 
 
-            this.saveUserDetails(
+              this.saveUserDetails(
+                response.user.email,
+                response.user.full_name,
+              );
 
-              response.user.email,
-
-              response.user.full_name,
-
-            );
-
-          }),
+            },
+          ),
 
 
-          finalize(() => {
+          finalize(
+            () => {
 
-            this.refreshRequest$ =
-              undefined;
+              this.refreshRequest$ =
+                undefined;
 
-          }),
+            },
+          ),
 
 
           shareReplay(1),
@@ -282,22 +296,14 @@ export class AuthService {
   }
 
 
-  /* =====================================================
-     AUTOMATIC TOKEN REFRESH
-  ===================================================== */
-
   startTokenRefreshTimer(): void {
 
-    /*
-     * Prevent multiple timers from running.
-     */
     this.stopTokenRefreshTimer();
 
 
-    /*
-     * Only start the timer if a refresh token exists.
-     */
-    if (!this.getRefreshToken()) {
+    if (
+      !this.getRefreshToken()
+    ) {
 
       return;
 
@@ -305,115 +311,112 @@ export class AuthService {
 
 
     this.refreshTimer =
-      setInterval(() => {
+      setInterval(
+        () => {
 
-        const refreshToken =
-          this.getRefreshToken();
+          if (
+            !this.getRefreshToken()
+          ) {
 
+            this.stopTokenRefreshTimer();
 
-        if (!refreshToken) {
+            return;
 
-          this.stopTokenRefreshTimer();
-
-          return;
-
-        }
-
-
-        this.refreshAccessToken()
-          .subscribe({
-
-            next: () => {
-
-              console.log(
-                'PulseOS authentication refreshed.',
-              );
-
-            },
+          }
 
 
-            error: (error) => {
+          this.refreshAccessToken()
+            .subscribe({
 
-              console.error(
-                'Token refresh failed:',
+              next: () => {
+
+                console.log(
+                  'PulseOS authentication refreshed.',
+                );
+
+              },
+
+
+              error: (
                 error,
-              );
+              ) => {
+
+                console.error(
+                  'Background token refresh failed:',
+                  error,
+                );
 
 
-              /*
-               * If refresh token is expired/invalid,
-               * clear authentication.
-               */
-              this.logout();
+                /*
+                 * Do not destroy the session for
+                 * temporary network/server failures.
+                 *
+                 * Only clear it when the refresh
+                 * token itself is rejected.
+                 */
+                if (
+                  error?.status === 401 ||
+                  error?.status === 403
+                ) {
 
-            },
+                  this.logout();
 
-          });
+                }
 
+              },
 
-      }, this.TOKEN_REFRESH_INTERVAL);
+            });
+
+        },
+
+        this.TOKEN_REFRESH_INTERVAL,
+      );
 
   }
 
-
-  /* =====================================================
-     STOP AUTOMATIC REFRESH
-  ===================================================== */
 
   private stopTokenRefreshTimer(): void {
 
-    if (this.refreshTimer) {
+    if (
+      !this.refreshTimer
+    ) {
 
-      clearInterval(
-        this.refreshTimer,
-      );
-
-      this.refreshTimer =
-        undefined;
+      return;
 
     }
 
+
+    clearInterval(
+      this.refreshTimer,
+    );
+
+
+    this.refreshTimer =
+      undefined;
+
   }
 
-
-  /* =====================================================
-     SUCCESSFUL LOGIN / SIGNUP
-  ===================================================== */
 
   private handleSuccessfulAuthentication(
     response: AuthResponse,
   ): void {
 
     this.saveTokens(
-
       response.user.access_token,
-
       response.user.refresh_token,
-
     );
 
 
     this.saveUserDetails(
-
       response.user.email,
-
       response.user.full_name,
-
     );
 
 
-    /*
-     * Start automatic token renewal after
-     * successful login/signup.
-     */
     this.startTokenRefreshTimer();
 
   }
 
-
-  /* =====================================================
-     SAVE TOKENS
-  ===================================================== */
 
   private saveTokens(
     accessToken: string,
@@ -434,11 +437,8 @@ export class AuthService {
   }
 
 
-  /* =====================================================
-     GET ACCESS TOKEN
-  ===================================================== */
-
-  getAccessToken(): string | null {
+  getAccessToken():
+    string | null {
 
     return localStorage.getItem(
       this.ACCESS_TOKEN_KEY,
@@ -447,11 +447,8 @@ export class AuthService {
   }
 
 
-  /* =====================================================
-     GET REFRESH TOKEN
-  ===================================================== */
-
-  getRefreshToken(): string | null {
+  getRefreshToken():
+    string | null {
 
     return localStorage.getItem(
       this.REFRESH_TOKEN_KEY,
@@ -460,30 +457,8 @@ export class AuthService {
   }
 
 
-  /* =====================================================
-     SAVE USER DETAILS
-  ===================================================== */
-
-  private saveUserDetails(
-    email: string,
-    fullName: string,
-  ): void {
-
-    localStorage.setItem(
-      this.USER_EMAIL_KEY,
-      email,
-    );
-
-
-    localStorage.setItem(
-      this.USER_FULL_NAME_KEY,
-      fullName,
-    );
-
-  }
-
-
-  getUserEmail(): string | null {
+  getUserEmail():
+    string | null {
 
     return localStorage.getItem(
       this.USER_EMAIL_KEY,
@@ -492,7 +467,8 @@ export class AuthService {
   }
 
 
-  getUserFullName(): string | null {
+  getUserFullName():
+    string | null {
 
     return localStorage.getItem(
       this.USER_FULL_NAME_KEY,
@@ -500,30 +476,16 @@ export class AuthService {
 
   }
 
-
-  /* =====================================================
-     LOGIN STATUS
-  ===================================================== */
 
   isLoggedIn(): boolean {
 
-    return !!(
-      this.getAccessToken() &&
-      this.getRefreshToken()
-    );
+    return !!this.getRefreshToken();
 
   }
 
 
-  /* =====================================================
-     LOGOUT
-  ===================================================== */
-
   logout(): void {
 
-    /*
-     * Stop token renewal first.
-     */
     this.stopTokenRefreshTimer();
 
 
@@ -544,6 +506,25 @@ export class AuthService {
 
     localStorage.removeItem(
       this.USER_FULL_NAME_KEY,
+    );
+
+  }
+
+
+  private saveUserDetails(
+    email: string,
+    fullName: string,
+  ): void {
+
+    localStorage.setItem(
+      this.USER_EMAIL_KEY,
+      email,
+    );
+
+
+    localStorage.setItem(
+      this.USER_FULL_NAME_KEY,
+      fullName,
     );
 
   }

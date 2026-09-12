@@ -33,7 +33,6 @@ export function authInterceptor(
   const authService =
     inject(AuthService);
 
-
   const router =
     inject(Router);
 
@@ -47,12 +46,10 @@ export function authInterceptor(
       '/auth/signup',
     );
 
-
   const isLoginRequest =
     request.url.includes(
       '/auth/login',
     );
-
 
   const isRefreshRequest =
     request.url.includes(
@@ -61,8 +58,8 @@ export function authInterceptor(
 
 
   /*
-   * Do not attach an old access token
-   * to authentication endpoints.
+   * Authentication endpoints must not receive
+   * an existing access token.
    */
   if (
     isSignupRequest ||
@@ -76,36 +73,30 @@ export function authInterceptor(
 
 
   /* =====================================================
-     ACCESS TOKEN
+     ADD ACCESS TOKEN
   ===================================================== */
 
   const accessToken =
     authService.getAccessToken();
 
 
-  let authenticatedRequest =
-    request;
+  const authenticatedRequest =
+    accessToken
+      ? request.clone({
 
+          setHeaders: {
 
-  if (accessToken) {
+            Authorization:
+              `Bearer ${accessToken}`,
 
-    authenticatedRequest =
-      request.clone({
+          },
 
-        setHeaders: {
-
-          Authorization:
-            `Bearer ${accessToken}`,
-
-        },
-
-      });
-
-  }
+        })
+      : request;
 
 
   /* =====================================================
-     SEND REQUEST
+     SEND ORIGINAL REQUEST
   ===================================================== */
 
   return next(
@@ -118,12 +109,13 @@ export function authInterceptor(
           error: HttpErrorResponse,
         ) => {
 
-
-          /* =============================================
-             NON-401 ERROR
-          ============================================= */
-
-          if (error.status !== 401) {
+          /*
+           * Only authentication failures should
+           * trigger token refresh.
+           */
+          if (
+            error.status !== 401
+          ) {
 
             return throwError(
               () => error,
@@ -132,15 +124,17 @@ export function authInterceptor(
           }
 
 
-          /* =============================================
-             CHECK REFRESH TOKEN
-          ============================================= */
+          /* =================================================
+             REFRESH TOKEN AVAILABLE?
+          ================================================= */
 
           const refreshToken =
             authService.getRefreshToken();
 
 
-          if (!refreshToken) {
+          if (
+            !refreshToken
+          ) {
 
             authService.logout();
 
@@ -156,24 +150,77 @@ export function authInterceptor(
           }
 
 
-          /* =============================================
+          /* =================================================
              REFRESH ACCESS TOKEN
-          ============================================= */
+          ================================================= */
 
           return authService
             .refreshAccessToken()
             .pipe(
 
+              /*
+               * IMPORTANT:
+               *
+               * This catchError handles ONLY errors
+               * produced by the refresh request.
+               *
+               * It is deliberately placed BEFORE
+               * switchMap.
+               */
+              catchError(
+                (
+                  refreshError:
+                    HttpErrorResponse,
+                ) => {
+
+                  console.error(
+                    'Authentication refresh failed:',
+                    refreshError,
+                  );
+
+
+                  /*
+                   * Logout only when the refresh token
+                   * itself has expired or is invalid.
+                   */
+                  if (
+                    refreshError.status === 401 ||
+                    refreshError.status === 403
+                  ) {
+
+                    authService.logout();
+
+                    router.navigate([
+                      '/login',
+                    ]);
+
+                  }
+
+
+                  /*
+                   * Network errors / 500 errors do not
+                   * automatically destroy the session.
+                   */
+                  return throwError(
+                    () => refreshError,
+                  );
+
+                },
+              ),
+
+
               switchMap(
-                (response) => {
+                (
+                  response,
+                ) => {
 
                   const newAccessToken =
                     response.user.access_token;
 
 
-                  /* =====================================
+                  /* =========================================
                      RETRY ORIGINAL REQUEST
-                  ===================================== */
+                  ========================================= */
 
                   const retryRequest =
                     request.clone({
@@ -188,31 +235,21 @@ export function authInterceptor(
                     });
 
 
+                  /*
+                   * IMPORTANT:
+                   *
+                   * Errors from the retried API request
+                   * are returned normally.
+                   *
+                   * For example:
+                   *
+                   * 422 -> stays 422
+                   * 500 -> stays 500
+                   *
+                   * They do NOT cause logout.
+                   */
                   return next(
                     retryRequest,
-                  );
-
-                },
-              ),
-
-
-              /* =========================================
-                 REFRESH TOKEN EXPIRED / INVALID
-              ========================================= */
-
-              catchError(
-                (refreshError) => {
-
-                  authService.logout();
-
-
-                  router.navigate([
-                    '/login',
-                  ]);
-
-
-                  return throwError(
-                    () => refreshError,
                   );
 
                 },

@@ -42,8 +42,9 @@ interface Question {
 
 interface ProfileRequest {
   dob: string;
-  height: number;
-  weight: number;
+
+  height: string;
+  weight: string;
   sex: string;
 
   wake_time: string;
@@ -55,14 +56,14 @@ interface ProfileRequest {
 
   experience: string;
 
-  training_days: number;
+  training_days: string;
   preferred_time: string;
   preferred_exercises: string;
   disliked_exercises: string;
   limitations: string;
 
   typical_foods: string;
-  meals_per_day: number;
+  meals_per_day: string;
   eating_out_frequency: string;
   favorite_foods: string;
   favorite_snacks: string;
@@ -80,9 +81,11 @@ interface ProfileResponse {
 
 @Component({
   selector: 'app-onboarding',
+
   imports: [
     FormsModule,
   ],
+
   templateUrl: './onboarding.html',
   styleUrl: './onboarding.css',
 })
@@ -521,6 +524,14 @@ export class Onboarding implements OnDestroy {
     this.profileError = '';
 
 
+    /*
+     * IMPORTANT:
+     *
+     * The current backend profile schema expects
+     * these values as strings.
+     *
+     * Do NOT convert height / weight to Number().
+     */
     const profile:
       ProfileRequest = {
 
@@ -530,14 +541,10 @@ export class Onboarding implements OnDestroy {
         ),
 
       height:
-        Number(
-          this.answers['height'],
-        ),
+        this.answers['height'] ?? '',
 
       weight:
-        Number(
-          this.answers['weight'],
-        ),
+        this.answers['weight'] ?? '',
 
       sex:
         this.answers['gender'] ?? '',
@@ -559,7 +566,7 @@ export class Onboarding implements OnDestroy {
           'fitnessLevel'
         ] ?? '',
 
-      training_days: 0,
+      training_days: '',
 
       preferred_time: '',
 
@@ -571,7 +578,7 @@ export class Onboarding implements OnDestroy {
 
       typical_foods: '',
 
-      meals_per_day: 0,
+      meals_per_day: '',
 
       eating_out_frequency: '',
 
@@ -638,12 +645,23 @@ export class Onboarding implements OnDestroy {
           );
 
 
+          /*
+           * Print FastAPI validation details.
+           *
+           * This makes future 422 problems much
+           * easier to identify.
+           */
           if (
-            error.status === 401
+            error.status === 422
           ) {
 
+            console.error(
+              'Profile validation details:',
+              error.error?.detail,
+            );
+
             this.profileError =
-              'Your session has expired. Please sign in again.';
+              'Some profile information was not accepted. Please check the console for validation details.';
 
             return;
 
@@ -651,11 +669,11 @@ export class Onboarding implements OnDestroy {
 
 
           if (
-            error.status === 422
+            error.status === 401
           ) {
 
             this.profileError =
-              'Some profile information was not accepted. Please check your answers.';
+              'Your session has expired. Please sign in again.';
 
             return;
 
@@ -704,20 +722,23 @@ export class Onboarding implements OnDestroy {
 
 
     this.completionTimer =
-      setTimeout(() => {
+      setTimeout(
+        () => {
 
-        this.finishOnboarding();
+          this.finishOnboarding();
 
-      }, 3000);
+        },
+        3000,
+      );
 
   }
 
 
   finishOnboarding(): void {
 
-    this.router.navigate([
+    this.router.navigateByUrl(
       '/dashboard',
-    ]);
+    );
 
   }
 
