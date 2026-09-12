@@ -43,6 +43,15 @@ def ensure_user_token_columns() -> None:
                 conn.execute(text(f"ALTER TABLE users ADD COLUMN {column_name} VARCHAR"))
 
 
+def ensure_diet_log_item_columns() -> None:
+    with engine.begin() as conn:
+        try:
+            conn.execute(text("SELECT serving_id FROM diet_log_items LIMIT 1"))
+        except exc.DatabaseError:
+            logger.warning("DB migration: adding missing serving_id column to diet_log_items")
+            conn.execute(text("ALTER TABLE diet_log_items ADD COLUMN serving_id INTEGER"))
+
+
 def init_db() -> None:
     from BE.app.models import Base as ModelsBase
 
@@ -51,6 +60,7 @@ def init_db() -> None:
         ModelsBase.metadata.create_all(bind=engine)
         ensure_user_password_hash_column()
         ensure_user_token_columns()
+        ensure_diet_log_item_columns()
         logger.info("DB init: complete")
     except Exception:
         logger.exception("DB init failed during schema creation or migration")
