@@ -55,13 +55,7 @@
 
       <section class="calorie-card">
 
-
         <div class="calorie-main-row">
-
-
-          <!-- =============================================
-               CALORIE RING
-          ============================================== -->
 
           <div
             class="calorie-ring"
@@ -87,12 +81,7 @@
           </div>
 
 
-          <!-- =============================================
-               MACROS
-          ============================================== -->
-
           <div class="macro-grid">
-
 
             <div class="macro-card protein">
 
@@ -137,10 +126,6 @@
         </div>
 
 
-        <!-- ===============================================
-             SET GOAL
-        ================================================ -->
-
         <button
           class="set-goal-button"
           type="button"
@@ -157,10 +142,6 @@
 
         </button>
 
-
-        <!-- ===============================================
-             CALORIES LEFT
-        ================================================ -->
 
         <div class="calories-left-row">
 
@@ -203,16 +184,12 @@
 
           <article class="meal-card">
 
-
             <div class="meal-header">
 
               <div class="meal-title-area">
 
-
                 <div class="meal-icon">
-
                   {{ meal.icon }}
-
                 </div>
 
 
@@ -222,14 +199,11 @@
                     {{ meal.name }}
                   </h2>
 
-
                   <p>
-
                     {{ meal.eatenCalories }}
                     of
                     {{ meal.targetCalories }}
                     Cal
-
                   </p>
 
                 </div>
@@ -249,26 +223,74 @@
             </div>
 
 
-            <div class="meal-empty-state">
+            @if (meal.items.length === 0) {
 
-              <span class="empty-bowl">
-                🥣
-              </span>
+              <div class="meal-empty-state">
 
-
-              <div>
-
-                <strong>
-                  No foods added yet
-                </strong>
-
-                <span>
-                  Tap the + button to add food
+                <span class="empty-bowl">
+                  🥣
                 </span>
+
+
+                <div>
+
+                  <strong>
+                    No foods added yet
+                  </strong>
+
+                  <span>
+                    Tap the + button to add food
+                  </span>
+
+                </div>
 
               </div>
 
-            </div>
+            }
+
+            @else {
+
+              <div class="meal-food-list">
+
+                @for (
+                  item of meal.items;
+                  track $index
+                ) {
+
+                  <div class="meal-food-item">
+
+                    <div class="meal-food-main">
+
+                      <strong>
+                        {{ item.food_name }}
+                      </strong>
+
+                      <span>
+                        {{ item.quantity_g }}g
+                      </span>
+
+                    </div>
+
+
+                    <div class="meal-food-calories">
+
+                      <strong>
+                        {{ item.calories }}
+                      </strong>
+
+                      <span>
+                        Cal
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                }
+
+              </div>
+
+            }
 
           </article>
 
@@ -287,9 +309,6 @@
 
   <nav class="mobile-bottom-nav">
 
-
-    <!-- HOME -->
-
     <button
       class="mobile-nav-item"
       type="button"
@@ -305,8 +324,6 @@
 
     </button>
 
-
-    <!-- WORKOUT -->
 
     <button
       class="mobile-nav-item"
@@ -325,8 +342,6 @@
     </button>
 
 
-    <!-- NUTRITION -->
-
     <button
       class="mobile-nav-item active"
       type="button"
@@ -343,8 +358,6 @@
 
     </button>
 
-
-    <!-- PROFILE -->
 
     <button
       class="mobile-nav-item"
@@ -432,7 +445,6 @@
             [(ngModel)]="calorieGoalInput"
           >
 
-
           <span>
             kcal
           </span>
@@ -449,6 +461,593 @@
       >
         Save Goal
       </button>
+
+    </section>
+
+  </div>
+
+}
+
+
+<!-- ========================================================
+     FOOD SEARCH
+========================================================= -->
+
+@if (showFoodSearch) {
+
+  <div
+    class="food-search-backdrop"
+    (click)="closeFoodSearch()"
+  >
+
+    <section
+      class="food-search-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="foodSearchTitle"
+      (click)="$event.stopPropagation()"
+    >
+
+      <header class="food-search-header">
+
+        <div>
+
+          <span class="food-search-eyebrow">
+            Add to
+          </span>
+
+
+          <h2 id="foodSearchTitle">
+
+            @if (selectedMeal) {
+
+              {{ selectedMeal.icon }}
+              {{ selectedMeal.name }}
+
+            }
+
+          </h2>
+
+        </div>
+
+
+        <button
+          class="food-search-close"
+          type="button"
+          aria-label="Close food search"
+          (click)="closeFoodSearch()"
+        >
+          ×
+        </button>
+
+      </header>
+
+
+      @if (!selectedFood) {
+
+        <form
+          class="food-search-form"
+          (ngSubmit)="searchFoods()"
+        >
+
+          <div class="food-search-input-wrapper">
+
+            <span class="food-search-icon">
+              🔍
+            </span>
+
+
+            <input
+              type="search"
+              name="foodSearch"
+              autocomplete="off"
+              placeholder="Search foods..."
+              [(ngModel)]="foodSearchQuery"
+            >
+
+
+            @if (foodSearchQuery) {
+
+              <button
+                class="food-search-clear"
+                type="button"
+                aria-label="Clear search"
+                (click)="clearFoodSearch()"
+              >
+                ×
+              </button>
+
+            }
+
+          </div>
+
+
+          <button
+            class="food-search-submit"
+            type="submit"
+          >
+            Search
+          </button>
+
+        </form>
+
+
+        <div class="food-result-heading">
+
+          <div>
+
+            <strong>
+              Foods
+            </strong>
+
+
+            @if (
+              !foodSearchLoading &&
+              foodSearchTotal > 0
+            ) {
+
+              <span>
+                {{ foodSearchTotal }} found
+              </span>
+
+            }
+
+          </div>
+
+
+          <span class="food-result-page">
+            Page {{ foodSearchPage }}
+          </span>
+
+        </div>
+
+
+        @if (foodSearchLoading) {
+
+          <div class="food-search-state">
+
+            <div class="food-loader">
+            </div>
+
+            <strong>
+              Finding foods...
+            </strong>
+
+            <span>
+              Searching the food database
+            </span>
+
+          </div>
+
+        }
+
+        @else if (foodSearchError) {
+
+          <div class="food-search-state">
+
+            <span class="food-state-icon">
+              🌱
+            </span>
+
+            <strong>
+              Something went wrong
+            </strong>
+
+            <span>
+              {{ foodSearchError }}
+            </span>
+
+
+            <button
+              class="food-retry-button"
+              type="button"
+              (click)="searchFoods()"
+            >
+              Try Again
+            </button>
+
+          </div>
+
+        }
+
+        @else if (
+          foodSearchResults.length === 0
+        ) {
+
+          <div class="food-search-state">
+
+            <span class="food-state-icon">
+              🥗
+            </span>
+
+            <strong>
+              No foods found
+            </strong>
+
+            <span>
+              Try searching for something else.
+            </span>
+
+          </div>
+
+        }
+
+        @else {
+
+          <div class="food-results-list">
+
+            @for (
+              food of foodSearchResults;
+              track food.food_id
+            ) {
+
+              <button
+                class="food-result-card"
+                type="button"
+                (click)="selectFood(food)"
+              >
+
+                <div class="food-result-main">
+
+                  <div class="food-result-icon">
+                    🍽️
+                  </div>
+
+
+                  <div class="food-result-copy">
+
+                    <strong>
+                      {{ food.name }}
+                    </strong>
+
+                    <span>
+                      Per 100g
+                    </span>
+
+                  </div>
+
+                </div>
+
+
+                <div class="food-result-calories">
+
+                  <strong>
+                    {{
+                      food
+                        .nutrition_per_100g
+                        .calories
+                    }}
+                  </strong>
+
+                  <span>
+                    Cal
+                  </span>
+
+                </div>
+
+
+                <div class="food-result-macros">
+
+                  <span>
+
+                    <b>
+                      {{
+                        food
+                          .nutrition_per_100g
+                          .protein_g
+                      }}g
+                    </b>
+
+                    Protein
+
+                  </span>
+
+
+                  <span>
+
+                    <b>
+                      {{
+                        food
+                          .nutrition_per_100g
+                          .carbs_g
+                      }}g
+                    </b>
+
+                    Carbs
+
+                  </span>
+
+
+                  <span>
+
+                    <b>
+                      {{
+                        food
+                          .nutrition_per_100g
+                          .fat_g
+                      }}g
+                    </b>
+
+                    Fat
+
+                  </span>
+
+                </div>
+
+              </button>
+
+            }
+
+          </div>
+
+
+          <div class="food-pagination">
+
+            <button
+              type="button"
+              [disabled]="!canGoToPreviousFoodPage"
+              (click)="previousFoodPage()"
+            >
+              ← Previous
+            </button>
+
+
+            <span>
+              Page {{ foodSearchPage }}
+            </span>
+
+
+            <button
+              type="button"
+              [disabled]="!canGoToNextFoodPage"
+              (click)="nextFoodPage()"
+            >
+              Next →
+            </button>
+
+          </div>
+
+        }
+
+      }
+
+      @else {
+
+        <div class="food-details">
+
+          <button
+            class="food-details-back"
+            type="button"
+            (click)="backToFoodResults()"
+          >
+            ← Back to foods
+          </button>
+
+
+          <div class="food-details-heading">
+
+            <div class="food-details-icon">
+              🍽️
+            </div>
+
+
+            <div>
+
+              <span>
+                {{ selectedFood.category }}
+              </span>
+
+              <h3>
+                {{ selectedFood.name }}
+              </h3>
+
+            </div>
+
+          </div>
+
+
+          <div class="food-details-summary">
+
+            <div>
+
+              <strong>
+                {{
+                  selectedFood
+                    .nutrition_per_100g
+                    .calories
+                }}
+              </strong>
+
+              <span>
+                Calories
+              </span>
+
+            </div>
+
+
+            <div>
+
+              <strong>
+                {{
+                  selectedFood
+                    .nutrition_per_100g
+                    .protein_g
+                }}g
+              </strong>
+
+              <span>
+                Protein
+              </span>
+
+            </div>
+
+
+            <div>
+
+              <strong>
+                {{
+                  selectedFood
+                    .nutrition_per_100g
+                    .carbs_g
+                }}g
+              </strong>
+
+              <span>
+                Carbs
+              </span>
+
+            </div>
+
+
+            <div>
+
+              <strong>
+                {{
+                  selectedFood
+                    .nutrition_per_100g
+                    .fat_g
+                }}g
+              </strong>
+
+              <span>
+                Fat
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <p class="food-per-100-label">
+            Nutrition values shown per 100g
+          </p>
+
+
+          <div class="serving-section">
+
+            <h4>
+              Available servings
+            </h4>
+
+
+            @if (
+              selectedFood.servings.length > 0
+            ) {
+
+              <div class="serving-list">
+
+                @for (
+                  serving of selectedFood.servings;
+                  track serving.serving_id
+                ) {
+
+                  <button
+                    class="serving-card"
+                    type="button"
+                    [class.selected]="isServingSelected(serving)"
+                    (click)="selectServing(serving)"
+                  >
+
+                    <div>
+
+                      <strong>
+                        {{ serving.name }}
+                      </strong>
+
+                      <span>
+                        {{ serving.quantity_g }}g
+                      </span>
+
+                    </div>
+
+
+                    <div class="serving-calories">
+
+                      <strong>
+                        {{ serving.calories }}
+                      </strong>
+
+                      <span>
+                        Cal
+                      </span>
+
+                    </div>
+
+                  </button>
+
+                }
+
+              </div>
+
+            }
+
+            @else {
+
+              <div class="no-servings">
+
+                <span>
+                  ⚖️
+                </span>
+
+
+                <div>
+
+                  <strong>
+                    No preset servings
+                  </strong>
+
+                  <p>
+                    This food can still be logged by weight.
+                  </p>
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+
+          @if (foodSaveError) {
+
+            <p class="food-save-error">
+              {{ foodSaveError }}
+            </p>
+
+          }
+
+
+          <button
+            class="food-add-coming-button"
+            type="button"
+            [disabled]="!selectedServing || isSavingFood"
+            (click)="addSelectedFoodToMeal()"
+          >
+
+            @if (isSavingFood) {
+
+              Adding...
+
+            }
+
+            @else if (selectedServing) {
+
+              Add to {{ selectedMeal?.name }}
+
+            }
+
+            @else {
+
+              Select serving to add
+
+            }
+
+          </button>
+
+        </div>
+
+      }
 
     </section>
 
