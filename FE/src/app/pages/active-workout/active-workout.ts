@@ -21,6 +21,10 @@ import {
   environment,
 } from '../../../environments/environment';
 
+import {
+  ConfirmDialog,
+} from '../../shared/confirm-dialog/confirm-dialog';
+
 
 /* =========================================================
    EXERCISE MODELS
@@ -164,6 +168,7 @@ interface ExerciseHistoryLastWorkout {
 interface ExerciseHistoryResponse {
   exercise_id: number;
   exercise_name: string;
+
   last_workout:
     ExerciseHistoryLastWorkout | null;
 }
@@ -178,6 +183,7 @@ interface ExerciseHistoryResponse {
 
   imports: [
     FormsModule,
+    ConfirmDialog,
   ],
 
   templateUrl:
@@ -198,6 +204,26 @@ export class ActiveWorkout
 
   workoutExercises:
     WorkoutExercise[] = [];
+
+
+  /* =====================================================
+     REMOVE EXERCISE CONFIRMATION
+  ===================================================== */
+
+  showRemoveExerciseDialog =
+    false;
+
+  pendingRemoveExerciseIndex:
+    number | null =
+    null;
+
+
+  /* =====================================================
+     DISCARD WORKOUT CONFIRMATION
+  ===================================================== */
+
+  showDiscardWorkoutDialog =
+    false;
 
 
   /* =====================================================
@@ -289,10 +315,14 @@ export class ActiveWorkout
   ===================================================== */
 
   constructor(
-    private router: Router,
+    private router:
+      Router,
+
     private changeDetector:
       ChangeDetectorRef,
-    private http: HttpClient,
+
+    private http:
+      HttpClient,
   ) {}
 
 
@@ -773,12 +803,6 @@ export class ActiveWorkout
               ?.sets ?? [];
 
 
-          /*
-           * No previous completed workout.
-           *
-           * Keep the exercise exactly
-           * as it currently is.
-           */
           if (
             previousSets.length === 0
           ) {
@@ -810,10 +834,6 @@ export class ActiveWorkout
           }
 
 
-          /*
-           * Sort previous sets by their
-           * original set number.
-           */
           const sortedPreviousSets =
             [...previousSets]
               .sort(
@@ -824,25 +844,6 @@ export class ActiveWorkout
                   first.set_number -
                   second.set_number,
               );
-
-
-          /*
-           * =================================================
-           * IMPORTANT
-           *
-           * Recreate every set from the last workout.
-           *
-           * Example:
-           *
-           * Previous:
-           * 1 -> 20kg x 10
-           * 2 -> 30kg x 8
-           * 3 -> 45kg x 6
-           *
-           * New workout automatically gets
-           * three rows.
-           * =================================================
-           */
 
 
           while (
@@ -873,17 +874,6 @@ export class ActiveWorkout
           }
 
 
-          /*
-           * Do NOT automatically remove
-           * additional sets that the user
-           * already added manually.
-           *
-           * Only ensure that at least the
-           * previous workout's number of
-           * sets exists.
-           */
-
-
           sortedPreviousSets.forEach(
             (
               previousSet,
@@ -900,9 +890,6 @@ export class ActiveWorkout
               }
 
 
-              /*
-               * PREVIOUS column
-               */
               currentSet.previousWeight =
                 previousSet.weight;
 
@@ -910,12 +897,6 @@ export class ActiveWorkout
                 previousSet.reps;
 
 
-              /*
-               * KG input
-               *
-               * Fill only if the user has
-               * not already entered something.
-               */
               if (
                 currentSet.weight ===
                   null ||
@@ -929,12 +910,6 @@ export class ActiveWorkout
               }
 
 
-              /*
-               * REPS input
-               *
-               * Fill only if the user has
-               * not already entered something.
-               */
               if (
                 currentSet.reps ===
                   null ||
@@ -951,11 +926,6 @@ export class ActiveWorkout
           );
 
 
-          /*
-           * Any current sets beyond the
-           * previous workout's count have
-           * no historical equivalent.
-           */
           workoutExercise
             .sets
             .forEach(
@@ -999,11 +969,6 @@ export class ActiveWorkout
           );
 
 
-          /*
-           * History failure should never
-           * prevent the workout from being
-           * used normally.
-           */
           workoutExercise
             .sets
             .forEach(
@@ -1154,11 +1119,6 @@ export class ActiveWorkout
     this.saveWorkoutExercises();
 
 
-    /*
-     * Reload history so if the newly
-     * created set has a matching previous
-     * set, PREVIOUS/KG/REPS are filled.
-     */
     this.loadExerciseHistory(
       workoutExercise,
     );
@@ -1184,21 +1144,61 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     DELETE EXERCISE
+     REMOVE EXERCISE
   ===================================================== */
 
   removeExercise(
     index: number,
   ): void {
 
-    const shouldRemove =
-      window.confirm(
-        'Remove this exercise?',
-      );
-
-
-    if (!shouldRemove) {
+    if (
+      index < 0 ||
+      index >=
+        this.workoutExercises.length
+    ) {
       return;
+    }
+
+
+    this.pendingRemoveExerciseIndex =
+      index;
+
+
+    this.showRemoveExerciseDialog =
+      true;
+
+  }
+
+
+  cancelRemoveExercise(): void {
+
+    this.showRemoveExerciseDialog =
+      false;
+
+
+    this.pendingRemoveExerciseIndex =
+      null;
+
+  }
+
+
+  confirmRemoveExercise(): void {
+
+    const index =
+      this.pendingRemoveExerciseIndex;
+
+
+    if (
+      index === null ||
+      index < 0 ||
+      index >=
+        this.workoutExercises.length
+    ) {
+
+      this.cancelRemoveExercise();
+
+      return;
+
     }
 
 
@@ -1209,6 +1209,43 @@ export class ActiveWorkout
 
 
     this.saveWorkoutExercises();
+
+
+    this.showRemoveExerciseDialog =
+      false;
+
+
+    this.pendingRemoveExerciseIndex =
+      null;
+
+  }
+
+
+  get pendingRemoveExerciseName():
+    string {
+
+    const index =
+      this.pendingRemoveExerciseIndex;
+
+
+    if (
+      index === null ||
+      index < 0 ||
+      index >=
+        this.workoutExercises.length
+    ) {
+
+      return 'this exercise';
+
+    }
+
+
+    return (
+      this.workoutExercises[index]
+        ?.exercise
+        ?.n ||
+      'this exercise'
+    );
 
   }
 
@@ -1703,11 +1740,6 @@ export class ActiveWorkout
     this.routineError = '';
 
 
-    /* =====================================================
-       STEP 1
-       POST /api/v1/routines
-    ===================================================== */
-
     this.http
       .post<CreateRoutineResponse>(
         `${this.apiBaseUrl}/routines`,
@@ -1728,11 +1760,6 @@ export class ActiveWorkout
             'true',
           );
 
-
-          /* =================================================
-             STEP 2
-             GET /api/v1/routines/{routine_id}
-          ================================================= */
 
           this.http
             .get<RoutineDetailResponse>(
@@ -1944,15 +1971,31 @@ export class ActiveWorkout
 
   discardWorkout(): void {
 
-    const shouldDiscard =
-      window.confirm(
-        'Discard this workout?',
-      );
-
-
-    if (!shouldDiscard) {
+    if (
+      this.isFinishingWorkout
+    ) {
       return;
     }
+
+
+    this.showDiscardWorkoutDialog =
+      true;
+
+  }
+
+
+  cancelDiscardWorkout(): void {
+
+    this.showDiscardWorkoutDialog =
+      false;
+
+  }
+
+
+  confirmDiscardWorkout(): void {
+
+    this.showDiscardWorkoutDialog =
+      false;
 
 
     this.clearWorkoutState();
@@ -2088,13 +2131,6 @@ export class ActiveWorkout
     const requestBody:
       SaveWorkoutRequest = {
 
-        /*
-         * Empty workout:
-         * routine_id = null
-         *
-         * Saved routine workout:
-         * routine_id = actual routine ID
-         */
         routine_id:
           this.getActiveRoutineId(),
 
@@ -2118,7 +2154,8 @@ export class ActiveWorkout
     );
 
 
-    this.isFinishingWorkout = true;
+    this.isFinishingWorkout =
+      true;
 
 
     this.http
@@ -2130,34 +2167,30 @@ export class ActiveWorkout
 
         next: response => {
 
-  console.log(
-    'Workout saved:',
-    response,
-  );
+          console.log(
+            'Workout saved:',
+            response,
+          );
 
 
-  this.isFinishingWorkout =
-    false;
+          this.isFinishingWorkout =
+            false;
 
 
-  /*
-   * Tell Profile that completed-workout
-   * history has changed.
-   */
-  localStorage.setItem(
-    'pulseos_workouts_changed',
-    'true',
-  );
+          localStorage.setItem(
+            'pulseos_workouts_changed',
+            'true',
+          );
 
 
-  this.clearWorkoutState();
+          this.clearWorkoutState();
 
 
-  this.router.navigate([
-    '/dashboard',
-  ]);
+          this.router.navigate([
+            '/dashboard',
+          ]);
 
-},
+        },
 
 
         error: error => {
@@ -2168,7 +2201,8 @@ export class ActiveWorkout
           );
 
 
-          this.isFinishingWorkout = false;
+          this.isFinishingWorkout =
+            false;
 
 
           if (

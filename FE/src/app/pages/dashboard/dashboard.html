@@ -152,71 +152,94 @@
 
   <nav class="mobile-bottom-nav">
 
-  <button
-    class="mobile-nav-item"
-    type="button"
-  >
+    <button
+      class="mobile-nav-item"
+      type="button"
+    >
 
-    <span class="nav-icon-circle emoji-icon">
-      🏠
-    </span>
+      <span class="nav-icon-circle emoji-icon">
+        🏠
+      </span>
 
-    <span class="nav-label">
-      Home
-    </span>
+      <span class="nav-label">
+        Home
+      </span>
 
-  </button>
-
-
-  <button
-    class="mobile-nav-item active"
-    type="button"
-  >
-
-    <span class="nav-icon-circle emoji-icon">
-      🏋️
-    </span>
-
-    <span class="nav-label">
-      Workouts
-    </span>
-
-  </button>
+    </button>
 
 
-  <button
-    class="mobile-nav-item"
-    type="button"
-    (click)="goToHealthify()"
-  >
+    <button
+      class="mobile-nav-item active"
+      type="button"
+    >
 
-    <span class="nav-icon-circle emoji-icon">
-      🥗
-    </span>
+      <span class="nav-icon-circle emoji-icon">
+        🏋️
+      </span>
 
-    <span class="nav-label">
-      Nutrition
-    </span>
+      <span class="nav-label">
+        Workouts
+      </span>
 
-  </button>
+    </button>
 
 
-  <button
-    class="mobile-nav-item"
-    type="button"
-    (click)="goToProfile()"
-  >
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToHealthify()"
+    >
 
-    <span class="nav-icon-circle emoji-icon">
-      👤
-    </span>
+      <span class="nav-icon-circle emoji-icon">
+        🥗
+      </span>
 
-    <span class="nav-label">
-      Profile
-    </span>
+      <span class="nav-label">
+        Nutrition
+      </span>
 
-  </button>
+    </button>
 
-</nav>
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToProfile()"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        👤
+      </span>
+
+      <span class="nav-label">
+        Profile
+      </span>
+
+    </button>
+
+  </nav>
 
 </div>
+
+
+<!-- ========================================================
+     DELETE ROUTINE CONFIRMATION
+========================================================= -->
+
+@if (showDeleteRoutineDialog) {
+
+  <app-confirm-dialog
+    icon="🗑️"
+    title="Delete Routine?"
+    [message]="
+      'Delete &quot;' +
+      (pendingDeleteRoutine?.name || 'this routine') +
+      '&quot;? This cannot be undone.'
+    "
+    confirmText="Delete"
+    cancelText="Cancel"
+    (confirmed)="confirmDeleteRoutine()"
+    (cancelled)="cancelDeleteRoutine()"
+  />
+
+}

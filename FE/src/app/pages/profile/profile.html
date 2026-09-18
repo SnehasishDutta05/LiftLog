@@ -158,6 +158,7 @@
 
             <strong>
               {{ streakDays }}
+
               @if (streakDays === 1) {
                 day
               } @else {
@@ -709,5 +710,24 @@
     </section>
 
   </div>
+
+}
+
+
+<!-- ========================================================
+     LOGOUT CONFIRMATION
+========================================================= -->
+
+@if (showLogoutDialog) {
+
+  <app-confirm-dialog
+    icon="👋"
+    title="Log Out?"
+    message="Are you sure you want to log out of PulseOS?"
+    confirmText="Log Out"
+    cancelText="Stay"
+    (confirmed)="confirmLogout()"
+    (cancelled)="cancelLogout()"
+  />
 
 }

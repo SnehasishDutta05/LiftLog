@@ -25,6 +25,10 @@ import {
   environment,
 } from '../../../environments/environment';
 
+import {
+  ConfirmDialog,
+} from '../../shared/confirm-dialog/confirm-dialog';
+
 
 /* =========================================================
    GET /api/v1/routines RESPONSE
@@ -116,7 +120,9 @@ interface StoredWorkoutExercise {
 @Component({
   selector: 'app-dashboard',
 
-  imports: [],
+  imports: [
+    ConfirmDialog,
+  ],
 
   templateUrl:
     './dashboard.html',
@@ -137,6 +143,19 @@ export class Dashboard
 
 
   isLoadingRoutines = false;
+
+
+  /* =====================================================
+     DELETE ROUTINE CONFIRMATION
+  ===================================================== */
+
+  showDeleteRoutineDialog =
+    false;
+
+
+  pendingDeleteRoutine:
+    DashboardRoutine | null =
+    null;
 
 
   /* =====================================================
@@ -431,9 +450,7 @@ export class Dashboard
 
 
   /* =====================================================
-     DELETE ROUTINE
-
-     DELETE /api/v1/routines/{routine_id}
+     DELETE ROUTINE CONFIRMATION
   ===================================================== */
 
   deleteRoutine(
@@ -450,19 +467,57 @@ export class Dashboard
     }
 
 
-    const shouldDelete =
-      window.confirm(
-        `Delete "${routine.name}"?`,
-      );
+    this.pendingDeleteRoutine =
+      routine;
+
+
+    this.showDeleteRoutineDialog =
+      true;
+
+  }
+
+
+  cancelDeleteRoutine(): void {
+
+    this.showDeleteRoutineDialog =
+      false;
+
+
+    this.pendingDeleteRoutine =
+      null;
+
+  }
+
+
+  confirmDeleteRoutine(): void {
+
+    const routine =
+      this.pendingDeleteRoutine;
 
 
     if (
-      !shouldDelete
+      !routine ||
+      routine.isDeleting
     ) {
+
+      this.cancelDeleteRoutine();
 
       return;
 
     }
+
+
+    /*
+     * Close the confirmation popup before
+     * beginning the API request.
+     */
+
+    this.showDeleteRoutineDialog =
+      false;
+
+
+    this.pendingDeleteRoutine =
+      null;
 
 
     routine.isDeleting =
@@ -472,6 +527,10 @@ export class Dashboard
     this.changeDetector
       .detectChanges();
 
+
+    /* =====================================================
+       DELETE /api/v1/routines/{routine_id}
+    ===================================================== */
 
     this.http
       .delete<void>(
@@ -821,13 +880,16 @@ export class Dashboard
   /* =====================================================
      BOTTOM NAVIGATION
   ===================================================== */
+
   goToHealthify(): void {
 
-  this.router.navigate([
-    '/healthify',
-  ]);
+    this.router.navigate([
+      '/healthify',
+    ]);
 
-}
+  }
+
+
   goToProfile(): void {
 
     this.router.navigate([

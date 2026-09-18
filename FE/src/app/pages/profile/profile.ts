@@ -13,6 +13,10 @@ import {
   WorkoutDetail,
 } from '../../services/liftlog-api.service';
 
+import {
+  ConfirmDialog,
+} from '../../shared/confirm-dialog/confirm-dialog';
+
 
 interface RecentWorkoutView {
   workoutId: number;
@@ -26,37 +30,83 @@ interface RecentWorkoutView {
 
 @Component({
   selector: 'app-profile',
-  imports: [],
-  templateUrl: './profile.html',
-  styleUrl: './profile.css',
+
+  imports: [
+    ConfirmDialog,
+  ],
+
+  templateUrl:
+    './profile.html',
+
+  styleUrl:
+    './profile.css',
 })
-export class Profile implements OnInit {
+export class Profile
+  implements OnInit {
+
 
   private readonly WORKOUTS_CHANGED_KEY =
     'pulseos_workouts_changed';
 
 
-  showSettings = false;
+  /* =====================================================
+     SETTINGS
+  ===================================================== */
 
-  fullName = 'PulseOS User';
+  showSettings =
+    false;
 
-  email = '';
 
-  workoutsThisWeek = 0;
+  /* =====================================================
+     LOGOUT CONFIRMATION
+  ===================================================== */
 
-  volumeThisWeek = 0;
+  showLogoutDialog =
+    false;
 
-  streakDays = 0;
 
-  exercisesThisWeek = 0;
+  /* =====================================================
+     USER
+  ===================================================== */
+
+  fullName =
+    'PulseOS User';
+
+  email =
+    '';
+
+
+  /* =====================================================
+     PROGRESS
+  ===================================================== */
+
+  workoutsThisWeek =
+    0;
+
+  volumeThisWeek =
+    0;
+
+  streakDays =
+    0;
+
+  exercisesThisWeek =
+    0;
+
 
   recentWorkouts:
     RecentWorkoutView[] = [];
 
-  isLoadingProgress = false;
 
-  progressError = '';
+  isLoadingProgress =
+    false;
 
+  progressError =
+    '';
+
+
+  /* =====================================================
+     CONSTRUCTOR
+  ===================================================== */
 
   constructor(
     private readonly router:
@@ -69,6 +119,10 @@ export class Profile implements OnInit {
       ChangeDetectorRef,
   ) {}
 
+
+  /* =====================================================
+     INIT
+  ===================================================== */
 
   ngOnInit(): void {
 
@@ -1066,9 +1120,9 @@ export class Profile implements OnInit {
     this.closeSettings();
 
 
-    window.alert(
-      'Account page will be connected next.',
-    );
+    this.router.navigate([
+      '/account',
+    ]);
 
   }
 
@@ -1153,9 +1207,9 @@ export class Profile implements OnInit {
 
   editProfile(): void {
 
-    window.alert(
-      'Edit Profile will be connected with the Account page next.',
-    );
+    this.router.navigate([
+      '/account',
+    ]);
 
   }
 
@@ -1173,29 +1227,45 @@ export class Profile implements OnInit {
     workoutId: number,
   ): void {
 
-    console.log(
-      'Selected workout:',
+    this.router.navigate([
+      '/workout-history',
       workoutId,
-    );
+    ]);
 
   }
 
 
   /* =====================================================
-     LOGOUT
+     LOGOUT CONFIRMATION
   ===================================================== */
 
   logout(): void {
 
-    const shouldLogout =
-      window.confirm(
-        'Log out of PulseOS?',
-      );
+    /*
+     * Keep the Settings sheet open underneath
+     * the confirmation dialog.
+     *
+     * If the user cancels, they return exactly
+     * where they were.
+     */
+    this.showLogoutDialog =
+      true;
+
+  }
 
 
-    if (!shouldLogout) {
-      return;
-    }
+  cancelLogout(): void {
+
+    this.showLogoutDialog =
+      false;
+
+  }
+
+
+  confirmLogout(): void {
+
+    this.showLogoutDialog =
+      false;
 
 
     localStorage.removeItem(

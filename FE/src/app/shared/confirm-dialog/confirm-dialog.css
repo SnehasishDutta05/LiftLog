@@ -1,0 +1,429 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+
+/* =====================================================
+   BACKDROP
+===================================================== */
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  background:
+    rgba(16, 35, 29, 0.46);
+
+  backdrop-filter:
+    blur(3px);
+
+  -webkit-backdrop-filter:
+    blur(3px);
+}
+
+
+/* =====================================================
+   DIALOG
+===================================================== */
+
+.confirm-dialog {
+  position: relative;
+
+  width: 100%;
+  max-width: 330px;
+
+  box-sizing: border-box;
+
+  padding:
+    28px
+    22px
+    22px;
+
+  background:
+    #ffffff;
+
+  border:
+    1px solid
+    rgba(21, 75, 59, 0.08);
+
+  border-radius:
+    24px;
+
+  box-shadow:
+    0 20px 55px
+    rgba(16, 35, 29, 0.22);
+
+  text-align:
+    center;
+
+  animation:
+    confirmDialogEnter
+    180ms
+    ease-out;
+}
+
+
+/* =====================================================
+   CLOSE BUTTON
+===================================================== */
+
+.close-button {
+  position: absolute;
+
+  top: 13px;
+  right: 13px;
+
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+
+  border-radius:
+    50%;
+
+  background:
+    #eef7f3;
+
+  color:
+    #35594e;
+
+  font-family:
+    inherit;
+
+  font-size:
+    25px;
+
+  font-weight:
+    400;
+
+  line-height:
+    1;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform 120ms ease,
+    background 120ms ease;
+}
+
+
+.close-button:hover {
+  background:
+    #e4f2ec;
+}
+
+
+.close-button:active {
+  transform:
+    scale(0.94);
+}
+
+
+/* =====================================================
+   ICON
+===================================================== */
+
+.confirm-icon {
+  width: 66px;
+  height: 66px;
+
+  margin:
+    2px
+    auto
+    18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius:
+    50%;
+
+  background:
+    #ffe8e8;
+
+  font-size:
+    29px;
+
+  line-height:
+    1;
+}
+
+
+/* =====================================================
+   TITLE
+===================================================== */
+
+.confirm-title {
+  margin:
+    0
+    0
+    9px;
+
+  color:
+    #10231d;
+
+  font-family:
+    inherit;
+
+  font-size:
+    22px;
+
+  font-weight:
+    800;
+
+  line-height:
+    1.25;
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+.confirm-message {
+  max-width:
+    270px;
+
+  margin:
+    0
+    auto
+    24px;
+
+  color:
+    #667a73;
+
+  font-family:
+    inherit;
+
+  font-size:
+    14px;
+
+  font-weight:
+    500;
+
+  line-height:
+    1.5;
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.confirm-actions {
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:
+    11px;
+}
+
+
+.confirm-actions button {
+  min-width: 0;
+  min-height: 50px;
+
+  padding:
+    0
+    14px;
+
+  box-sizing:
+    border-box;
+
+  border-radius:
+    999px;
+
+  font-family:
+    inherit;
+
+  font-size:
+    14px;
+
+  font-weight:
+    800;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+
+/* =====================================================
+   CANCEL
+===================================================== */
+
+.cancel-button {
+  border:
+    1.5px solid
+    #9ed9bf;
+
+  background:
+    #f8fbfa;
+
+  color:
+    #154b3b;
+}
+
+
+.cancel-button:hover {
+  background:
+    #eef8f3;
+}
+
+
+.cancel-button:active {
+  transform:
+    scale(0.97);
+}
+
+
+/* =====================================================
+   CONFIRM
+===================================================== */
+
+.confirm-button {
+  border:
+    1.5px solid
+    #154b3b;
+
+  background:
+    #154b3b;
+
+  color:
+    #ffffff;
+}
+
+
+.confirm-button:hover {
+  background:
+    #102f26;
+
+  border-color:
+    #102f26;
+}
+
+
+.confirm-button:active {
+  transform:
+    scale(0.97);
+}
+
+
+/* =====================================================
+   OPEN ANIMATION
+===================================================== */
+
+@keyframes confirmDialogEnter {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+/* =====================================================
+   SMALL PHONES
+===================================================== */
+
+@media (
+  max-width: 380px
+) {
+
+  .confirm-backdrop {
+    padding:
+      16px;
+  }
+
+
+  .confirm-dialog {
+    max-width:
+      320px;
+
+    padding:
+      26px
+      18px
+      20px;
+  }
+
+
+  .confirm-icon {
+    width:
+      62px;
+
+    height:
+      62px;
+
+    font-size:
+      27px;
+  }
+
+
+  .confirm-title {
+    font-size:
+      21px;
+  }
+
+
+  .confirm-message {
+    font-size:
+      13.5px;
+  }
+
+
+  .confirm-actions {
+    gap:
+      9px;
+  }
+
+
+  .confirm-actions button {
+    min-height:
+      48px;
+
+    padding:
+      0
+      10px;
+
+    font-size:
+      13.5px;
+  }
+
+}

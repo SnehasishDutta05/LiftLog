@@ -257,16 +257,10 @@
             [class.completed]="set.completed"
           >
 
-            <!-- SET NUMBER -->
-
             <div class="set-number">
               {{ setIndex + 1 }}
             </div>
 
-
-            <!-- ============================================
-                 PREVIOUS WORKOUT
-            ============================================= -->
 
             <div class="previous-value">
 
@@ -288,8 +282,6 @@
             </div>
 
 
-            <!-- WEIGHT -->
-
             <input
               class="set-input"
               type="number"
@@ -303,8 +295,6 @@
             />
 
 
-            <!-- REPS -->
-
             <input
               class="set-input"
               type="number"
@@ -317,8 +307,6 @@
               (ngModelChange)="updateWorkoutState()"
             />
 
-
-            <!-- COMPLETE SET -->
 
             <button
               class="complete-set-button"
@@ -552,5 +540,47 @@
     </div>
 
   </div>
+
+}
+
+
+<!-- ========================================================
+     REMOVE EXERCISE CONFIRMATION
+========================================================= -->
+
+@if (showRemoveExerciseDialog) {
+
+  <app-confirm-dialog
+    icon="🏋️"
+    title="Remove Exercise?"
+    [message]="
+      'Remove ' +
+      pendingRemoveExerciseName +
+      '? This exercise and its sets will be removed from your workout.'
+    "
+    confirmText="Remove"
+    cancelText="Cancel"
+    (confirmed)="confirmRemoveExercise()"
+    (cancelled)="cancelRemoveExercise()"
+  />
+
+}
+
+
+<!-- ========================================================
+     DISCARD WORKOUT CONFIRMATION
+========================================================= -->
+
+@if (showDiscardWorkoutDialog) {
+
+  <app-confirm-dialog
+    icon="↩️"
+    title="Discard Workout?"
+    message="Your current workout progress will be lost."
+    confirmText="Discard"
+    cancelText="Keep Workout"
+    (confirmed)="confirmDiscardWorkout()"
+    (cancelled)="cancelDiscardWorkout()"
+  />
 
 }

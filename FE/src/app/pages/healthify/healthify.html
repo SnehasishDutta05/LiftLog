@@ -1388,3 +1388,26 @@
   </div>
 
 }
+<!-- =====================================================
+     REMOVE FOOD CONFIRMATION
+====================================================== -->
+
+@if (showDeleteFoodDialog) {
+
+  <app-confirm-dialog
+    icon="🗑️"
+    title="Remove Food Item?"
+    [message]="
+      'Remove ' +
+      (pendingDeleteItem?.food_name || 'this food') +
+      ' from ' +
+      (pendingDeleteMeal?.name || 'this meal') +
+      '?'
+    "
+    confirmText="Remove"
+    cancelText="Cancel"
+    (confirmed)="confirmDeleteFood()"
+    (cancelled)="cancelDeleteFood()"
+  />
+
+}
