@@ -22,11 +22,8 @@ import {
 
 export interface UserPublic {
   id: number;
-
   email: string;
-
   full_name: string;
-
   auth_provider: string;
 }
 
@@ -37,18 +34,14 @@ export interface UserPublic {
 
 export interface AuthResponse {
   access_token: string;
-
   refresh_token: string;
-
   token_type: string;
-
   user: UserPublic;
 }
 
 
 export interface SignupResponse {
   message: string;
-
   user: UserPublic;
 }
 
@@ -59,13 +52,9 @@ export interface SignupResponse {
 
 export interface Routine {
   id: number;
-
   user_id: number;
-
   name: string;
-
   created_at: string;
-
   updated_at: string;
 }
 
@@ -76,19 +65,56 @@ export interface RoutineListResponse {
 
 
 /* =========================================================
-   WORKOUTS
+   LEGACY WORKOUT TYPE
+
+   Keep this because existing workout/dashboard code may
+   already depend on it.
 ========================================================= */
 
 export interface Workout {
   id: number;
-
   user_id: number;
-
   status: string;
-
   started_at: string;
-
   completed_at: string | null;
+}
+
+
+/* =========================================================
+   COMPLETED WORKOUT HISTORY
+========================================================= */
+
+export interface WorkoutSetDetail {
+  set_number: number;
+  weight: number | null;
+  reps: number | null;
+}
+
+
+export interface WorkoutExerciseDetail {
+  workout_exercise_id: number;
+  exercise_id: number;
+  exercise_name: string | null;
+  sets: WorkoutSetDetail[];
+}
+
+
+export interface WorkoutDetail {
+  workout_id: number;
+  routine_id: number | null;
+  started_at: string;
+  finished_at: string | null;
+  duration_seconds: number | null;
+  exercises: WorkoutExerciseDetail[];
+}
+
+
+export interface WorkoutHistoryResponse {
+  items: WorkoutDetail[];
+  total: number;
+  limit: number;
+  offset: number;
+  has_more: boolean;
 }
 
 
@@ -98,7 +124,6 @@ export interface Workout {
 
 export interface ExerciseApiRecord {
   exercise_id: number;
-
   name: string;
 }
 
@@ -123,12 +148,7 @@ export class LiftlogApiService {
 
 
   /* =====================================================
-     LEGACY AUTH HEADERS
-
-     Existing workout/routine methods still use these.
-     We are leaving them unchanged so nothing else breaks.
-
-     New exercise loading uses the global auth interceptor.
+     AUTH HEADERS
   ===================================================== */
 
   private authHeaders(
@@ -136,13 +156,11 @@ export class LiftlogApiService {
   ): HttpHeaders {
 
     return new HttpHeaders({
-
       'Content-Type':
         'application/json',
 
       Authorization:
         `Bearer ${token}`,
-
     });
 
   }
@@ -262,7 +280,10 @@ export class LiftlogApiService {
 
 
   /* =====================================================
-     WORKOUTS
+     LEGACY WORKOUT METHODS
+
+     Leave these unchanged so existing screens continue
+     compiling exactly as before.
   ===================================================== */
 
   getWorkouts(
@@ -359,15 +380,50 @@ export class LiftlogApiService {
 
 
   /* =====================================================
+     COMPLETED WORKOUT HISTORY
+
+     Matches the current FastAPI response:
+
+     {
+       items,
+       total,
+       limit,
+       offset,
+       has_more
+     }
+  ===================================================== */
+
+  getWorkoutHistory(
+    token: string,
+    limit = 50,
+    offset = 0,
+  ):
+    Observable<WorkoutHistoryResponse> {
+
+    return this.http
+      .get<WorkoutHistoryResponse>(
+        `${this.apiUrl}/workouts`,
+        {
+          headers:
+            this.authHeaders(
+              token,
+            ),
+
+          params: {
+            limit:
+              limit.toString(),
+
+            offset:
+              offset.toString(),
+          },
+        },
+      );
+
+  }
+
+
+  /* =====================================================
      EXERCISES
-
-     GET /api/v1/exercises
-
-     No token argument is required here.
-
-     auth.interceptor.ts automatically attaches:
-
-     Authorization: Bearer <access_token>
   ===================================================== */
 
   getExercises():

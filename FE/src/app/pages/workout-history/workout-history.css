@@ -1,0 +1,581 @@
+:host {
+  display: block;
+
+  width: 100%;
+
+  min-height: 100vh;
+
+  background: #f5f7f6;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+button {
+  font: inherit;
+}
+
+
+.history-shell {
+  width: 100%;
+
+  min-height: 100vh;
+
+  display: flex;
+
+  justify-content: center;
+
+  background: #f5f7f6;
+
+  color: #10231d;
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+.history-main {
+  width: 100%;
+
+  max-width: 444px;
+
+  min-height: 100vh;
+
+  background: #ffffff;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.history-header {
+  min-height: 78px;
+
+  display: grid;
+
+  grid-template-columns:
+    42px
+    minmax(0, 1fr)
+    42px;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding:
+    max(
+      18px,
+      env(safe-area-inset-top)
+    )
+    18px
+    12px;
+
+  border-bottom:
+    1px solid #edf1ef;
+
+  background: #ffffff;
+}
+
+
+.history-header h1 {
+  margin: 0;
+
+  overflow: hidden;
+
+  color: #10231d;
+
+  font-size: 21px;
+
+  line-height: 1.2;
+
+  font-weight: 850;
+
+  letter-spacing: -0.4px;
+
+  text-align: center;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.back-button {
+  width: 40px;
+
+  height: 40px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 0 0 4px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #f1f6f3;
+
+  color: #10231d;
+
+  font-size: 31px;
+
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+
+.header-spacer {
+  width: 40px;
+
+  height: 40px;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.history-content {
+  padding:
+    18px
+    18px
+    34px;
+}
+
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+.history-filters {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  overflow-x: auto;
+
+  padding-bottom: 2px;
+
+  scrollbar-width: none;
+}
+
+
+.history-filters::-webkit-scrollbar {
+  display: none;
+}
+
+
+.history-filters button {
+  min-height: 34px;
+
+  flex: 0 0 auto;
+
+  padding:
+    7px
+    13px;
+
+  border:
+    1px solid
+    #e1e8e4;
+
+  border-radius: 999px;
+
+  background: #ffffff;
+
+  color: #6e7d77;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.history-filters button.active {
+  border-color: #154b3b;
+
+  background: #154b3b;
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   HISTORY LIST
+========================================================= */
+
+.history-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-top: 20px;
+}
+
+
+.history-card {
+  width: 100%;
+
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    46px
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 15px;
+
+  border:
+    1px solid
+    #e3e9e6;
+
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  color: #10231d;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    transform
+    150ms ease,
+    border-color
+    150ms ease,
+    background
+    150ms ease;
+}
+
+
+.history-card:active {
+  transform:
+    scale(0.99);
+
+  border-color:
+    #cce2d7;
+
+  background:
+    #fbfdfc;
+}
+
+
+.workout-icon {
+  width: 46px;
+
+  height: 46px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: #e9f8f0;
+
+  font-size: 21px;
+}
+
+
+.workout-content {
+  min-width: 0;
+}
+
+
+.workout-heading {
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+}
+
+
+.workout-heading strong {
+  overflow: hidden;
+
+  color: #10231d;
+
+  font-size: 14px;
+
+  line-height: 1.25;
+
+  font-weight: 800;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.workout-chevron {
+  flex: 0 0 auto;
+
+  color: #9ba7a2;
+
+  font-size: 23px;
+
+  line-height: 1;
+}
+
+
+.workout-date {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #84928c;
+
+  font-size: 10px;
+
+  line-height: 1.3;
+}
+
+
+.workout-summary {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-top: 11px;
+
+  color: #65756e;
+
+  font-size: 10px;
+}
+
+
+.workout-summary strong {
+  color: #128458;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   EMPTY / LOADING / ERROR
+========================================================= */
+
+.history-state {
+  min-height: 330px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding:
+    30px
+    24px;
+
+  text-align: center;
+}
+
+
+.state-icon {
+  width: 58px;
+
+  height: 58px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  border-radius: 18px;
+
+  background: #eaf8f1;
+
+  color: #166c4c;
+
+  font-size: 25px;
+
+  font-weight: 800;
+}
+
+
+.history-state strong {
+  color: #10231d;
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+
+.history-state > span:not(.history-loader) {
+  max-width: 260px;
+
+  margin-top: 7px;
+
+  color: #87958f;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+
+.history-loader {
+  width: 26px;
+
+  height: 26px;
+
+  margin-bottom: 15px;
+
+  border:
+    3px solid
+    #dce9e3;
+
+  border-top-color:
+    #128458;
+
+  border-radius: 50%;
+
+  animation:
+    history-spin
+    0.75s
+    linear
+    infinite;
+}
+
+
+@keyframes history-spin {
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 360px) {
+
+  .history-header {
+    padding-left: 14px;
+
+    padding-right: 14px;
+  }
+
+
+  .history-content {
+    padding:
+      16px
+      14px
+      30px;
+  }
+
+
+  .history-card {
+    grid-template-columns:
+      42px
+      minmax(0, 1fr);
+
+    gap: 11px;
+
+    padding: 13px;
+  }
+
+
+  .workout-icon {
+    width: 42px;
+
+    height: 42px;
+
+    font-size: 19px;
+  }
+
+}
+
+
+/* =========================================================
+   DESKTOP
+
+   Intentionally retains the same mobile portrait layout.
+========================================================= */
+
+@media (min-width: 445px) {
+
+  :host {
+    padding:
+      28px
+      0;
+  }
+
+
+  .history-main {
+    min-height:
+      calc(
+        100vh -
+        56px
+      );
+
+    box-shadow:
+      0
+      16px
+      50px
+      rgba(
+        7,
+        21,
+        45,
+        0.08
+      );
+  }
+
+}

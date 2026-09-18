@@ -6,14 +6,12 @@
 
 
       <!-- ==================================================
-           HEADER
+           TOP ACTION
       =================================================== -->
 
       <header class="profile-header">
 
-        <h1>
-          Profile
-        </h1>
+        <div class="profile-header-spacer"></div>
 
 
         <button
@@ -41,9 +39,9 @@
 
         <div class="profile-user-copy">
 
-          <h2>
+          <h1>
             {{ fullName }}
-          </h2>
+          </h1>
 
 
           <p>
@@ -88,30 +86,24 @@
 
           <article class="progress-card">
 
-            <span class="progress-label">
-              Workouts
-            </span>
+            <div class="progress-card-top">
+
+              <span class="progress-icon">
+                🏋️
+              </span>
+
+
+              <span class="progress-label">
+                Workouts
+              </span>
+
+            </div>
+
 
             <strong>
               {{ workoutsThisWeek }}
             </strong>
 
-            <span class="progress-subtext">
-              This week
-            </span>
-
-          </article>
-
-
-          <article class="progress-card">
-
-            <span class="progress-label">
-              Volume
-            </span>
-
-            <strong>
-              {{ volumeThisWeek }} kg
-            </strong>
 
             <span class="progress-subtext">
               This week
@@ -122,13 +114,57 @@
 
           <article class="progress-card">
 
-            <span class="progress-label">
-              Streak
+            <div class="progress-card-top">
+
+              <span class="progress-icon">
+                📊
+              </span>
+
+
+              <span class="progress-label">
+                Volume
+              </span>
+
+            </div>
+
+
+            <strong class="progress-volume">
+              {{ formatVolume(volumeThisWeek) }} kg
+            </strong>
+
+
+            <span class="progress-subtext">
+              This week
             </span>
 
+          </article>
+
+
+          <article class="progress-card">
+
+            <div class="progress-card-top">
+
+              <span class="progress-icon">
+                🔥
+              </span>
+
+
+              <span class="progress-label">
+                Streak
+              </span>
+
+            </div>
+
+
             <strong>
-              {{ streakDays }} days
+              {{ streakDays }}
+              @if (streakDays === 1) {
+                day
+              } @else {
+                days
+              }
             </strong>
+
 
             <span class="progress-subtext">
               Keep it going!
@@ -139,13 +175,24 @@
 
           <article class="progress-card">
 
-            <span class="progress-label">
-              Exercises
-            </span>
+            <div class="progress-card-top">
+
+              <span class="progress-icon">
+                💪
+              </span>
+
+
+              <span class="progress-label">
+                Exercises
+              </span>
+
+            </div>
+
 
             <strong>
               {{ exercisesThisWeek }}
             </strong>
+
 
             <span class="progress-subtext">
               This week
@@ -162,7 +209,7 @@
            RECENT ACTIVITY
       =================================================== -->
 
-      <section class="profile-section">
+      <section class="profile-section recent-section">
 
         <div class="section-heading-row">
 
@@ -174,6 +221,7 @@
           <button
             class="text-action"
             type="button"
+            (click)="viewAllWorkouts()"
           >
             View All
           </button>
@@ -181,185 +229,132 @@
         </div>
 
 
-        <div class="activity-card">
+        @if (isLoadingProgress) {
 
-          <div class="empty-activity">
+          <div class="activity-card">
 
-            <strong>
-              No recent workouts yet
-            </strong>
+            <div class="activity-loading">
 
+              <span class="activity-loader"></span>
 
-            <span>
-              Completed workouts will appear here.
-            </span>
+              <span>
+                Loading your workouts...
+              </span>
 
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ==================================================
-           PERSONAL DETAILS
-      =================================================== -->
-
-      <section class="profile-section">
-
-        <div class="section-heading-row">
-
-          <h2>
-            Personal Details
-          </h2>
-
-
-          <button
-            class="text-action"
-            type="button"
-            (click)="editProfile()"
-          >
-            Edit
-          </button>
-
-        </div>
-
-
-        <div class="details-card">
-
-          <div class="detail-row">
-
-            <span>
-              Age
-            </span>
-
-            <strong>
-              {{ age }}
-            </strong>
+            </div>
 
           </div>
 
+        } @else if (progressError) {
 
-          <div class="detail-row">
+          <div class="activity-card">
 
-            <span>
-              Height
-            </span>
+            <div class="empty-activity">
 
-            <strong>
-              {{ height }}
-            </strong>
-
-          </div>
+              <strong>
+                Unable to load activity
+              </strong>
 
 
-          <div class="detail-row">
+              <span>
+                {{ progressError }}
+              </span>
 
-            <span>
-              Weight
-            </span>
-
-            <strong>
-              {{ weight }}
-            </strong>
+            </div>
 
           </div>
 
+        } @else if (recentWorkouts.length === 0) {
 
-          <div class="detail-row">
+          <div class="activity-card">
 
-            <span>
-              Fitness Level
-            </span>
+            <div class="empty-activity">
 
-            <strong>
-              {{ fitnessLevel }}
-            </strong>
-
-          </div>
+              <div class="empty-activity-icon">
+                🏋️
+              </div>
 
 
-          <div class="detail-row">
+              <strong>
+                No recent workouts yet
+              </strong>
 
-            <span>
-              Goal
-            </span>
 
-            <strong>
-              {{ goal }}
-            </strong>
+              <span>
+                Completed workouts will appear here.
+              </span>
+
+            </div>
 
           </div>
 
-        </div>
+        } @else {
 
-      </section>
+          <div class="recent-workout-list">
 
+            @for (
+              workout of recentWorkouts;
+              track workout.workoutId
+            ) {
 
-      <!-- ==================================================
-           SETTINGS
-      =================================================== -->
+              <button
+                class="recent-workout-card"
+                type="button"
+                (click)="openRecentWorkout(workout.workoutId)"
+              >
 
-      <section class="profile-section">
-
-        <h2 class="standalone-section-title">
-          Settings
-        </h2>
-
-
-        <div class="settings-card">
-
-          <button
-            class="settings-row"
-            type="button"
-            (click)="openAppearance()"
-          >
-
-            <span>
-              Appearance
-            </span>
-
-            <span class="settings-chevron">
-              ›
-            </span>
-
-          </button>
+                <div class="recent-workout-icon">
+                  🏋️
+                </div>
 
 
-          <button
-            class="settings-row"
-            type="button"
-            (click)="openAccount()"
-          >
+                <div class="recent-workout-copy">
 
-            <span>
-              Account
-            </span>
-
-            <span class="settings-chevron">
-              ›
-            </span>
-
-          </button>
+                  <strong class="recent-workout-title">
+                    {{ workout.title }}
+                  </strong>
 
 
-          <button
-            class="settings-row logout-row"
-            type="button"
-            (click)="logout()"
-          >
+                  <span class="recent-workout-meta">
+                    {{ workout.dateLabel }}
+                    •
+                    {{ workout.durationLabel }}
+                  </span>
 
-            <span>
-              Logout
-            </span>
 
-            <span class="settings-chevron">
-              ›
-            </span>
+                  <div class="recent-workout-stats">
 
-          </button>
+                    <span>
+                      {{ workout.exerciseCount }}
 
-        </div>
+                      @if (workout.exerciseCount === 1) {
+                        exercise
+                      } @else {
+                        exercises
+                      }
+                    </span>
+
+
+                    <span class="recent-workout-volume">
+                      {{ formatVolume(workout.volume) }} kg
+                    </span>
+
+                  </div>
+
+                </div>
+
+
+                <span class="recent-workout-chevron">
+                  ›
+                </span>
+
+              </button>
+
+            }
+
+          </div>
+
+        }
 
       </section>
 
@@ -374,77 +369,80 @@
 
   <nav class="mobile-bottom-nav">
 
-  <button
-    class="mobile-nav-item"
-    type="button"
-  >
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goHome()"
+    >
 
-    <span class="nav-icon-circle emoji-icon">
-      🏠
-    </span>
+      <span class="nav-icon-circle emoji-icon">
+        🏠
+      </span>
 
-    <span class="nav-label">
-      Home
-    </span>
+      <span class="nav-label">
+        Home
+      </span>
 
-  </button>
-
-
-  <button
-    class="mobile-nav-item"
-    type="button"
-    (click)="goToWorkouts()"
-  >
-
-    <span class="nav-icon-circle emoji-icon">
-      🏋️
-    </span>
-
-    <span class="nav-label">
-      Workouts
-    </span>
-
-  </button>
+    </button>
 
 
-  <button
-    class="mobile-nav-item"
-    type="button"
-    (click)="goToHealthify()"
-  >
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToWorkouts()"
+    >
 
-    <span class="nav-icon-circle emoji-icon">
-      🥗
-    </span>
+      <span class="nav-icon-circle emoji-icon">
+        🏋️
+      </span>
 
-    <span class="nav-label">
-      Nutrition
-    </span>
+      <span class="nav-label">
+        Workouts
+      </span>
 
-  </button>
+    </button>
 
 
-  <button
-    class="mobile-nav-item active"
-    type="button"
-  >
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToHealthify()"
+    >
 
-    <span class="nav-icon-circle emoji-icon">
-      👤
-    </span>
+      <span class="nav-icon-circle emoji-icon">
+        🥗
+      </span>
 
-    <span class="nav-label">
-      Profile
-    </span>
+      <span class="nav-label">
+        Nutrition
+      </span>
 
-  </button>
+    </button>
 
-</nav>
+
+    <button
+      class="mobile-nav-item active"
+      type="button"
+      (click)="goToProfile()"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        👤
+      </span>
+
+      <span class="nav-label">
+        Profile
+      </span>
+
+    </button>
+
+  </nav>
+
 </div>
 
 
 <!-- ========================================================
-     SETTINGS POPUP
+     SETTINGS BOTTOM SHEET
 ========================================================= -->
 
 @if (showSettings) {
@@ -454,13 +452,16 @@
     (click)="closeSettings()"
   >
 
-    <div
+    <section
       class="settings-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="settingsTitle"
       (click)="$event.stopPropagation()"
     >
+
+      <div class="settings-drag-handle"></div>
+
 
       <div class="settings-modal-header">
 
@@ -470,8 +471,9 @@
             Settings
           </h2>
 
+
           <p>
-            Manage your PulseOS preferences.
+            Customize your PulseOS experience.
           </p>
 
         </div>
@@ -491,49 +493,199 @@
 
       <div class="settings-modal-list">
 
+
+        <!-- APPEARANCE -->
+
         <button
+          class="settings-modal-row"
           type="button"
           (click)="openAppearance()"
         >
 
-          <span>
-            Appearance
+          <span class="settings-modal-icon">
+            ☀️
           </span>
 
-          <span>
+
+          <span class="settings-modal-copy">
+
+            <strong>
+              Appearance
+            </strong>
+
+            <small>
+              Light, Dark or System
+            </small>
+
+          </span>
+
+
+          <span class="settings-modal-chevron">
             ›
           </span>
 
         </button>
 
 
+        <!-- ACCOUNT -->
+
         <button
+          class="settings-modal-row"
           type="button"
           (click)="openAccount()"
         >
 
-          <span>
-            Account
+          <span class="settings-modal-icon">
+            👤
           </span>
 
-          <span>
+
+          <span class="settings-modal-copy">
+
+            <strong>
+              Account
+            </strong>
+
+            <small>
+              Personal details and account
+            </small>
+
+          </span>
+
+
+          <span class="settings-modal-chevron">
             ›
           </span>
 
         </button>
 
 
+        <!-- NOTIFICATIONS -->
+
         <button
-          class="modal-logout"
+          class="settings-modal-row"
           type="button"
-          (click)="logout()"
+          (click)="openNotifications()"
         >
 
-          <span>
-            Logout
+          <span class="settings-modal-icon">
+            🔔
           </span>
 
-          <span>
+
+          <span class="settings-modal-copy">
+
+            <strong>
+              Notifications
+            </strong>
+
+            <small>
+              Workout reminders and updates
+            </small>
+
+          </span>
+
+
+          <span class="settings-modal-chevron">
+            ›
+          </span>
+
+        </button>
+
+
+        <!-- PRIVACY -->
+
+        <button
+          class="settings-modal-row"
+          type="button"
+          (click)="openPrivacy()"
+        >
+
+          <span class="settings-modal-icon">
+            🛡️
+          </span>
+
+
+          <span class="settings-modal-copy">
+
+            <strong>
+              Privacy
+            </strong>
+
+            <small>
+              Manage your data
+            </small>
+
+          </span>
+
+
+          <span class="settings-modal-chevron">
+            ›
+          </span>
+
+        </button>
+
+
+        <!-- SUPPORT -->
+
+        <button
+          class="settings-modal-row"
+          type="button"
+          (click)="openSupport()"
+        >
+
+          <span class="settings-modal-icon">
+            ❔
+          </span>
+
+
+          <span class="settings-modal-copy">
+
+            <strong>
+              Help & Support
+            </strong>
+
+            <small>
+              Get help or contact us
+            </small>
+
+          </span>
+
+
+          <span class="settings-modal-chevron">
+            ›
+          </span>
+
+        </button>
+
+
+        <!-- ABOUT -->
+
+        <button
+          class="settings-modal-row"
+          type="button"
+          (click)="openAbout()"
+        >
+
+          <span class="settings-modal-icon">
+            ⓘ
+          </span>
+
+
+          <span class="settings-modal-copy">
+
+            <strong>
+              About
+            </strong>
+
+            <small>
+              App information and version
+            </small>
+
+          </span>
+
+
+          <span class="settings-modal-chevron">
             ›
           </span>
 
@@ -541,7 +693,20 @@
 
       </div>
 
-    </div>
+
+      <div class="settings-logout-area">
+
+        <button
+          class="settings-logout-button"
+          type="button"
+          (click)="logout()"
+        >
+          Log Out
+        </button>
+
+      </div>
+
+    </section>
 
   </div>
 

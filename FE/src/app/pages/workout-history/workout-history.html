@@ -1,0 +1,247 @@
+<div class="history-shell">
+
+  <main class="history-main">
+
+    <!-- ==================================================
+         HEADER
+    =================================================== -->
+
+    <header class="history-header">
+
+      <button
+        class="back-button"
+        type="button"
+        aria-label="Back to profile"
+        (click)="goBack()"
+      >
+        ‹
+      </button>
+
+
+      <h1>
+        Recent Activity
+      </h1>
+
+
+      <div class="header-spacer"></div>
+
+    </header>
+
+
+    <div class="history-content">
+
+
+      <!-- ==================================================
+           FILTERS
+      =================================================== -->
+
+      <div class="history-filters">
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'all'"
+          (click)="selectFilter('all')"
+        >
+          All
+        </button>
+
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'week'"
+          (click)="selectFilter('week')"
+        >
+          This Week
+        </button>
+
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'month'"
+          (click)="selectFilter('month')"
+        >
+          This Month
+        </button>
+
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'year'"
+          (click)="selectFilter('year')"
+        >
+          This Year
+        </button>
+
+      </div>
+
+
+      <!-- ==================================================
+           LOADING
+      =================================================== -->
+
+      @if (isLoading) {
+
+        <div class="history-state">
+
+          <span class="history-loader"></span>
+
+
+          <strong>
+            Loading your workouts...
+          </strong>
+
+
+          <span>
+            Your completed workouts will appear here.
+          </span>
+
+        </div>
+
+      }
+
+
+      <!-- ==================================================
+           ERROR
+      =================================================== -->
+
+      @else if (errorMessage) {
+
+        <div class="history-state">
+
+          <div class="state-icon">
+            !
+          </div>
+
+
+          <strong>
+            Unable to load workouts
+          </strong>
+
+
+          <span>
+            {{ errorMessage }}
+          </span>
+
+        </div>
+
+      }
+
+
+      <!-- ==================================================
+           EMPTY
+      =================================================== -->
+
+      @else if (filteredWorkouts.length === 0) {
+
+        <div class="history-state">
+
+          <div class="state-icon">
+            🏋️
+          </div>
+
+
+          <strong>
+            No workouts here yet
+          </strong>
+
+
+          @if (selectedFilter === 'all') {
+
+            <span>
+              Finish your first workout and it will appear here.
+            </span>
+
+          } @else {
+
+            <span>
+              You haven't completed a workout during this period.
+            </span>
+
+          }
+
+        </div>
+
+      }
+
+
+      <!-- ==================================================
+           WORKOUT HISTORY
+      =================================================== -->
+
+      @else {
+
+        <section class="history-list">
+
+          @for (
+            workout of filteredWorkouts;
+            track workout.workoutId
+          ) {
+
+            <button
+              class="history-card"
+              type="button"
+              (click)="openWorkout(workout.workoutId)"
+            >
+
+              <div class="workout-icon">
+                🏋️
+              </div>
+
+
+              <div class="workout-content">
+
+                <div class="workout-heading">
+
+                  <strong>
+                    {{ workout.title }}
+                  </strong>
+
+
+                  <span class="workout-chevron">
+                    ›
+                  </span>
+
+                </div>
+
+
+                <span class="workout-date">
+                  {{ workout.dateLabel }}
+                  •
+                  {{ workout.durationLabel }}
+                </span>
+
+
+                <div class="workout-summary">
+
+                  <span>
+                    {{ workout.exerciseCount }}
+
+                    @if (workout.exerciseCount === 1) {
+                      exercise
+                    } @else {
+                      exercises
+                    }
+                  </span>
+
+
+                  <strong>
+                    {{ formatVolume(workout.volume) }} kg
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </button>
+
+          }
+
+        </section>
+
+      }
+
+    </div>
+
+  </main>
+
+</div>

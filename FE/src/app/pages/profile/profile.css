@@ -9,6 +9,11 @@
 }
 
 
+* {
+  box-sizing: border-box;
+}
+
+
 button {
   font: inherit;
 }
@@ -51,9 +56,9 @@ button {
 
 .profile-content {
   padding:
-    max(24px, env(safe-area-inset-top))
+    max(20px, env(safe-area-inset-top))
     18px
-    30px;
+    32px;
 }
 
 
@@ -62,28 +67,22 @@ button {
 ========================================================= */
 
 .profile-header {
+  min-height: 44px;
+
   display: flex;
 
   align-items: center;
 
   justify-content: space-between;
 
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 
-.profile-header h1 {
-  margin: 0;
+.profile-header-spacer {
+  width: 42px;
 
-  font-size: 34px;
-
-  line-height: 1;
-
-  font-weight: 800;
-
-  letter-spacing: -1px;
-
-  color: #10231d;
+  height: 42px;
 }
 
 
@@ -92,11 +91,15 @@ button {
 
   height: 42px;
 
+  flex: 0 0 42px;
+
   display: flex;
 
   align-items: center;
 
   justify-content: center;
+
+  padding: 0;
 
   border: none;
 
@@ -106,9 +109,20 @@ button {
 
   color: #10231d;
 
-  font-size: 22px;
+  font-size: 21px;
 
   cursor: pointer;
+
+  transition:
+    transform 150ms ease,
+    background 150ms ease;
+}
+
+
+.settings-icon-button:active {
+  transform: scale(0.94);
+
+  background: #e8f1ed;
 }
 
 
@@ -123,16 +137,16 @@ button {
 
   gap: 16px;
 
-  margin-bottom: 30px;
+  margin-bottom: 32px;
 }
 
 
 .profile-avatar {
-  width: 84px;
+  width: 82px;
 
-  height: 84px;
+  height: 82px;
 
-  flex: 0 0 84px;
+  flex: 0 0 82px;
 
   display: flex;
 
@@ -146,7 +160,7 @@ button {
 
   color: #166c4c;
 
-  font-size: 34px;
+  font-size: 33px;
 
   font-weight: 800;
 }
@@ -157,14 +171,20 @@ button {
 }
 
 
-.profile-user-copy h2 {
+.profile-user-copy h1 {
   margin: 0;
+
+  color: #10231d;
 
   font-size: 20px;
 
+  line-height: 1.15;
+
   font-weight: 800;
 
-  color: #10231d;
+  letter-spacing: -0.3px;
+
+  overflow-wrap: anywhere;
 }
 
 
@@ -173,7 +193,9 @@ button {
 
   color: #74847e;
 
-  font-size: 13px;
+  font-size: 12px;
+
+  line-height: 1.35;
 
   overflow-wrap: anywhere;
 }
@@ -197,6 +219,17 @@ button {
   font-weight: 700;
 
   cursor: pointer;
+
+  transition:
+    transform 150ms ease,
+    background 150ms ease;
+}
+
+
+.edit-profile-button:active {
+  transform: scale(0.97);
+
+  background: #dff2e8;
 }
 
 
@@ -206,6 +239,12 @@ button {
 
 .profile-section {
   margin-top: 28px;
+}
+
+
+.profile-user +
+.profile-section {
+  margin-top: 0;
 }
 
 
@@ -222,13 +261,14 @@ button {
 }
 
 
-.section-heading-row h2,
-.standalone-section-title {
+.section-heading-row h2 {
   margin: 0;
 
   color: #10231d;
 
-  font-size: 21px;
+  font-size: 20px;
+
+  line-height: 1.15;
 
   font-weight: 800;
 
@@ -240,10 +280,14 @@ button {
   color: #72817c;
 
   font-size: 12px;
+
+  white-space: nowrap;
 }
 
 
 .text-action {
+  padding: 5px 0;
+
   border: none;
 
   background: transparent;
@@ -252,7 +296,7 @@ button {
 
   font-size: 12px;
 
-  font-weight: 700;
+  font-weight: 750;
 
   cursor: pointer;
 }
@@ -266,14 +310,16 @@ button {
   display: grid;
 
   grid-template-columns:
-    1fr 1fr;
+    repeat(2, minmax(0, 1fr));
 
   gap: 10px;
 }
 
 
 .progress-card {
-  min-height: 104px;
+  min-width: 0;
+
+  min-height: 112px;
 
   display: flex;
 
@@ -281,35 +327,82 @@ button {
 
   justify-content: center;
 
-  padding: 15px;
+  padding: 14px;
 
   border: 1px solid #e3e9e6;
 
-  border-radius: 16px;
+  border-radius: 17px;
 
   background: #ffffff;
 }
 
 
+.progress-card-top {
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+
+.progress-icon {
+  width: 24px;
+
+  height: 24px;
+
+  flex: 0 0 24px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: #edf8f3;
+
+  font-size: 13px;
+}
+
+
 .progress-label {
+  min-width: 0;
+
   color: #5c6d66;
 
-  font-size: 12px;
+  font-size: 11px;
 
-  font-weight: 600;
+  line-height: 1.2;
+
+  font-weight: 650;
 }
 
 
 .progress-card strong {
-  margin-top: 6px;
+  max-width: 100%;
+
+  margin-top: 8px;
 
   color: #10231d;
 
-  font-size: 24px;
+  font-size: 23px;
 
   line-height: 1;
 
-  font-weight: 800;
+  font-weight: 850;
+
+  letter-spacing: -0.4px;
+
+  overflow-wrap: anywhere;
+}
+
+
+.progress-card strong.progress-volume {
+  font-size: 20px;
 }
 
 
@@ -318,33 +411,40 @@ button {
 
   color: #8a9892;
 
-  font-size: 11px;
+  font-size: 10px;
+
+  line-height: 1.2;
 }
 
 
 /* =========================================================
-   ACTIVITY / DETAILS / SETTINGS
+   RECENT ACTIVITY
 ========================================================= */
 
-.activity-card,
-.details-card,
-.settings-card {
+.recent-section {
+  margin-top: 30px;
+}
+
+
+.activity-card {
   overflow: hidden;
 
   border: 1px solid #e3e9e6;
 
-  border-radius: 16px;
+  border-radius: 17px;
 
   background: #ffffff;
 }
 
 
 .empty-activity {
-  min-height: 110px;
+  min-height: 126px;
 
   display: flex;
 
   flex-direction: column;
+
+  align-items: flex-start;
 
   justify-content: center;
 
@@ -352,10 +452,35 @@ button {
 }
 
 
+.empty-activity-icon {
+  width: 38px;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 10px;
+
+  border-radius: 12px;
+
+  background: #edf8f3;
+
+  font-size: 19px;
+}
+
+
 .empty-activity strong {
   color: #10231d;
 
   font-size: 14px;
+
+  line-height: 1.25;
+
+  font-weight: 800;
 }
 
 
@@ -364,71 +489,97 @@ button {
 
   color: #8a9892;
 
-  font-size: 12px;
+  font-size: 11px;
+
+  line-height: 1.4;
 }
 
 
-.detail-row {
-  min-height: 50px;
+.activity-loading {
+  min-height: 110px;
 
   display: flex;
 
   align-items: center;
 
-  justify-content: space-between;
+  justify-content: center;
 
-  gap: 12px;
+  gap: 9px;
 
-  padding: 0 16px;
+  padding: 18px;
 
-  border-bottom: 1px solid #edf1ef;
+  color: #74847e;
+
+  font-size: 11px;
 }
 
 
-.detail-row:last-child {
-  border-bottom: none;
+.activity-loader {
+  width: 17px;
+
+  height: 17px;
+
+  flex: 0 0 17px;
+
+  border: 2px solid #dce9e3;
+
+  border-top-color: #128458;
+
+  border-radius: 50%;
+
+  animation:
+    profile-spin
+    0.75s
+    linear
+    infinite;
 }
 
 
-.detail-row span {
-  color: #596a63;
+@keyframes profile-spin {
 
-  font-size: 13px;
+  to {
+    transform: rotate(360deg);
+  }
+
 }
 
 
-.detail-row strong {
-  color: #10231d;
+/* =========================================================
+   RECENT WORKOUT CARDS
+========================================================= */
 
-  font-size: 13px;
+.recent-workout-list {
+  display: flex;
 
-  font-weight: 700;
+  flex-direction: column;
 
-  text-align: right;
+  gap: 9px;
 }
 
 
-.settings-card {
-  margin-top: 12px;
-}
-
-
-.settings-row {
+.recent-workout-card {
   width: 100%;
 
-  min-height: 52px;
+  min-width: 0;
 
-  display: flex;
+  min-height: 92px;
+
+  display: grid;
+
+  grid-template-columns:
+    42px
+    minmax(0, 1fr)
+    18px;
 
   align-items: center;
 
-  justify-content: space-between;
+  gap: 11px;
 
-  padding: 0 16px;
+  padding: 13px;
 
-  border: none;
+  border: 1px solid #e3e9e6;
 
-  border-bottom: 1px solid #edf1ef;
+  border-radius: 17px;
 
   background: #ffffff;
 
@@ -437,23 +588,121 @@ button {
   text-align: left;
 
   cursor: pointer;
+
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease;
 }
 
 
-.settings-row:last-child {
-  border-bottom: none;
+.recent-workout-card:active {
+  transform: scale(0.99);
+
+  border-color: #cfe5da;
+
+  background: #fbfdfc;
 }
 
 
-.settings-chevron {
-  color: #8b9893;
+.recent-workout-icon {
+  width: 42px;
+
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background: #eaf8f1;
+
+  font-size: 20px;
+}
+
+
+.recent-workout-copy {
+  min-width: 0;
+}
+
+
+.recent-workout-title {
+  display: block;
+
+  overflow: hidden;
+
+  color: #10231d;
+
+  font-size: 13px;
+
+  line-height: 1.2;
+
+  font-weight: 800;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.recent-workout-meta {
+  display: block;
+
+  margin-top: 4px;
+
+  overflow: hidden;
+
+  color: #82918b;
+
+  font-size: 10px;
+
+  line-height: 1.3;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.recent-workout-stats {
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 8px;
+
+  margin-top: 8px;
+
+  color: #596a63;
+
+  font-size: 10px;
+
+  line-height: 1.2;
+}
+
+
+.recent-workout-volume {
+  color: #128458;
+
+  font-weight: 750;
+
+  white-space: nowrap;
+}
+
+
+.recent-workout-chevron {
+  color: #9aa6a1;
 
   font-size: 22px;
-}
 
-
-.logout-row {
-  color: #ad4141;
+  line-height: 1;
 }
 
 
@@ -530,17 +779,15 @@ button {
 }
 
 
-/* =========================================================
-   NAV ICON CIRCLE
-========================================================= */
-
 .nav-icon-circle {
   width: 38px;
+
   height: 38px;
 
   display: flex;
 
   align-items: center;
+
   justify-content: center;
 
   border-radius: 50%;
@@ -556,23 +803,6 @@ button {
 }
 
 
-.nav-icon-circle svg {
-  width: 22px;
-
-  height: 22px;
-
-  fill: none;
-
-  stroke: currentColor;
-
-  stroke-width: 1.9;
-
-  stroke-linecap: round;
-
-  stroke-linejoin: round;
-}
-
-
 .nav-label {
   font-size: 11px;
 
@@ -583,10 +813,6 @@ button {
   white-space: nowrap;
 }
 
-
-/* =========================================================
-   ACTIVE TAB
-========================================================= */
 
 .mobile-nav-item.active {
   color: #128458;
@@ -615,8 +841,21 @@ button {
 }
 
 
+.emoji-icon {
+  font-size: 20px;
+
+  line-height: 1;
+
+  font-family:
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji",
+    sans-serif;
+}
+
+
 /* =========================================================
-   SETTINGS MODAL
+   SETTINGS BACKDROP
 ========================================================= */
 
 .settings-backdrop {
@@ -632,27 +871,75 @@ button {
 
   justify-content: center;
 
-  padding: 18px;
+  padding: 0;
 
   background:
-    rgba(16, 35, 29, 0.28);
+    rgba(16, 35, 29, 0.36);
+
+  backdrop-filter:
+    blur(3px);
+
+  -webkit-backdrop-filter:
+    blur(3px);
 }
 
+
+/* =========================================================
+   SETTINGS BOTTOM SHEET
+========================================================= */
 
 .settings-modal {
   width: 100%;
 
-  max-width: 410px;
+  max-width: 444px;
 
-  overflow: hidden;
+  max-height:
+    calc(
+      100dvh -
+      24px
+    );
 
-  border-radius: 22px;
+  overflow-y: auto;
+
+  padding:
+    10px
+    16px
+    max(
+      20px,
+      env(safe-area-inset-bottom)
+    );
+
+  border-radius:
+    26px
+    26px
+    0
+    0;
 
   background: #ffffff;
 
   box-shadow:
-    0 24px 60px
+    0 -18px 55px
     rgba(16, 35, 29, 0.18);
+
+  scrollbar-width: none;
+}
+
+
+.settings-modal::-webkit-scrollbar {
+  display: none;
+}
+
+
+.settings-drag-handle {
+  width: 42px;
+
+  height: 4px;
+
+  margin: 0 auto 13px;
+
+  border-radius: 999px;
+
+  background: #d8e1dd;
 }
 
 
@@ -665,10 +952,10 @@ button {
 
   gap: 16px;
 
-  padding: 20px;
-
-  border-bottom:
-    1px solid #edf1ef;
+  padding:
+    4px
+    2px
+    17px;
 }
 
 
@@ -679,7 +966,11 @@ button {
 
   font-size: 22px;
 
-  font-weight: 800;
+  line-height: 1.1;
+
+  font-weight: 850;
+
+  letter-spacing: -0.4px;
 }
 
 
@@ -688,7 +979,9 @@ button {
 
   color: #7e8d87;
 
-  font-size: 12px;
+  font-size: 11px;
+
+  line-height: 1.35;
 }
 
 
@@ -697,32 +990,66 @@ button {
 
   height: 36px;
 
-  border: none;
-
-  border-radius: 50%;
-
-  background: #f2f6f4;
-
-  color: #10231d;
-
-  font-size: 24px;
-
-  cursor: pointer;
-}
-
-
-.settings-modal-list button {
-  width: 100%;
-
-  min-height: 56px;
+  flex: 0 0 36px;
 
   display: flex;
 
   align-items: center;
 
-  justify-content: space-between;
+  justify-content: center;
 
-  padding: 0 20px;
+  padding: 0;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #f0f5f2;
+
+  color: #52625c;
+
+  font-size: 24px;
+
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   SETTINGS ROWS
+========================================================= */
+
+.settings-modal-list {
+  overflow: hidden;
+
+  border: 1px solid #e4ebe7;
+
+  border-radius: 18px;
+
+  background: #ffffff;
+}
+
+
+.settings-modal-row {
+  width: 100%;
+
+  min-height: 66px;
+
+  display: grid;
+
+  grid-template-columns:
+    40px
+    minmax(0, 1fr)
+    18px;
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding:
+    10px
+    14px;
 
   border: none;
 
@@ -735,20 +1062,107 @@ button {
 
   text-align: left;
 
-  font-weight: 700;
-
   cursor: pointer;
 }
 
 
-.settings-modal-list button:last-child {
+.settings-modal-row:last-child {
   border-bottom: none;
 }
 
 
-.settings-modal-list
-.modal-logout {
-  color: #ad4141;
+.settings-modal-icon {
+  width: 38px;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #edf8f3;
+
+  font-size: 18px;
+}
+
+
+.settings-modal-copy {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.settings-modal-copy strong {
+  color: #10231d;
+
+  font-size: 12px;
+
+  line-height: 1.2;
+
+  font-weight: 800;
+}
+
+
+.settings-modal-copy small {
+  overflow: hidden;
+
+  color: #87948f;
+
+  font-size: 9px;
+
+  line-height: 1.3;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.settings-modal-chevron {
+  color: #9ba7a2;
+
+  font-size: 22px;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.settings-logout-area {
+  margin-top: 12px;
+}
+
+
+.settings-logout-button {
+  width: 100%;
+
+  min-height: 49px;
+
+  border: 1px solid #f0dada;
+
+  border-radius: 14px;
+
+  background: #fff8f8;
+
+  color: #b54848;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  cursor: pointer;
 }
 
 
@@ -760,42 +1174,85 @@ button {
 
   .profile-content {
     padding:
-      22px
+      18px
       14px
       28px;
   }
 
 
-  .profile-header h1 {
-    font-size: 31px;
+  .profile-header {
+    margin-bottom: 11px;
   }
 
 
   .profile-avatar {
-    width: 72px;
+    width: 70px;
 
-    height: 72px;
+    height: 70px;
 
-    flex-basis: 72px;
+    flex-basis: 70px;
 
-    font-size: 30px;
+    font-size: 29px;
   }
 
 
-  .profile-user-copy h2 {
+  .profile-user {
+    gap: 13px;
+
+    margin-bottom: 28px;
+  }
+
+
+  .profile-user-copy h1 {
     font-size: 18px;
   }
 
 
-  .progress-card {
-    min-height: 96px;
+  .profile-user-copy p {
+    font-size: 11px;
+  }
 
-    padding: 13px;
+
+  .progress-card {
+    min-height: 104px;
+
+    padding: 12px;
   }
 
 
   .progress-card strong {
-    font-size: 21px;
+    font-size: 20px;
+  }
+
+
+  .progress-card strong.progress-volume {
+    font-size: 17px;
+  }
+
+
+  .recent-workout-card {
+    grid-template-columns:
+      38px
+      minmax(0, 1fr)
+      15px;
+
+    gap: 9px;
+
+    padding: 11px;
+  }
+
+
+  .recent-workout-icon {
+    width: 38px;
+
+    height: 38px;
+
+    font-size: 18px;
+  }
+
+
+  .recent-workout-stats {
+    font-size: 9px;
   }
 
 
@@ -806,10 +1263,39 @@ button {
   }
 
 
-  .nav-icon-circle svg {
-    width: 21px;
+  .settings-modal {
+    padding:
+      9px
+      13px
+      max(
+        17px,
+        env(safe-area-inset-bottom)
+      );
+  }
 
-    height: 21px;
+
+  .settings-modal-row {
+    min-height: 62px;
+
+    grid-template-columns:
+      36px
+      minmax(0, 1fr)
+      16px;
+
+    gap: 9px;
+
+    padding:
+      9px
+      11px;
+  }
+
+
+  .settings-modal-icon {
+    width: 35px;
+
+    height: 35px;
+
+    font-size: 16px;
   }
 
 }
@@ -818,36 +1304,39 @@ button {
 /* =========================================================
    DESKTOP
 
-   Still keeps PulseOS portrait/mobile-first.
+   IMPORTANT:
+   PulseOS intentionally keeps the exact portrait/mobile
+   layout on desktop.
+
+   There is NO desktop redesign.
 ========================================================= */
 
 @media (min-width: 445px) {
 
   :host {
-    padding: 28px 0;
+    padding:
+      28px
+      0;
   }
 
 
   .profile-main {
     min-height:
-      calc(100vh - 56px);
+      calc(
+        100vh -
+        56px
+      );
 
     box-shadow:
-      0 16px 50px
-      rgba(7, 21, 45, 0.08);
+      0
+      16px
+      50px
+      rgba(
+        7,
+        21,
+        45,
+        0.08
+      );
   }
-/* =========================================================
-   EMOJI NAVIGATION ICONS
-========================================================= */
 
-.emoji-icon {
-  font-size: 20px;
-  line-height: 1;
-
-  font-family:
-    "Apple Color Emoji",
-    "Segoe UI Emoji",
-    "Noto Color Emoji",
-    sans-serif;
-}
 }

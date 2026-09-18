@@ -2130,23 +2130,34 @@ export class ActiveWorkout
 
         next: response => {
 
-          console.log(
-            'Workout saved:',
-            response,
-          );
+  console.log(
+    'Workout saved:',
+    response,
+  );
 
 
-          this.isFinishingWorkout = false;
+  this.isFinishingWorkout =
+    false;
 
 
-          this.clearWorkoutState();
+  /*
+   * Tell Profile that completed-workout
+   * history has changed.
+   */
+  localStorage.setItem(
+    'pulseos_workouts_changed',
+    'true',
+  );
 
 
-          this.router.navigate([
-            '/dashboard',
-          ]);
+  this.clearWorkoutState();
 
-        },
+
+  this.router.navigate([
+    '/dashboard',
+  ]);
+
+},
 
 
         error: error => {

@@ -9,6 +9,7 @@ import { ExercisePicker } from './pages/exercise-picker/exercise-picker';
 import { FoodPicker } from './pages/food-picker/food-picker';
 import { Profile } from './pages/profile/profile';
 import { Healthify } from './pages/healthify/healthify';
+import { WorkoutHistory } from './pages/workout-history/workout-history';
 
 
 export const routes: Routes = [
@@ -59,11 +60,20 @@ export const routes: Routes = [
   },
 
   {
+    path: 'workout-history',
+    component: WorkoutHistory,
+  },
+
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
   },
 
+  /*
+   * IMPORTANT:
+   * Wildcard must ALWAYS remain last.
+   */
   {
     path: '**',
     redirectTo: 'login',
