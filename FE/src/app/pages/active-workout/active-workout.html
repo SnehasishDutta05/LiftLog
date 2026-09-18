@@ -584,3 +584,22 @@
   />
 
 }
+
+
+<!-- ========================================================
+     FINISH WORKOUT CONFIRMATION
+========================================================= -->
+
+@if (showFinishWorkoutDialog) {
+
+  <app-confirm-dialog
+    icon="✓"
+    title="Finish Workout?"
+    message="Ready to save and finish this workout?"
+    confirmText="Save"
+    cancelText="Continue"
+    (confirmed)="saveFinishedWorkout()"
+    (cancelled)="continueWorkout()"
+  />
+
+}

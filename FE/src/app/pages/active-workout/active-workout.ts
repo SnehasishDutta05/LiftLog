@@ -227,6 +227,14 @@ export class ActiveWorkout
 
 
   /* =====================================================
+     FINISH WORKOUT CONFIRMATION
+  ===================================================== */
+
+  showFinishWorkoutDialog =
+    false;
+
+
+  /* =====================================================
      ROUTINE MODAL
   ===================================================== */
 
@@ -2009,7 +2017,7 @@ export class ActiveWorkout
 
 
   /* =====================================================
-     FINISH WORKOUT
+     FINISH WORKOUT CONFIRMATION
   ===================================================== */
 
   finishWorkout(): void {
@@ -2032,6 +2040,40 @@ export class ActiveWorkout
       return;
 
     }
+
+
+    this.showFinishWorkoutDialog =
+      true;
+
+  }
+
+
+  continueWorkout(): void {
+
+    if (
+      this.isFinishingWorkout
+    ) {
+      return;
+    }
+
+
+    this.showFinishWorkoutDialog =
+      false;
+
+  }
+
+
+  saveFinishedWorkout(): void {
+
+    if (
+      this.isFinishingWorkout
+    ) {
+      return;
+    }
+
+
+    this.showFinishWorkoutDialog =
+      false;
 
 
     const storedStartTime =
