@@ -6,10 +6,13 @@ import { Onboarding } from './pages/onboarding/onboarding';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { ActiveWorkout } from './pages/active-workout/active-workout';
 import { ExercisePicker } from './pages/exercise-picker/exercise-picker';
+import { FoodPicker } from './pages/food-picker/food-picker';
 import { Profile } from './pages/profile/profile';
 import { Healthify } from './pages/healthify/healthify';
 
+
 export const routes: Routes = [
+
   {
     path: 'login',
     component: Login,
@@ -33,6 +36,11 @@ export const routes: Routes = [
   {
     path: 'healthify',
     component: Healthify,
+  },
+
+  {
+    path: 'food-picker',
+    component: FoodPicker,
   },
 
   {
@@ -60,4 +68,5 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login',
   },
+
 ];

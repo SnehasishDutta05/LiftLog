@@ -1,0 +1,678 @@
+<div class="food-picker-shell">
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header class="picker-header">
+
+    <button
+      class="cancel-button"
+      type="button"
+      (click)="cancel()"
+    >
+      Cancel
+    </button>
+
+
+    <div class="header-title">
+
+      <span class="header-kicker">
+        ADD TO
+      </span>
+
+      <h1>
+        {{ mealName }}
+      </h1>
+
+    </div>
+
+
+    <div class="header-spacer"></div>
+
+  </header>
+
+
+  <!-- =====================================================
+       FOOD LIST
+  ====================================================== -->
+
+  @if (
+    !selectedFood &&
+    !isLoadingDetails
+  ) {
+
+    <main class="picker-content">
+
+
+      <!-- =================================================
+           SEARCH
+      ================================================== -->
+
+      <form
+        class="search-row"
+        (ngSubmit)="searchFoods()"
+      >
+
+        <div class="search-box">
+
+          <span class="search-icon">
+            ⌕
+          </span>
+
+
+          <!--
+            type="text" intentionally.
+
+            type="search" gives Chrome its own X button,
+            which caused the duplicate clear buttons.
+          -->
+          <input
+            type="text"
+            name="foodSearch"
+            [(ngModel)]="searchTerm"
+            placeholder="Search foods"
+            autocomplete="off"
+          />
+
+
+          @if (searchTerm) {
+
+            <button
+              class="clear-search"
+              type="button"
+              aria-label="Clear search"
+              (click)="clearSearch()"
+            >
+              ×
+            </button>
+
+          }
+
+        </div>
+
+
+        <button
+          class="search-button"
+          type="submit"
+          [disabled]="isLoading"
+        >
+          Search
+        </button>
+
+      </form>
+
+
+      <!-- =================================================
+           HEADING
+      ================================================== -->
+
+      <div class="results-heading">
+
+        <h2>
+          Foods
+        </h2>
+
+
+        @if (!isLoading) {
+
+          <span>
+            {{ totalFoods }}
+            results
+          </span>
+
+        }
+
+      </div>
+
+
+      <!-- =================================================
+           LOADING
+      ================================================== -->
+
+      @if (isLoading) {
+
+        <div class="state-card">
+
+          <div class="loader"></div>
+
+          <strong>
+            Finding foods...
+          </strong>
+
+          <span>
+            Searching the food database
+          </span>
+
+        </div>
+
+      }
+
+
+      <!-- =================================================
+           ERROR
+      ================================================== -->
+
+      @else if (loadError) {
+
+        <div class="state-card">
+
+          <div class="empty-icon">
+            ⚠️
+          </div>
+
+          <strong>
+            Couldn't load foods
+          </strong>
+
+          <span>
+            {{ loadError }}
+          </span>
+
+
+          <button
+            type="button"
+            class="retry-button"
+            (click)="searchFoods()"
+          >
+            Try Again
+          </button>
+
+        </div>
+
+      }
+
+
+      <!-- =================================================
+           EMPTY
+      ================================================== -->
+
+      @else if (foods.length === 0) {
+
+        <div class="state-card">
+
+          <div class="empty-icon">
+            🍽️
+          </div>
+
+          <strong>
+            No foods found
+          </strong>
+
+          <span>
+            Try another search.
+          </span>
+
+        </div>
+
+      }
+
+
+      <!-- =================================================
+           RESULTS
+      ================================================== -->
+
+      @else {
+
+        <div class="food-list">
+
+          @for (
+            food of foods;
+            track food.food_id
+          ) {
+
+            <button
+              class="food-row"
+              type="button"
+              (click)="selectFood(food)"
+            >
+
+              <div class="food-avatar">
+                P
+              </div>
+
+
+              <div class="food-copy">
+
+                <strong class="food-name">
+                  {{ food.name }}
+                </strong>
+
+
+                <span class="food-calories">
+
+                  {{
+                    food
+                      .nutrition_per_100g
+                      .calories
+                  }}
+                  Cal / 100g
+
+                </span>
+
+
+                <span class="food-macros">
+
+                  P
+                  {{
+                    food
+                      .nutrition_per_100g
+                      .protein_g
+                  }}g
+
+                  ·
+
+                  C
+                  {{
+                    food
+                      .nutrition_per_100g
+                      .carbs_g
+                  }}g
+
+                  ·
+
+                  F
+                  {{
+                    food
+                      .nutrition_per_100g
+                      .fat_g
+                  }}g
+
+                </span>
+
+              </div>
+
+
+              <div class="food-chevron">
+                ›
+              </div>
+
+            </button>
+
+          }
+
+        </div>
+
+
+        <!-- ===============================================
+             PAGINATION
+        ================================================ -->
+
+        <div class="pagination">
+
+          <button
+            type="button"
+            [disabled]="!canGoPrevious || isLoading"
+            (click)="previousPage()"
+          >
+            Previous
+          </button>
+
+
+          <span>
+            Page
+            {{ page }}
+          </span>
+
+
+          <button
+            type="button"
+            [disabled]="!canGoNext || isLoading"
+            (click)="nextPage()"
+          >
+            Next
+          </button>
+
+        </div>
+
+      }
+
+    </main>
+
+  }
+
+
+  <!-- =====================================================
+       FOOD DETAILS LOADING
+  ====================================================== -->
+
+  @if (isLoadingDetails) {
+
+    <main class="picker-content">
+
+      <div class="state-card">
+
+        <div class="loader"></div>
+
+        <strong>
+          Loading food...
+        </strong>
+
+        <span>
+          Getting serving information
+        </span>
+
+      </div>
+
+    </main>
+
+  }
+
+
+  <!-- =====================================================
+       FOOD DETAILS
+  ====================================================== -->
+
+  @if (selectedFood) {
+
+    <main
+      class="
+        picker-content
+        details-content
+      "
+    >
+
+      <button
+        class="back-results-button"
+        type="button"
+        (click)="backToFoods()"
+      >
+        ‹ Back to foods
+      </button>
+
+
+      <!-- =================================================
+           FOOD CARD
+      ================================================== -->
+
+      <section class="food-detail-card">
+
+        <div class="detail-top">
+
+          <div class="detail-avatar">
+            P
+          </div>
+
+
+          <div>
+
+            <span class="detail-category">
+
+              {{
+                selectedFood.category ||
+                'Food'
+              }}
+
+            </span>
+
+
+            <h2>
+              {{ selectedFood.name }}
+            </h2>
+
+
+            <p>
+
+              {{
+                selectedFood
+                  .nutrition_per_100g
+                  .calories
+              }}
+
+              Cal per 100g
+
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- ===============================================
+             MACROS
+        ================================================ -->
+
+        <div class="detail-macros">
+
+          <div>
+
+            <strong>
+
+              {{
+                selectedFood
+                  .nutrition_per_100g
+                  .protein_g
+              }}g
+
+            </strong>
+
+            <span>
+              Protein
+            </span>
+
+          </div>
+
+
+          <div>
+
+            <strong>
+
+              {{
+                selectedFood
+                  .nutrition_per_100g
+                  .carbs_g
+              }}g
+
+            </strong>
+
+            <span>
+              Carbs
+            </span>
+
+          </div>
+
+
+          <div>
+
+            <strong>
+
+              {{
+                selectedFood
+                  .nutrition_per_100g
+                  .fat_g
+              }}g
+
+            </strong>
+
+            <span>
+              Fats
+            </span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           SERVINGS
+      ================================================== -->
+
+      <section class="servings-section">
+
+        <div class="section-heading">
+
+          <span>
+            CHOOSE SERVING
+          </span>
+
+          <h2>
+            How much?
+          </h2>
+
+        </div>
+
+
+        @if (
+          !selectedFood.servings ||
+          selectedFood.servings.length === 0
+        ) {
+
+          <div class="state-card compact">
+
+            <strong>
+              No servings available
+            </strong>
+
+            <span>
+              Try another food.
+            </span>
+
+          </div>
+
+        }
+
+
+        @else {
+
+          <div class="serving-list">
+
+            @for (
+              serving of
+                selectedFood.servings;
+              track serving.serving_id
+            ) {
+
+              <button
+                class="serving-card"
+                type="button"
+                [class.selected]="
+                  isServingSelected(
+                    serving
+                  )
+                "
+                (click)="
+                  selectServing(
+                    serving
+                  )
+                "
+              >
+
+                <div>
+
+                  <strong>
+                    {{ serving.name }}
+                  </strong>
+
+                  <span>
+                    {{ serving.quantity_g }}g
+                  </span>
+
+                </div>
+
+
+                <div class="serving-calories">
+
+                  <strong>
+                    {{ serving.calories }}
+                  </strong>
+
+                  <span>
+                    Cal
+                  </span>
+
+                </div>
+
+
+                <div class="radio-dot">
+
+                  @if (
+                    isServingSelected(
+                      serving
+                    )
+                  ) {
+
+                    <span></span>
+
+                  }
+
+                </div>
+
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+      </section>
+
+
+      <!-- =================================================
+           ERRORS
+      ================================================== -->
+
+      @if (detailsError) {
+
+        <p class="error-message">
+          {{ detailsError }}
+        </p>
+
+      }
+
+
+      @if (saveError) {
+
+        <p class="error-message">
+          {{ saveError }}
+        </p>
+
+      }
+
+
+      <!-- =================================================
+           ADD BUTTON
+      ================================================== -->
+
+      <div class="add-food-footer">
+
+        <button
+          class="add-food-button"
+          type="button"
+          [disabled]="
+            !selectedServing ||
+            isSaving
+          "
+          (click)="addSelectedFood()"
+        >
+
+          @if (isSaving) {
+
+            Adding...
+
+          }
+
+          @else if (selectedServing) {
+
+            Add to
+            {{ mealName }}
+
+          }
+
+          @else {
+
+            Select a serving
+
+          }
+
+        </button>
+
+      </div>
+
+    </main>
+
+  }
+
+</div>

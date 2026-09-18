@@ -21,11 +21,26 @@ import {
 ========================================================= */
 
 export interface NutritionValues {
-  calories: number;
-  protein_g: number;
-  carbs_g: number;
-  fat_g: number;
-  fiber_g: number;
+
+  calories:
+    number;
+
+
+  protein_g:
+    number;
+
+
+  carbs_g:
+    number;
+
+
+  fat_g:
+    number;
+
+
+  fiber_g:
+    number;
+
 }
 
 
@@ -34,10 +49,22 @@ export interface NutritionValues {
 ========================================================= */
 
 export interface NutritionGoals {
-  calories: number;
-  protein_g: number;
-  carbs_g: number;
-  fat_g: number;
+
+  calories:
+    number;
+
+
+  protein_g:
+    number;
+
+
+  carbs_g:
+    number;
+
+
+  fat_g:
+    number;
+
 }
 
 
@@ -46,20 +73,42 @@ export interface NutritionGoals {
 ========================================================= */
 
 export interface FoodSearchItem {
-  food_id: number;
-  name: string;
-  nutrition_per_100g: NutritionValues;
+
+  food_id:
+    number;
+
+
+  name:
+    string;
+
+
+  nutrition_per_100g:
+    NutritionValues;
+
 }
 
 
 export interface FoodSearchResponse {
-  items: FoodSearchItem[];
+
+  items:
+    FoodSearchItem[];
+
 
   pagination: {
-    page: number;
-    page_size: number;
-    total: number;
+
+    page:
+      number;
+
+
+    page_size:
+      number;
+
+
+    total:
+      number;
+
   };
+
 }
 
 
@@ -70,25 +119,41 @@ export interface FoodSearchResponse {
 export interface FoodServing
 extends NutritionValues {
 
-  serving_id: number;
+  serving_id:
+    number;
 
-  name: string;
 
-  quantity_g: number;
+  name:
+    string;
+
+
+  quantity_g:
+    number;
 
 }
 
 
 export interface FoodDetails {
-  food_id: number;
 
-  name: string;
+  food_id:
+    number;
 
-  nutrition_per_100g: NutritionValues;
 
-  category: string;
+  name:
+    string;
 
-  servings: FoodServing[];
+
+  nutrition_per_100g:
+    NutritionValues;
+
+
+  category:
+    string;
+
+
+  servings:
+    FoodServing[];
+
 }
 
 
@@ -97,27 +162,49 @@ export interface FoodDetails {
 ========================================================= */
 
 export interface DietLogRequestItem {
-  food_id?: number | null;
 
-  custom_food_id?: number | null;
+  food_id?:
+    number |
+    null;
 
-  serving_id?: number | null;
 
-  quantity_g: number;
+  custom_food_id?:
+    number |
+    null;
+
+
+  serving_id?:
+    number |
+    null;
+
+
+  quantity_g:
+    number;
+
 }
 
 
 export interface DietLogRequestMeal {
-  meal_type: string;
 
-  items: DietLogRequestItem[];
+  meal_type:
+    string;
+
+
+  items:
+    DietLogRequestItem[];
+
 }
 
 
 export interface DietLogRequest {
-  date: string;
 
-  meals: DietLogRequestMeal[];
+  date:
+    string;
+
+
+  meals:
+    DietLogRequestMeal[];
+
 }
 
 
@@ -126,45 +213,85 @@ export interface DietLogRequest {
 ========================================================= */
 
 export interface DietLogItem {
-  food_id: number | null;
 
-  custom_food_id: number | null;
+  food_id:
+    number |
+    null;
 
-  serving_id: number | null;
 
-  food_name: string;
+  custom_food_id:
+    number |
+    null;
 
-  quantity_g: number;
 
-  calories: number;
+  serving_id:
+    number |
+    null;
 
-  protein_g: number;
 
-  carbs_g: number;
+  food_name:
+    string;
 
-  fat_g: number;
 
-  fiber_g: number;
+  quantity_g:
+    number;
+
+
+  calories:
+    number;
+
+
+  protein_g:
+    number;
+
+
+  carbs_g:
+    number;
+
+
+  fat_g:
+    number;
+
+
+  fiber_g:
+    number;
+
 }
 
 
 export interface DietLogMeal {
-  meal_name: string;
 
-  items: DietLogItem[];
+  meal_name:
+    string;
 
-  nutrition: NutritionValues;
+
+  items:
+    DietLogItem[];
+
+
+  nutrition:
+    NutritionValues;
+
 }
 
 
 export interface DietLogResponse {
-  log_id: number;
 
-  date: string;
+  log_id:
+    number;
 
-  last_updated: string;
 
-  meals: DietLogMeal[];
+  date:
+    string;
+
+
+  last_updated:
+    string;
+
+
+  meals:
+    DietLogMeal[];
+
 }
 
 
@@ -173,21 +300,60 @@ export interface DietLogResponse {
 ========================================================= */
 
 @Injectable({
-  providedIn: 'root',
+  providedIn:
+    'root',
 })
 export class NutritionService {
+
+
+  /*
+   * =======================================================
+   * REAL FASTAPI DIET API
+   *
+   * :8001
+   *
+   * Currently used only for nutrition goals.
+   * =======================================================
+   */
 
   private readonly apiUrl =
     `${environment.apiBaseUrl}/diet`;
 
 
+  /*
+   * =======================================================
+   * TEMPORARY MOCK DIET API
+   *
+   * :8002
+   *
+   * Used for:
+   *
+   * - foods
+   * - food details
+   * - daily logs
+   * - create log
+   * - update log
+   * - delete log
+   *
+   * When the backend Diet APIs are ready, these methods can
+   * be switched back to apiUrl.
+   * =======================================================
+   */
+
+  private readonly mockDietApiUrl =
+    'http://localhost:8002/api/v1/diet';
+
+
   constructor(
-    private http: HttpClient,
+    private http:
+      HttpClient,
   ) {}
 
 
   /* =====================================================
      GOALS
+
+     REAL BACKEND :8001
   ===================================================== */
 
   getGoals():
@@ -195,32 +361,41 @@ export class NutritionService {
 
     return this.http
       .get<NutritionGoals>(
+
         `${this.apiUrl}/goals`,
+
       );
 
   }
 
 
   updateGoals(
-    payload: NutritionGoals,
+    payload:
+      NutritionGoals,
   ):
     Observable<NutritionGoals> {
 
     return this.http
       .put<NutritionGoals>(
+
         `${this.apiUrl}/goals`,
+
         payload,
+
       );
 
   }
 
 
   /* =====================================================
-     LOGS
+     GET LOG
+
+     MOCK SERVER :8002
   ===================================================== */
 
   getLogs(
-    date?: string,
+    date?:
+      string,
   ):
     Observable<DietLogResponse> {
 
@@ -228,12 +403,17 @@ export class NutritionService {
       new HttpParams();
 
 
-    if (date) {
+    if (
+      date
+    ) {
 
       params =
         params.set(
+
           'date',
+
           date,
+
         );
 
     }
@@ -241,52 +421,86 @@ export class NutritionService {
 
     return this.http
       .get<DietLogResponse>(
-        `${this.apiUrl}/logs`,
+
+        `${this.mockDietApiUrl}/logs`,
+
         {
           params,
         },
+
       );
 
   }
 
 
+  /* =====================================================
+     CREATE LOG
+
+     MOCK SERVER :8002
+  ===================================================== */
+
   createLog(
-    payload: DietLogRequest,
+    payload:
+      DietLogRequest,
   ):
     Observable<DietLogResponse> {
 
     return this.http
       .post<DietLogResponse>(
-        `${this.apiUrl}/logs`,
+
+        `${this.mockDietApiUrl}/logs`,
+
         payload,
+
       );
 
   }
 
 
+  /* =====================================================
+     UPDATE LOG
+
+     MOCK SERVER :8002
+  ===================================================== */
+
   updateLog(
-    logId: number,
-    payload: DietLogRequest,
+    logId:
+      number,
+
+    payload:
+      DietLogRequest,
   ):
     Observable<DietLogResponse> {
 
     return this.http
       .patch<DietLogResponse>(
-        `${this.apiUrl}/logs/${logId}`,
+
+        `${this.mockDietApiUrl}/logs/${logId}`,
+
         payload,
+
       );
 
   }
 
 
+  /* =====================================================
+     DELETE LOG
+
+     MOCK SERVER :8002
+  ===================================================== */
+
   deleteLog(
-    logId: number,
+    logId:
+      number,
   ):
     Observable<void> {
 
     return this.http
       .delete<void>(
-        `${this.apiUrl}/logs/${logId}`,
+
+        `${this.mockDietApiUrl}/logs/${logId}`,
+
       );
 
   }
@@ -294,24 +508,41 @@ export class NutritionService {
 
   /* =====================================================
      FOOD SEARCH
+
+     MOCK SERVER :8002
   ===================================================== */
 
   searchFoods(
-    search: string = '',
-    page: number = 1,
-    pageSize: number = 20,
+    search:
+      string = '',
+
+    page:
+      number = 1,
+
+    pageSize:
+      number = 20,
   ):
     Observable<FoodSearchResponse> {
 
     let params =
       new HttpParams()
         .set(
+
           'page',
-          String(page),
+
+          String(
+            page,
+          ),
+
         )
         .set(
+
           'page_size',
-          String(pageSize),
+
+          String(
+            pageSize,
+          ),
+
         );
 
 
@@ -319,12 +550,17 @@ export class NutritionService {
       search.trim();
 
 
-    if (trimmedSearch) {
+    if (
+      trimmedSearch
+    ) {
 
       params =
         params.set(
+
           'search',
+
           trimmedSearch,
+
         );
 
     }
@@ -332,10 +568,13 @@ export class NutritionService {
 
     return this.http
       .get<FoodSearchResponse>(
-        `${this.apiUrl}/foods`,
+
+        `${this.mockDietApiUrl}/foods`,
+
         {
           params,
         },
+
       );
 
   }
@@ -343,16 +582,21 @@ export class NutritionService {
 
   /* =====================================================
      FOOD DETAILS
+
+     MOCK SERVER :8002
   ===================================================== */
 
   getFoodDetails(
-    foodId: number,
+    foodId:
+      number,
   ):
     Observable<FoodDetails> {
 
     return this.http
       .get<FoodDetails>(
-        `${this.apiUrl}/foods/${foodId}`,
+
+        `${this.mockDietApiUrl}/foods/${foodId}`,
+
       );
 
   }

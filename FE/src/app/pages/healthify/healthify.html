@@ -252,43 +252,148 @@
 
               <div class="meal-food-list">
 
-                @for (
-                  item of meal.items;
-                  track $index
-                ) {
+  @for (
+    item of meal.items;
+    track $index;
+    let itemIndex = $index
+  ) {
 
-                  <div class="meal-food-item">
+    <div class="meal-food-item">
 
-                    <div class="meal-food-main">
-
-                      <strong>
-                        {{ item.food_name }}
-                      </strong>
-
-                      <span>
-                        {{ item.quantity_g }}g
-                      </span>
-
-                    </div>
+      <!-- FOOD ICON -->
+      <div class="meal-food-icon">
+        {{ foodEmoji(item) }}
+      </div>
 
 
-                    <div class="meal-food-calories">
+      <!-- FOOD NAME + QUANTITY -->
+      <div class="meal-food-copy">
 
-                      <strong>
-                        {{ item.calories }}
-                      </strong>
+        <strong>
+          {{ item.food_name }}
+        </strong>
 
-                      <span>
-                        Cal
-                      </span>
+        <span>
+          {{ item.quantity_g }} g
+        </span>
 
-                    </div>
+      </div>
 
-                  </div>
 
-                }
+      <!-- CALORIES + ACTIONS -->
+      <div class="meal-food-right">
 
-              </div>
+        <div class="meal-food-calories">
+
+          <strong>
+            {{ item.calories }}
+          </strong>
+
+          <span>
+            Cal
+          </span>
+
+        </div>
+
+
+        <div class="meal-food-actions">
+
+          <!-- EDIT -->
+          <button
+            class="meal-action-button edit"
+            type="button"
+            aria-label="Edit food"
+            [disabled]="isDeletingItem(meal, itemIndex)"
+            (click)="openEditFood(
+              meal,
+              item,
+              itemIndex
+            )"
+          >
+
+            <svg
+              class="meal-action-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                d="M16.5 3.5a2.121 2.121 0 0 1 3 3L8 18l-4 1 1-4Z"
+              />
+              <path
+                d="M14.5 5.5l4 4"
+              />
+            </svg>
+
+          </button>
+
+
+          <!-- DELETE -->
+          <button
+            class="meal-action-button delete"
+            type="button"
+            aria-label="Delete food"
+            [disabled]="isDeletingItem(meal, itemIndex)"
+            (click)="deleteFood(
+              meal,
+              item,
+              itemIndex
+            )"
+          >
+
+            @if (
+              isDeletingItem(
+                meal,
+                itemIndex
+              )
+            ) {
+
+              <span class="meal-delete-loader"></span>
+
+            } @else {
+
+              <svg
+                class="meal-action-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="M3 6h18" />
+
+                <path d="M8 6V4h8v2" />
+
+                <path d="M19 6 18 20H6L5 6" />
+
+                <path d="M10 11v5" />
+
+                <path d="M14 11v5" />
+              </svg>
+
+            }
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- MEAL TOTAL -->
+  <div class="meal-total-row">
+
+    <span>
+      Meal Total
+    </span>
+
+    <strong>
+      {{ meal.eatenCalories }} Cal
+    </strong>
+
+  </div>
+
+</div>
 
             }
 
@@ -1048,6 +1153,235 @@
         </div>
 
       }
+
+    </section>
+
+  </div>
+
+}
+<!-- =====================================================
+     EDIT FOOD MODAL
+====================================================== -->
+
+@if (
+  showEditFoodModal &&
+  editingItem &&
+  editingMeal
+) {
+
+  <div
+    class="edit-food-backdrop"
+    (click)="closeEditFood()"
+  >
+
+    <section
+      class="edit-food-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="edit-food-title"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- HEADER -->
+      <div class="edit-food-header">
+
+        <div>
+          <h2 id="edit-food-title">
+            Edit Food Item
+          </h2>
+        </div>
+
+        <button
+          class="edit-food-close"
+          type="button"
+          aria-label="Close edit food"
+          [disabled]="isUpdatingFood"
+          (click)="closeEditFood()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- FOOD IDENTITY -->
+      <div class="edit-food-identity">
+
+        <div class="edit-food-icon">
+          {{ foodEmoji(editingItem) }}
+        </div>
+
+        <div>
+
+          <strong>
+            {{ editingItem.food_name }}
+          </strong>
+
+          <span>
+            {{ editingItem.calories }} Cal per
+            {{ editingItem.quantity_g }}g
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- QUANTITY -->
+      <div class="edit-quantity-section">
+
+        <label>
+          Quantity
+        </label>
+
+        <div class="edit-quantity-control">
+
+          <button
+            type="button"
+            aria-label="Decrease quantity"
+            [disabled]="isUpdatingFood"
+            (click)="decreaseEditQuantity()"
+          >
+            −
+          </button>
+
+
+          <div class="edit-quantity-input">
+
+            <input
+              type="number"
+              min="1"
+              step="1"
+              inputmode="decimal"
+              [(ngModel)]="editQuantity"
+              [disabled]="isUpdatingFood"
+              (blur)="normalizeEditQuantity()"
+            />
+
+            <span>
+              g
+            </span>
+
+          </div>
+
+
+          <button
+            type="button"
+            aria-label="Increase quantity"
+            [disabled]="isUpdatingFood"
+            (click)="increaseEditQuantity()"
+          >
+            +
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- CALORIE PREVIEW -->
+      <div class="edit-calorie-preview">
+
+        <strong>
+          {{ editedCalories }}
+        </strong>
+
+        <span>
+          Cal
+        </span>
+
+      </div>
+
+
+      <!-- MACRO PREVIEW -->
+      <div class="edit-macro-preview">
+
+        <div class="edit-macro-box protein">
+
+          <strong>
+            {{ editedProtein }}g
+          </strong>
+
+          <span>
+            Protein
+          </span>
+
+        </div>
+
+
+        <div class="edit-macro-box carbs">
+
+          <strong>
+            {{ editedCarbs }}g
+          </strong>
+
+          <span>
+            Carbs
+          </span>
+
+        </div>
+
+
+        <div class="edit-macro-box fats">
+
+          <strong>
+            {{ editedFats }}g
+          </strong>
+
+          <span>
+            Fats
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- ERROR -->
+      @if (editFoodError) {
+
+        <p class="edit-food-error">
+          {{ editFoodError }}
+        </p>
+
+      }
+
+
+      <!-- FOOTER -->
+      <div class="edit-food-footer">
+
+        <button
+          class="edit-food-cancel"
+          type="button"
+          [disabled]="isUpdatingFood"
+          (click)="closeEditFood()"
+        >
+          Cancel
+        </button>
+
+
+        <button
+          class="edit-food-save"
+          type="button"
+          [disabled]="isUpdatingFood || editQuantity <= 0"
+          (click)="saveEditedFood()"
+        >
+
+          @if (isUpdatingFood) {
+
+            <span class="edit-food-save-loader"></span>
+
+            Saving...
+
+          } @else {
+
+            Save Changes
+
+          }
+
+        </button>
+
+      </div>
 
     </section>
 

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   OnInit,
 } from '@angular/core';
@@ -22,7 +23,6 @@ import {
   NutritionService,
   NutritionGoals,
   DietLogItem,
-  DietLogMeal,
   DietLogRequest,
   DietLogRequestItem,
   DietLogResponse,
@@ -31,13 +31,9 @@ import {
 
 interface MealSection {
   name: string;
-
   icon: string;
-
   targetCalories: number;
-
   eatenCalories: number;
-
   items: DietLogItem[];
 }
 
@@ -58,11 +54,6 @@ interface MealSection {
 export class Healthify
 implements OnInit {
 
-
-  /* =====================================================
-     DAILY CALORIE DATA
-  ===================================================== */
-
   calorieGoal =
     Number(
       localStorage.getItem(
@@ -70,123 +61,92 @@ implements OnInit {
       ),
     ) || 2000;
 
-
   caloriesEaten = 0;
-
   protein = 0;
-
   carbs = 0;
-
   fats = 0;
-
-
-  /* =====================================================
-     CURRENT DIET LOG
-  ===================================================== */
 
   currentLog:
     DietLogResponse | null =
     null;
 
+  isLoadingNutrition = false;
+  nutritionLoadError = false;
+  isSavingFood = false;
+  foodSaveError = '';
 
-  /* =====================================================
-     API STATE
-  ===================================================== */
-
-  isLoadingNutrition =
-    false;
-
-
-  nutritionLoadError =
-    false;
-
-
-  isSavingFood =
-    false;
-
-
-  foodSaveError =
-    '';
-
-
-  /* =====================================================
-     CALORIE GOAL MODAL
-  ===================================================== */
-
-  showGoalModal =
-    false;
-
-
+  showGoalModal = false;
   calorieGoalInput =
     this.calorieGoal;
 
-
-  /* =====================================================
-     FOOD SEARCH
-  ===================================================== */
-
-  showFoodSearch =
-    false;
-
+  showFoodSearch = false;
 
   selectedMeal:
     MealSection | null =
     null;
 
-
-  foodSearchQuery =
-    '';
-
+  foodSearchQuery = '';
 
   foodSearchResults:
     FoodSearchItem[] =
     [];
 
-
-  foodSearchLoading =
-    false;
-
-
-  foodSearchError =
-    '';
-
-
-  foodSearchPage =
-    1;
-
-
-  foodSearchTotal =
-    0;
-
+  foodSearchLoading = false;
+  foodSearchError = '';
+  foodSearchPage = 1;
+  foodSearchTotal = 0;
 
   readonly foodSearchPageSize =
     20;
-
-
-  /* =====================================================
-     FOOD DETAILS
-  ===================================================== */
 
   selectedFood:
     FoodDetails | null =
     null;
 
-
   selectedServing:
     FoodServing | null =
     null;
 
-
-  foodDetailsLoading =
-    false;
+  foodDetailsLoading = false;
 
 
   /* =====================================================
-     MEALS
+     EDIT FOOD
   ===================================================== */
 
-  meals: MealSection[] = [
+  showEditFoodModal = false;
 
+  editingMeal:
+    MealSection | null =
+    null;
+
+  editingItem:
+    DietLogItem | null =
+    null;
+
+  editingItemIndex = -1;
+
+  editQuantity = 0;
+
+  isUpdatingFood = false;
+
+  editFoodError = '';
+
+
+  /* =====================================================
+     DELETE FOOD
+  ===================================================== */
+
+  deletingMeal:
+    MealSection | null =
+    null;
+
+  deletingItemIndex = -1;
+
+  isDeletingFood = false;
+
+
+  meals: MealSection[] = [
     {
       name: 'Breakfast',
       icon: '☀️',
@@ -194,7 +154,6 @@ implements OnInit {
       eatenCalories: 0,
       items: [],
     },
-
     {
       name: 'Morning Snack',
       icon: '🍃',
@@ -202,7 +161,6 @@ implements OnInit {
       eatenCalories: 0,
       items: [],
     },
-
     {
       name: 'Lunch',
       icon: '🍴',
@@ -210,7 +168,6 @@ implements OnInit {
       eatenCalories: 0,
       items: [],
     },
-
     {
       name: 'Evening Snack',
       icon: '🍎',
@@ -218,7 +175,6 @@ implements OnInit {
       eatenCalories: 0,
       items: [],
     },
-
     {
       name: 'Dinner',
       icon: '🌙',
@@ -226,7 +182,6 @@ implements OnInit {
       eatenCalories: 0,
       items: [],
     },
-
   ];
 
 
@@ -236,179 +191,140 @@ implements OnInit {
 
     private nutritionService:
       NutritionService,
+
+    private cdr:
+      ChangeDetectorRef,
   ) {}
 
 
-  /* =====================================================
-     INIT
-  ===================================================== */
-
   ngOnInit(): void {
-
     this.loadNutritionData();
-
   }
 
 
   /* =====================================================
-     LOAD NUTRITION
+     LOAD
   ===================================================== */
 
   private loadNutritionData(): void {
-
-    this.isLoadingNutrition =
-      true;
-
-
-    this.nutritionLoadError =
-      false;
-
+    this.isLoadingNutrition = true;
+    this.nutritionLoadError = false;
 
     this.loadGoals();
-
     this.loadLogs();
-
   }
 
 
-  /* =====================================================
-     LOAD GOALS
-  ===================================================== */
-
   private loadGoals(): void {
-
     this.nutritionService
       .getGoals()
       .subscribe({
-
         next: (
           response:
             NutritionGoals,
         ) => {
-
           const calories =
             this.safeNumber(
               response.calories,
             );
 
-
-          if (
-            calories > 0
-          ) {
-
+          if (calories > 0) {
             this.calorieGoal =
               calories;
-
 
             this.calorieGoalInput =
               calories;
 
-
             localStorage.setItem(
               'pulseos_calorie_goal',
-              String(
-                calories,
-              ),
+              String(calories),
             );
 
+            this.cdr.detectChanges();
           }
-
         },
 
         error: (
           error:
             unknown,
         ) => {
-
           console.error(
             'Unable to load nutrition goals:',
             error,
           );
-
         },
-
       });
-
   }
 
 
-  /* =====================================================
-     LOAD LOGS
-  ===================================================== */
-
   private loadLogs(): void {
+    const date =
+      this.todayApiDate;
+
+    console.log(
+      'Loading Healthify diet log for:',
+      date,
+    );
 
     this.nutritionService
-      .getLogs(
-        this.todayApiDate,
-      )
+      .getLogs(date)
       .subscribe({
-
         next: (
           response:
             DietLogResponse,
         ) => {
+          console.log(
+            'Healthify diet log response:',
+            response,
+          );
 
           this.currentLog =
             response;
-
 
           this.applyDietLog(
             response,
           );
 
-
           this.isLoadingNutrition =
             false;
 
+          this.cdr.detectChanges();
         },
 
         error: (
           error:
             HttpErrorResponse,
         ) => {
-
-          /*
-           * No log for today is a completely valid
-           * state for a new day.
-           */
           if (
             error.status === 404
           ) {
-
             this.currentLog =
               null;
 
-
             this.resetNutritionForEmptyDay();
-
 
             this.isLoadingNutrition =
               false;
 
+            this.cdr.detectChanges();
 
             return;
-
           }
-
 
           console.error(
             'Unable to load diet log:',
             error,
           );
 
-
           this.nutritionLoadError =
             true;
-
 
           this.isLoadingNutrition =
             false;
 
+          this.cdr.detectChanges();
         },
-
       });
-
   }
 
 
@@ -417,216 +333,781 @@ implements OnInit {
   ===================================================== */
 
   private applyDietLog(
-    log: DietLogResponse,
+    log:
+      DietLogResponse,
   ): void {
-
-    this.caloriesEaten = 0;
-
-    this.protein = 0;
-
-    this.carbs = 0;
-
-    this.fats = 0;
-
-
-    this.resetMeals();
-
-
     if (
       !log ||
-      !Array.isArray(
-        log.meals,
-      )
+      !Array.isArray(log.meals)
     ) {
-
+      this.resetNutritionForEmptyDay();
       return;
-
     }
 
+    let totalCalories = 0;
+    let totalProtein = 0;
+    let totalCarbs = 0;
+    let totalFats = 0;
 
-    log.meals.forEach(
-      (
-        meal:
-          DietLogMeal,
-      ) => {
-
-        const nutrition =
-          meal.nutrition;
-
-
-        if (
-          nutrition
-        ) {
-
-          this.caloriesEaten +=
-            this.safeNumber(
-              nutrition.calories,
+    const updatedMeals:
+      MealSection[] =
+      this.meals.map(
+        mealSection => {
+          const matchingMeal =
+            log.meals.find(
+              apiMeal =>
+                this.normalizeMealName(
+                  apiMeal.meal_name,
+                ) ===
+                this.normalizeMealName(
+                  mealSection.name,
+                ),
             );
 
+          if (!matchingMeal) {
+            return {
+              ...mealSection,
+              eatenCalories: 0,
+              items: [],
+            };
+          }
 
-          this.protein +=
+          const nutrition =
+            matchingMeal.nutrition;
+
+          const eatenCalories =
             this.safeNumber(
-              nutrition.protein_g,
+              nutrition?.calories,
             );
 
+          totalCalories +=
+            eatenCalories;
 
-          this.carbs +=
+          totalProtein +=
             this.safeNumber(
-              nutrition.carbs_g,
+              nutrition?.protein_g,
             );
 
-
-          this.fats +=
+          totalCarbs +=
             this.safeNumber(
-              nutrition.fat_g,
+              nutrition?.carbs_g,
             );
 
-        }
-
-
-        const mealSection =
-          this.findMealSection(
-            meal.meal_name,
-          );
-
-
-        if (
-          mealSection
-        ) {
-
-          mealSection.eatenCalories =
+          totalFats +=
             this.safeNumber(
-              meal.nutrition
-                ?.calories,
+              nutrition?.fat_g,
             );
 
+          return {
+            ...mealSection,
 
-          mealSection.items =
-            Array.isArray(
-              meal.items,
-            )
-              ? meal.items
-              : [];
+            eatenCalories,
 
-        }
-
-      },
-    );
-
-
-    this.caloriesEaten =
-      Math.round(
-        this.caloriesEaten,
+            items:
+              Array.isArray(
+                matchingMeal.items,
+              )
+                ? [...matchingMeal.items]
+                : [],
+          };
+        },
       );
 
+    this.meals =
+      updatedMeals;
+
+    this.caloriesEaten =
+      Math.round(totalCalories);
 
     this.protein =
       this.roundMacro(
-        this.protein,
+        totalProtein,
       );
-
 
     this.carbs =
       this.roundMacro(
-        this.carbs,
+        totalCarbs,
       );
-
 
     this.fats =
       this.roundMacro(
-        this.fats,
+        totalFats,
       );
 
+    console.log(
+      'Healthify diet log applied:',
+      {
+        caloriesEaten:
+          this.caloriesEaten,
+
+        protein:
+          this.protein,
+
+        carbs:
+          this.carbs,
+
+        fats:
+          this.fats,
+
+        meals:
+          this.meals,
+      },
+    );
   }
 
 
-  /* =====================================================
-     RESET
-  ===================================================== */
-
   private resetNutritionForEmptyDay(): void {
-
     this.caloriesEaten = 0;
-
     this.protein = 0;
-
     this.carbs = 0;
-
     this.fats = 0;
 
-
     this.resetMeals();
-
   }
 
 
   private resetMeals(): void {
-
-    this.meals.forEach(
-      meal => {
-
-        meal.eatenCalories =
-          0;
-
-
-        meal.items =
-          [];
-
-      },
-    );
-
+    this.meals =
+      this.meals.map(
+        meal => ({
+          ...meal,
+          eatenCalories: 0,
+          items: [],
+        }),
+      );
   }
 
 
   /* =====================================================
-     NUMBER HELPERS
+     EDIT FOOD
   ===================================================== */
 
-  private safeNumber(
-    value: unknown,
-  ): number {
+  openEditFood(
+    meal:
+      MealSection,
 
-    const parsed =
-      Number(
-        value,
+    item:
+      DietLogItem,
+
+    itemIndex:
+      number,
+  ): void {
+    if (
+      this.isUpdatingFood ||
+      this.isDeletingFood
+    ) {
+      return;
+    }
+
+    this.editingMeal =
+      meal;
+
+    this.editingItem =
+      item;
+
+    this.editingItemIndex =
+      itemIndex;
+
+    this.editQuantity =
+      this.safeNumber(
+        item.quantity_g,
       );
 
+    this.editFoodError =
+      '';
+
+    this.showEditFoodModal =
+      true;
+  }
+
+
+  closeEditFood(): void {
+    if (
+      this.isUpdatingFood
+    ) {
+      return;
+    }
+
+    this.showEditFoodModal =
+      false;
+
+    this.editingMeal =
+      null;
+
+    this.editingItem =
+      null;
+
+    this.editingItemIndex =
+      -1;
+
+    this.editFoodError =
+      '';
+  }
+
+
+  decreaseEditQuantity(): void {
+    const current =
+      this.safeNumber(
+        this.editQuantity,
+      );
+
+    this.editQuantity =
+      Math.max(
+        1,
+        current - 10,
+      );
+  }
+
+
+  increaseEditQuantity(): void {
+    const current =
+      this.safeNumber(
+        this.editQuantity,
+      );
+
+    this.editQuantity =
+      Math.min(
+        5000,
+        current + 10,
+      );
+  }
+
+
+  normalizeEditQuantity(): void {
+    let quantity =
+      this.safeNumber(
+        this.editQuantity,
+      );
+
+    quantity =
+      Math.round(quantity);
+
+    quantity =
+      Math.max(
+        1,
+        Math.min(
+          5000,
+          quantity,
+        ),
+      );
+
+    this.editQuantity =
+      quantity;
+  }
+
+
+  get editNutritionMultiplier():
+    number {
+    if (
+      !this.editingItem
+    ) {
+      return 0;
+    }
+
+    const originalQuantity =
+      this.safeNumber(
+        this.editingItem
+          .quantity_g,
+      );
+
+    if (
+      originalQuantity <= 0
+    ) {
+      return 0;
+    }
+
+    return (
+      this.safeNumber(
+        this.editQuantity,
+      ) /
+      originalQuantity
+    );
+  }
+
+
+  get editedCalories():
+    number {
+    if (
+      !this.editingItem
+    ) {
+      return 0;
+    }
+
+    return Math.round(
+      this.safeNumber(
+        this.editingItem.calories,
+      ) *
+      this.editNutritionMultiplier,
+    );
+  }
+
+
+  get editedProtein():
+    number {
+    return this.getEditedMacro(
+      this.editingItem
+        ?.protein_g,
+    );
+  }
+
+
+  get editedCarbs():
+    number {
+    return this.getEditedMacro(
+      this.editingItem
+        ?.carbs_g,
+    );
+  }
+
+
+  get editedFats():
+    number {
+    return this.getEditedMacro(
+      this.editingItem
+        ?.fat_g,
+    );
+  }
+
+
+  get editedFiber():
+    number {
+    return this.getEditedMacro(
+      this.editingItem
+        ?.fiber_g,
+    );
+  }
+
+
+  private getEditedMacro(
+    value:
+      unknown,
+  ): number {
+    return this.roundMacro(
+      this.safeNumber(value) *
+      this.editNutritionMultiplier,
+    );
+  }
+
+
+  saveEditedFood(): void {
+    if (
+      !this.currentLog ||
+      !this.editingMeal ||
+      !this.editingItem ||
+      this.editingItemIndex < 0 ||
+      this.isUpdatingFood
+    ) {
+      return;
+    }
+
+    this.normalizeEditQuantity();
+
+    if (
+      this.editQuantity <= 0
+    ) {
+      this.editFoodError =
+        'Enter a valid quantity.';
+
+      return;
+    }
+
+    const payload =
+      this.buildModifiedLogPayload(
+        this.editingMeal.name,
+        this.editingItemIndex,
+        'edit',
+        this.editQuantity,
+      );
+
+    if (!payload) {
+      this.editFoodError =
+        'Unable to update this food.';
+
+      return;
+    }
+
+    this.isUpdatingFood =
+      true;
+
+    this.editFoodError =
+      '';
+
+    this.nutritionService
+      .updateLog(
+        this.currentLog.log_id,
+        payload,
+      )
+      .subscribe({
+        next: (
+          response:
+            DietLogResponse,
+        ) => {
+          this.currentLog =
+            response;
+
+          this.applyDietLog(
+            response,
+          );
+
+          this.isUpdatingFood =
+            false;
+
+          this.showEditFoodModal =
+            false;
+
+          this.editingMeal =
+            null;
+
+          this.editingItem =
+            null;
+
+          this.editingItemIndex =
+            -1;
+
+          this.cdr.detectChanges();
+        },
+
+        error: (
+          error:
+            HttpErrorResponse,
+        ) => {
+          console.error(
+            'Unable to edit food:',
+            error,
+          );
+
+          this.isUpdatingFood =
+            false;
+
+          this.editFoodError =
+            'Unable to save changes right now.';
+
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+
+  /* =====================================================
+     DELETE FOOD
+  ===================================================== */
+
+  deleteFood(
+    meal:
+      MealSection,
+
+    item:
+      DietLogItem,
+
+    itemIndex:
+      number,
+  ): void {
+    if (
+      !this.currentLog ||
+      this.isDeletingFood ||
+      this.isUpdatingFood
+    ) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        `Remove ${item.food_name} from ${meal.name}?`,
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const payload =
+      this.buildModifiedLogPayload(
+        meal.name,
+        itemIndex,
+        'delete',
+      );
+
+    if (!payload) {
+      return;
+    }
+
+    this.deletingMeal =
+      meal;
+
+    this.deletingItemIndex =
+      itemIndex;
+
+    this.isDeletingFood =
+      true;
+
+    this.nutritionService
+      .updateLog(
+        this.currentLog.log_id,
+        payload,
+      )
+      .subscribe({
+        next: (
+          response:
+            DietLogResponse,
+        ) => {
+          this.currentLog =
+            response;
+
+          this.applyDietLog(
+            response,
+          );
+
+          this.isDeletingFood =
+            false;
+
+          this.deletingMeal =
+            null;
+
+          this.deletingItemIndex =
+            -1;
+
+          this.cdr.detectChanges();
+        },
+
+        error: (
+          error:
+            HttpErrorResponse,
+        ) => {
+          console.error(
+            'Unable to delete food:',
+            error,
+          );
+
+          this.isDeletingFood =
+            false;
+
+          this.deletingMeal =
+            null;
+
+          this.deletingItemIndex =
+            -1;
+
+          window.alert(
+            'Unable to delete this food right now.',
+          );
+
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+
+  isDeletingItem(
+    meal:
+      MealSection,
+
+    index:
+      number,
+  ): boolean {
+    return (
+      this.isDeletingFood &&
+      this.deletingMeal?.name ===
+        meal.name &&
+      this.deletingItemIndex ===
+        index
+    );
+  }
+
+
+  private buildModifiedLogPayload(
+    mealName:
+      string,
+
+    itemIndex:
+      number,
+
+    operation:
+      'edit' |
+      'delete',
+
+    quantity?:
+      number,
+  ):
+    DietLogRequest | null {
+    if (!this.currentLog) {
+      return null;
+    }
+
+    const targetMealName =
+      this.normalizeMealName(
+        mealName,
+      );
+
+    const requestMeals =
+      this.currentLog.meals.map(
+        meal => {
+          let items =
+            meal.items.map(
+              item =>
+                this.convertExistingItemToRequest(
+                  item,
+                ),
+            );
+
+          if (
+            this.normalizeMealName(
+              meal.meal_name,
+            ) ===
+            targetMealName
+          ) {
+            if (
+              operation ===
+              'delete'
+            ) {
+              items =
+                items.filter(
+                  (
+                    _item,
+                    index,
+                  ) =>
+                    index !==
+                    itemIndex,
+                );
+            }
+            else if (
+              operation ===
+              'edit' &&
+              items[itemIndex]
+            ) {
+              items[itemIndex] = {
+                ...items[itemIndex],
+
+                quantity_g:
+                  this.safeNumber(
+                    quantity,
+                  ),
+              };
+            }
+          }
+
+          return {
+            meal_type:
+              meal.meal_name,
+
+            items,
+          };
+        },
+      )
+      .filter(
+        meal =>
+          meal.items.length > 0,
+      );
+
+    return {
+      date:
+        this.todayApiDate,
+
+      meals:
+        requestMeals,
+    };
+  }
+
+
+  /* =====================================================
+     HELPERS
+  ===================================================== */
+
+  foodEmoji(
+    item:
+      DietLogItem,
+  ): string {
+    const name =
+      String(
+        item.food_name ?? '',
+      )
+        .toLowerCase();
+
+    if (
+      name.includes(
+        'rice',
+      )
+    ) {
+      return '🍚';
+    }
+
+    if (
+      name.includes(
+        'chicken',
+      )
+    ) {
+      return '🍗';
+    }
+
+    if (
+      name.includes(
+        'egg',
+      )
+    ) {
+      return '🥚';
+    }
+
+    if (
+      name.includes(
+        'banana',
+      )
+    ) {
+      return '🍌';
+    }
+
+    if (
+      name.includes(
+        'oat',
+      )
+    ) {
+      return '🥣';
+    }
+
+    if (
+      name.includes(
+        'paneer',
+      )
+    ) {
+      return '🧀';
+    }
+
+    return '🍽️';
+  }
+
+
+  private safeNumber(
+    value:
+      unknown,
+  ): number {
+    const parsed =
+      Number(value);
 
     if (
       !Number.isFinite(
         parsed,
       )
     ) {
-
       return 0;
-
     }
 
-
     return parsed;
-
   }
 
 
   private roundMacro(
-    value: number,
+    value:
+      number,
   ): number {
-
-    return Math.round(
-      value * 10,
-    ) / 10;
-
+    return (
+      Math.round(
+        value * 10,
+      ) / 10
+    );
   }
 
 
-  /* =====================================================
-     MEAL MAPPING
-  ===================================================== */
-
   private normalizeMealName(
-    mealName: string,
+    mealName:
+      string,
   ): string {
-
     return String(
       mealName ?? '',
     )
@@ -636,97 +1117,16 @@ implements OnInit {
         /[_-]+/g,
         ' ',
       );
-
   }
 
-
-  private findMealSection(
-    mealName: string,
-  ):
-    MealSection |
-    undefined {
-
-    const normalized =
-      this.normalizeMealName(
-        mealName,
-      );
-
-
-    if (
-      normalized ===
-      'breakfast'
-    ) {
-
-      return this.meals[0];
-
-    }
-
-
-    if (
-      normalized ===
-        'morning snack' ||
-      normalized ===
-        'morning snacks' ||
-      normalized ===
-        'snack'
-    ) {
-
-      return this.meals[1];
-
-    }
-
-
-    if (
-      normalized ===
-      'lunch'
-    ) {
-
-      return this.meals[2];
-
-    }
-
-
-    if (
-      normalized ===
-        'evening snack' ||
-      normalized ===
-        'evening snacks'
-    ) {
-
-      return this.meals[3];
-
-    }
-
-
-    if (
-      normalized ===
-      'dinner'
-    ) {
-
-      return this.meals[4];
-
-    }
-
-
-    return undefined;
-
-  }
-
-
-  /* =====================================================
-     DATE
-  ===================================================== */
 
   private get todayApiDate():
     string {
-
     const today =
       new Date();
 
-
     const year =
       today.getFullYear();
-
 
     const month =
       String(
@@ -737,7 +1137,6 @@ implements OnInit {
           '0',
         );
 
-
     const day =
       String(
         today.getDate(),
@@ -747,14 +1146,12 @@ implements OnInit {
           '0',
         );
 
-
     return `${year}-${month}-${day}`;
-
   }
 
 
-  get todayLabel(): string {
-
+  get todayLabel():
+    string {
     return new Intl.DateTimeFormat(
       'en-US',
       {
@@ -773,101 +1170,80 @@ implements OnInit {
     ).format(
       new Date(),
     );
-
   }
 
 
-  /* =====================================================
-     CALORIES
-  ===================================================== */
-
-  get caloriesLeft(): number {
-
+  get caloriesLeft():
+    number {
     return Math.max(
       0,
 
       this.safeNumber(
         this.calorieGoal,
       ) -
-
       this.safeNumber(
         this.caloriesEaten,
       ),
     );
-
   }
 
 
-  get calorieProgress(): number {
-
+  get calorieProgress():
+    number {
     const goal =
       this.safeNumber(
         this.calorieGoal,
       );
-
 
     const eaten =
       this.safeNumber(
         this.caloriesEaten,
       );
 
-
     if (
       goal <= 0
     ) {
-
       return 0;
-
     }
-
 
     return Math.min(
       100,
 
       Math.max(
         0,
-
         (
           eaten /
           goal
         ) * 100,
       ),
     );
-
   }
 
 
   /* =====================================================
-     GOAL MODAL
+     GOAL
   ===================================================== */
 
   openGoalModal(): void {
-
     this.calorieGoalInput =
       this.calorieGoal;
 
-
     this.showGoalModal =
       true;
-
   }
 
 
   closeGoalModal(): void {
-
     this.showGoalModal =
       false;
-
   }
 
 
   saveCalorieGoal(): void {
-
     const newGoal =
       Number(
         this.calorieGoalInput,
       );
-
 
     if (
       !Number.isFinite(
@@ -876,35 +1252,25 @@ implements OnInit {
       newGoal < 500 ||
       newGoal > 10000
     ) {
-
       window.alert(
         'Enter a calorie goal between 500 and 10,000 calories.',
       );
 
-
       return;
-
     }
 
-
     const roundedGoal =
-      Math.round(
-        newGoal,
-      );
-
+      Math.round(newGoal);
 
     this.nutritionService
       .getGoals()
       .subscribe({
-
         next: (
           currentGoals:
             NutritionGoals,
         ) => {
-
           const payload:
             NutritionGoals = {
-
             calories:
               roundedGoal,
 
@@ -922,35 +1288,27 @@ implements OnInit {
               this.safeNumber(
                 currentGoals.fat_g,
               ),
-
           };
-
 
           this.updateNutritionGoals(
             payload,
           );
-
         },
 
         error: (
           error:
             unknown,
         ) => {
-
           console.error(
             'Unable to read nutrition goals:',
             error,
           );
 
-
           window.alert(
             'Unable to update your calorie goal right now.',
           );
-
         },
-
       });
-
   }
 
 
@@ -958,33 +1316,27 @@ implements OnInit {
     payload:
       NutritionGoals,
   ): void {
-
     this.nutritionService
       .updateGoals(
         payload,
       )
       .subscribe({
-
         next: (
           response:
             NutritionGoals,
         ) => {
-
           const savedGoal =
             this.safeNumber(
               response.calories,
             );
-
 
           this.calorieGoal =
             savedGoal > 0
               ? savedGoal
               : payload.calories;
 
-
           this.calorieGoalInput =
             this.calorieGoal;
-
 
           localStorage.setItem(
             'pulseos_calorie_goal',
@@ -993,186 +1345,94 @@ implements OnInit {
             ),
           );
 
-
           this.closeGoalModal();
 
+          this.cdr.detectChanges();
         },
 
         error: (
           error:
             unknown,
         ) => {
-
           console.error(
             'Unable to update nutrition goals:',
             error,
           );
 
-
           window.alert(
             'Unable to update your calorie goal right now.',
           );
-
         },
-
       });
-
   }
 
 
   /* =====================================================
-     OPEN FOOD SEARCH
+     ADD FOOD
   ===================================================== */
 
   addFood(
-    meal: MealSection,
+    meal:
+      MealSection,
   ): void {
-
-    this.selectedMeal =
-      meal;
-
-
-    this.showFoodSearch =
-      true;
-
-
-    this.selectedFood =
-      null;
-
-
-    this.selectedServing =
-      null;
-
-
-    this.foodSearchQuery =
-      '';
-
-
-    this.foodSearchPage =
-      1;
-
-
-    this.foodSearchResults =
-      [];
-
-
-    this.foodSearchError =
-      '';
-
-
-    this.foodSaveError =
-      '';
-
-
-    this.loadFoods();
-
+    this.router.navigate(
+      [
+        '/food-picker',
+      ],
+      {
+        queryParams: {
+          meal:
+            meal.name,
+        },
+      },
+    );
   }
 
 
   /* =====================================================
-     CLOSE FOOD SEARCH
+     LEGACY FOOD SEARCH
   ===================================================== */
 
   closeFoodSearch(): void {
-
     if (
       this.isSavingFood
     ) {
-
       return;
-
     }
 
-
-    this.showFoodSearch =
-      false;
-
-
-    this.selectedMeal =
-      null;
-
-
-    this.selectedFood =
-      null;
-
-
-    this.selectedServing =
-      null;
-
-
-    this.foodSearchQuery =
-      '';
-
-
-    this.foodSearchResults =
-      [];
-
-
-    this.foodSearchError =
-      '';
-
-
-    this.foodSaveError =
-      '';
-
+    this.showFoodSearch = false;
+    this.selectedMeal = null;
+    this.selectedFood = null;
+    this.selectedServing = null;
+    this.foodSearchQuery = '';
+    this.foodSearchResults = [];
+    this.foodSearchError = '';
+    this.foodSaveError = '';
   }
 
 
-  /* =====================================================
-     SEARCH
-  ===================================================== */
-
   searchFoods(): void {
-
-    this.foodSearchPage =
-      1;
-
-
-    this.selectedFood =
-      null;
-
-
-    this.selectedServing =
-      null;
-
+    this.foodSearchPage = 1;
+    this.selectedFood = null;
+    this.selectedServing = null;
 
     this.loadFoods();
-
   }
 
 
   clearFoodSearch(): void {
-
-    this.foodSearchQuery =
-      '';
-
-
-    this.foodSearchPage =
-      1;
-
-
-    this.selectedFood =
-      null;
-
-
-    this.selectedServing =
-      null;
-
+    this.foodSearchQuery = '';
+    this.foodSearchPage = 1;
+    this.selectedFood = null;
+    this.selectedServing = null;
 
     this.loadFoods();
-
   }
 
 
   private loadFoods(): void {
-
-    this.foodSearchLoading =
-      true;
-
-
-    this.foodSearchError =
-      '';
-
+    this.foodSearchLoading = true;
+    this.foodSearchError = '';
 
     this.nutritionService
       .searchFoods(
@@ -1181,222 +1441,150 @@ implements OnInit {
         this.foodSearchPageSize,
       )
       .subscribe({
-
-        next: (
-          response,
-        ) => {
-
+        next: response => {
           this.foodSearchResults =
             response.items ?? [];
-
 
           this.foodSearchTotal =
             response.pagination
               ?.total ?? 0;
 
-
           this.foodSearchLoading =
             false;
 
+          this.cdr.detectChanges();
         },
 
         error: (
           error:
             unknown,
         ) => {
-
           console.error(
             'Unable to search foods:',
             error,
           );
 
-
-          this.foodSearchResults =
-            [];
-
+          this.foodSearchResults = [];
 
           this.foodSearchError =
             'Unable to load foods right now.';
 
-
           this.foodSearchLoading =
             false;
 
+          this.cdr.detectChanges();
         },
-
       });
-
   }
 
 
-  /* =====================================================
-     FOOD PAGINATION
-  ===================================================== */
-
   get canGoToPreviousFoodPage():
     boolean {
-
     return (
-      this.foodSearchPage >
-      1
+      this.foodSearchPage > 1
     );
-
   }
 
 
   get canGoToNextFoodPage():
     boolean {
-
     return (
       this.foodSearchPage *
       this.foodSearchPageSize
-    ) < this.foodSearchTotal;
-
+    ) <
+    this.foodSearchTotal;
   }
 
 
   previousFoodPage(): void {
-
     if (
       !this.canGoToPreviousFoodPage
     ) {
-
       return;
-
     }
 
-
-    this.foodSearchPage -=
-      1;
-
+    this.foodSearchPage -= 1;
 
     this.loadFoods();
-
   }
 
 
   nextFoodPage(): void {
-
     if (
       !this.canGoToNextFoodPage
     ) {
-
       return;
-
     }
 
-
-    this.foodSearchPage +=
-      1;
-
+    this.foodSearchPage += 1;
 
     this.loadFoods();
-
   }
 
-
-  /* =====================================================
-     FOOD DETAILS
-  ===================================================== */
 
   selectFood(
     food:
       FoodSearchItem,
   ): void {
-
-    this.foodDetailsLoading =
-      true;
-
-
-    this.selectedFood =
-      null;
-
-
-    this.selectedServing =
-      null;
-
-
-    this.foodSaveError =
-      '';
-
+    this.foodDetailsLoading = true;
+    this.selectedFood = null;
+    this.selectedServing = null;
+    this.foodSaveError = '';
 
     this.nutritionService
       .getFoodDetails(
         food.food_id,
       )
       .subscribe({
-
         next: (
           response:
             FoodDetails,
         ) => {
-
           this.selectedFood =
             response;
-
 
           this.foodDetailsLoading =
             false;
 
+          this.cdr.detectChanges();
         },
 
         error: (
           error:
             unknown,
         ) => {
-
           console.error(
             'Unable to load food details:',
             error,
           );
 
-
           this.foodDetailsLoading =
             false;
-
 
           this.foodSearchError =
             'Unable to load this food.';
 
+          this.cdr.detectChanges();
         },
-
       });
-
   }
 
 
   backToFoodResults(): void {
-
-    this.selectedFood =
-      null;
-
-
-    this.selectedServing =
-      null;
-
-
-    this.foodSaveError =
-      '';
-
+    this.selectedFood = null;
+    this.selectedServing = null;
+    this.foodSaveError = '';
   }
 
-
-  /* =====================================================
-     SELECT SERVING
-  ===================================================== */
 
   selectServing(
     serving:
       FoodServing,
   ): void {
-
     this.selectedServing =
       serving;
 
-
-    this.foodSaveError =
-      '';
-
+    this.foodSaveError = '';
   }
 
 
@@ -1404,45 +1592,29 @@ implements OnInit {
     serving:
       FoodServing,
   ): boolean {
-
     return (
       this.selectedServing
         ?.serving_id ===
       serving.serving_id
     );
-
   }
 
 
-  /* =====================================================
-     ADD FOOD TO DIET LOG
-  ===================================================== */
-
   addSelectedFoodToMeal(): void {
-
     if (
       !this.selectedMeal ||
       !this.selectedFood ||
       !this.selectedServing ||
       this.isSavingFood
     ) {
-
       return;
-
     }
 
-
-    this.isSavingFood =
-      true;
-
-
-    this.foodSaveError =
-      '';
-
+    this.isSavingFood = true;
+    this.foodSaveError = '';
 
     const newItem:
       DietLogRequestItem = {
-
       food_id:
         this.selectedFood.food_id,
 
@@ -1450,120 +1622,89 @@ implements OnInit {
         null,
 
       serving_id:
-        this.selectedServing.serving_id,
+        this.selectedServing
+          .serving_id,
 
       quantity_g:
         this.safeNumber(
-          this.selectedServing.quantity_g,
+          this.selectedServing
+            .quantity_g,
         ),
-
     };
-
 
     const payload =
       this.buildDietLogPayload(
         newItem,
       );
 
-
     if (
       this.currentLog
     ) {
-
       this.nutritionService
         .updateLog(
           this.currentLog.log_id,
           payload,
         )
         .subscribe({
-
           next: (
             response:
               DietLogResponse,
           ) => {
-
             this.handleFoodSaved(
               response,
             );
-
           },
 
           error: (
             error:
               HttpErrorResponse,
           ) => {
-
             this.handleFoodSaveError(
               error,
             );
-
           },
-
         });
 
-
       return;
-
     }
-
 
     this.nutritionService
       .createLog(
         payload,
       )
       .subscribe({
-
         next: (
           response:
             DietLogResponse,
         ) => {
-
           this.handleFoodSaved(
             response,
           );
-
         },
 
         error: (
           error:
             HttpErrorResponse,
         ) => {
-
           this.handleFoodSaveError(
             error,
           );
-
         },
-
       });
-
   }
 
-
-  /* =====================================================
-     BUILD LOG PAYLOAD
-
-     PATCH replaces all meals on the backend.
-
-     Therefore we MUST preserve every existing item and
-     append the new item to the selected meal.
-  ===================================================== */
 
   private buildDietLogPayload(
     newItem:
       DietLogRequestItem,
-  ):
-    DietLogRequest {
-
+  ): DietLogRequest {
     const meals =
       this.currentLog
         ?.meals ?? [];
 
-
     const requestMeals =
       meals.map(
         meal => ({
-
           meal_type:
             meal.meal_name,
 
@@ -1574,21 +1715,17 @@ implements OnInit {
                   item,
                 ),
             ),
-
         }),
       );
-
 
     const selectedMealName =
       this.selectedMeal
         ?.name ?? '';
 
-
     const selectedNormalized =
       this.normalizeMealName(
         selectedMealName,
       );
-
 
     const existingMeal =
       requestMeals.find(
@@ -1599,53 +1736,39 @@ implements OnInit {
           selectedNormalized,
       );
 
-
     if (
       existingMeal
     ) {
-
       existingMeal.items.push(
         newItem,
       );
-
     }
     else {
-
       requestMeals.push({
-
         meal_type:
           selectedMealName,
 
         items: [
           newItem,
         ],
-
       });
-
     }
 
-
     return {
-
       date:
         this.todayApiDate,
 
       meals:
         requestMeals,
-
     };
-
   }
 
 
   private convertExistingItemToRequest(
     item:
       DietLogItem,
-  ):
-    DietLogRequestItem {
-
+  ): DietLogRequestItem {
     return {
-
       food_id:
         item.food_id,
 
@@ -1659,150 +1782,112 @@ implements OnInit {
         this.safeNumber(
           item.quantity_g,
         ),
-
     };
-
   }
 
-
-  /* =====================================================
-     FOOD SAVE SUCCESS
-  ===================================================== */
 
   private handleFoodSaved(
     response:
       DietLogResponse,
   ): void {
-
     this.currentLog =
       response;
-
 
     this.applyDietLog(
       response,
     );
 
-
     this.isSavingFood =
       false;
 
-
     this.closeFoodSearch();
 
+    this.cdr.detectChanges();
   }
 
-
-  /* =====================================================
-     FOOD SAVE ERROR
-  ===================================================== */
 
   private handleFoodSaveError(
     error:
       HttpErrorResponse,
   ): void {
-
     console.error(
       'Unable to save food:',
       error,
     );
 
-
     this.isSavingFood =
       false;
-
 
     if (
       error.status === 422
     ) {
-
       console.error(
         'Diet log validation details:',
         error.error?.detail,
       );
 
-
       this.foodSaveError =
         'This food could not be added. Please try another serving.';
 
+      this.cdr.detectChanges();
 
       return;
-
     }
-
 
     if (
       error.status === 401
     ) {
-
       this.foodSaveError =
         'Your session could not be verified. Please try again.';
 
+      this.cdr.detectChanges();
 
       return;
-
     }
-
 
     if (
       error.status === 0
     ) {
-
       this.foodSaveError =
         'Unable to connect to PulseOS.';
 
+      this.cdr.detectChanges();
 
       return;
-
     }
-
 
     this.foodSaveError =
       'Unable to add this food right now.';
 
+    this.cdr.detectChanges();
   }
 
 
-  /* =====================================================
-     SETTINGS
-  ===================================================== */
-
   openSettings(): void {
-
     window.alert(
       'Nutrition settings will be connected next.',
     );
-
   }
 
 
-  /* =====================================================
-     NAVIGATION
-  ===================================================== */
-
   goToWorkouts(): void {
-
     this.router.navigate([
       '/dashboard',
     ]);
-
   }
 
 
   goToHealthify(): void {
-
     this.router.navigate([
       '/healthify',
     ]);
-
   }
 
 
   goToProfile(): void {
-
     this.router.navigate([
       '/profile',
     ]);
-
   }
 
 }
