@@ -1,0 +1,176 @@
+<div class="workout-detail-shell">
+
+  @if (isLoading) {
+
+    <div class="detail-state">
+      <span class="detail-loader"></span>
+      <strong>Loading workout...</strong>
+    </div>
+
+  } @else if (errorMessage) {
+
+    <div class="detail-state">
+
+      <strong>
+        {{ errorMessage }}
+      </strong>
+
+      <button
+        type="button"
+        (click)="goBack()"
+      >
+        Back to Profile
+      </button>
+
+    </div>
+
+  } @else if (workout) {
+
+    <header class="detail-hero">
+
+      <div class="detail-top-row">
+
+        <button
+          class="detail-back"
+          type="button"
+          aria-label="Back"
+          (click)="goBack()"
+        >
+          ‹
+        </button>
+
+        <button
+          class="detail-menu"
+          type="button"
+          aria-label="Workout options"
+        >
+          •••
+        </button>
+
+      </div>
+
+
+      <div class="workout-heading">
+
+        <div class="workout-heading-icon">
+          🏋️
+        </div>
+
+        <div>
+
+          <h1>
+            Workout
+          </h1>
+
+          <p>
+            {{ completedDate }}
+            •
+            {{ durationLabel }}
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="summary-grid">
+
+        <article>
+
+          <span>
+            ◉ Volume
+          </span>
+
+          <strong>
+            {{ formatVolume(totalVolume) }} kg
+          </strong>
+
+        </article>
+
+
+        <article>
+
+          <span>
+            ◉ Exercises
+          </span>
+
+          <strong>
+            {{ workout.exercises.length }}
+          </strong>
+
+        </article>
+
+      </div>
+
+    </header>
+
+
+    <main class="detail-content">
+
+      <h2>
+        Exercises
+      </h2>
+
+
+      @if (workout.exercises.length === 0) {
+
+        <div class="no-exercises">
+          No exercises were saved for this workout.
+        </div>
+
+      } @else {
+
+        <div class="exercise-list">
+
+          @for (
+            exercise of workout.exercises;
+            track exercise.workout_exercise_id
+          ) {
+
+            <article class="exercise-row">
+
+              <div class="exercise-icon">
+                🏋️
+              </div>
+
+
+              <div class="exercise-copy">
+
+                <strong>
+                  {{
+                    exercise.exercise_name ||
+                    'Exercise'
+                  }}
+                </strong>
+
+                <span>
+                  {{ setSummary(exercise) }}
+                </span>
+
+              </div>
+
+
+              <strong class="exercise-volume">
+                {{
+                  formatVolume(
+                    exerciseVolume(
+                      exercise
+                    )
+                  )
+                }}
+                kg
+              </strong>
+
+            </article>
+
+          }
+
+        </div>
+
+      }
+
+    </main>
+
+  }
+
+</div>

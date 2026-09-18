@@ -10,7 +10,8 @@ import { FoodPicker } from './pages/food-picker/food-picker';
 import { Profile } from './pages/profile/profile';
 import { Healthify } from './pages/healthify/healthify';
 import { WorkoutHistory } from './pages/workout-history/workout-history';
-
+import { WorkoutDetailPage} from './pages/workout-detail/workout-detail';
+import { Account } from './pages/account/account';
 
 export const routes: Routes = [
 
@@ -63,6 +64,16 @@ export const routes: Routes = [
     path: 'workout-history',
     component: WorkoutHistory,
   },
+
+  {
+  path: 'workout-history/:workoutId',
+  component: WorkoutDetailPage,
+},
+
+{
+  path: 'account',
+  component: Account,
+},
 
   {
     path: '',
