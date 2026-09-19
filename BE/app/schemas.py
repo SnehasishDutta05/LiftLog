@@ -100,6 +100,13 @@ class UserProfileResponse(BaseModel):
         from_attributes = True
 
 
+class UserProfileRead(UserProfileRequest):
+    version: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ProfileHistoryEntry(BaseModel):
     value: Optional[str] = None
     recorded_at: datetime

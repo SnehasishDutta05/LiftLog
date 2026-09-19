@@ -50,6 +50,14 @@ def test_profile_saves_versioned_snapshots_and_history():
         assert profiles[0].height == "175 cm"
         assert profiles[0].available_training_time == "60 minutes"
 
+        latest = client.get("/api/v1/profile", headers=headers)
+        assert latest.status_code == 200, latest.text
+        latest_payload = latest.json()
+        assert latest_payload["version"] == 2
+        assert latest_payload["weight"] == "75.5 kg"
+        assert latest_payload["height"] == "175 cm"
+        assert latest_payload["available_training_time"] == "60 minutes"
+
         assert profiles[1].version == 2
         assert profiles[1].weight == "75.5 kg"
         assert profiles[1].height == "175 cm"

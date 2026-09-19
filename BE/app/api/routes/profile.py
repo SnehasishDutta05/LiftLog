@@ -7,11 +7,27 @@ from sqlalchemy.orm import Session
 from BE.app.api.deps import get_current_user
 from BE.app.db import get_db
 from BE.app.models import User, UserProfile
-from BE.app.schemas import ProfileHistoryResponse, UserProfileRequest, UserProfileResponse
+from BE.app.schemas import ProfileHistoryResponse, UserProfileRead, UserProfileRequest, UserProfileResponse
 
 logger = logging.getLogger("liftlog")
 
 router = APIRouter(prefix="/profile", tags=["profile"])
+
+
+@router.get("", response_model=UserProfileRead)
+def get_latest_user_profile(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    profile = (
+        db.query(UserProfile)
+        .filter(UserProfile.user_id == current_user.id)
+        .order_by(desc(UserProfile.version))
+        .first()
+    )
+    if profile is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+    return profile
 
 
 @router.get("/history", response_model=ProfileHistoryResponse)
