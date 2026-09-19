@@ -7,7 +7,7 @@
       <section class="workout-section">
 
         <!-- ===============================================
-             WORKOUT TITLE
+             WORKOUT HEADER
         ================================================ -->
 
         <div class="workout-title-row">
@@ -15,6 +15,10 @@
           <h1>
             Workout
           </h1>
+
+          <p>
+            Ready when you are 💪
+          </p>
 
         </div>
 
@@ -29,16 +33,45 @@
           (click)="startEmptyWorkout()"
         >
 
-          <span class="plus-icon">
+          <span class="start-empty-plus">
 
-            <span class="plus-horizontal"></span>
-            <span class="plus-vertical"></span>
+            <span class="plus-icon">
+
+              <span class="plus-horizontal"></span>
+              <span class="plus-vertical"></span>
+
+            </span>
 
           </span>
 
 
-          <span class="start-empty-label">
-            Start Empty Workout
+          <span class="start-empty-copy">
+
+            <strong>
+              Start Empty Workout
+            </strong>
+
+            <span>
+              Build your session as you go
+            </span>
+
+          </span>
+
+
+          <!-- Decorative only -->
+          <span
+            class="workout-decoration"
+            aria-hidden="true"
+          >
+            <span class="dumbbell">
+
+              <span class="dumbbell-weight dumbbell-weight-left"></span>
+
+              <span class="dumbbell-bar"></span>
+
+              <span class="dumbbell-weight dumbbell-weight-right"></span>
+
+            </span>
           </span>
 
         </button>
@@ -54,8 +87,20 @@
             My Routines
           </h2>
 
+
+          <span
+            class="routine-count"
+            [attr.aria-label]="routines.length + ' routines'"
+          >
+            {{ routines.length }}
+          </span>
+
         </div>
 
+
+        <!-- ===============================================
+             ROUTINE LIST
+        ================================================ -->
 
         <div class="routine-list">
 
@@ -67,6 +112,11 @@
             <article class="routine-card">
 
               <div class="routine-left">
+
+                <!--
+                  Keep the existing original routine initials.
+                  No exercise images are introduced.
+                -->
 
                 <div
                   class="routine-badge"
@@ -91,7 +141,7 @@
               </div>
 
 
-              <div class="routine-actions-inline">
+              <div class="routine-actions">
 
                 <button
                   class="start-routine-button"
@@ -100,7 +150,10 @@
                   (click)="startRoutine(routine)"
                 >
 
-                  <span class="routine-plus">
+                  <span
+                    class="routine-plus"
+                    aria-hidden="true"
+                  >
                     +
                   </span>
 
@@ -121,11 +174,20 @@
 
                   @if (routine.isDeleting) {
 
-                    ...
+                    <span class="delete-loader"></span>
 
                   } @else {
 
-                    Delete
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path d="M4 7h16"></path>
+                      <path d="M9 7V4h6v3"></path>
+                      <path d="M6.5 7l1 13h9l1-13"></path>
+                      <path d="M10 11v5"></path>
+                      <path d="M14 11v5"></path>
+                    </svg>
 
                   }
 

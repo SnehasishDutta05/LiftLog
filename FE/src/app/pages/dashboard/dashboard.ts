@@ -491,167 +491,157 @@ export class Dashboard
 
   confirmDeleteRoutine(): void {
 
-    const routine =
-      this.pendingDeleteRoutine;
+  const routine =
+    this.pendingDeleteRoutine;
 
 
-    if (
-      !routine ||
-      routine.isDeleting
-    ) {
+  if (
+    !routine ||
+    routine.isDeleting
+  ) {
 
-      this.cancelDeleteRoutine();
+    this.cancelDeleteRoutine();
 
-      return;
-
-    }
-
-
-    /*
-     * Close the confirmation popup before
-     * beginning the API request.
-     */
-
-    this.showDeleteRoutineDialog =
-      false;
-
-
-    this.pendingDeleteRoutine =
-      null;
-
-
-    routine.isDeleting =
-      true;
-
-
-    this.changeDetector
-      .detectChanges();
-
-
-    /* =====================================================
-       DELETE /api/v1/routines/{routine_id}
-    ===================================================== */
-
-    this.http
-      .delete<void>(
-        `${this.apiBaseUrl}/routines/${routine.routine_id}`,
-      )
-      .subscribe({
-
-        next: () => {
-
-          /*
-           * DELETE returned 204.
-           *
-           * Remove the routine immediately
-           * from the UI.
-           */
-
-          this.routines =
-            this.routines.filter(
-              item =>
-                item.routine_id !==
-                routine.routine_id,
-            );
-
-
-          const activeRoutineId =
-            localStorage.getItem(
-              this.ACTIVE_ROUTINE_ID_KEY,
-            );
-
-
-          if (
-            activeRoutineId &&
-            Number(
-              activeRoutineId,
-            ) ===
-              routine.routine_id
-          ) {
-
-            localStorage.removeItem(
-              this.ACTIVE_ROUTINE_ID_KEY,
-            );
-
-          }
-
-
-          this.changeDetector
-            .detectChanges();
-
-        },
-
-
-        error: error => {
-
-          console.error(
-            'DELETE routine failed:',
-            error,
-          );
-
-
-          routine.isDeleting =
-            false;
-
-
-          this.changeDetector
-            .detectChanges();
-
-
-          if (
-            error.status ===
-            404
-          ) {
-
-            /*
-             * Backend already does not
-             * have this routine.
-             *
-             * Remove it locally too.
-             */
-
-            this.routines =
-              this.routines.filter(
-                item =>
-                  item.routine_id !==
-                  routine.routine_id,
-              );
-
-
-            this.changeDetector
-              .detectChanges();
-
-
-            return;
-
-          }
-
-
-          if (
-            error.status ===
-            401
-          ) {
-
-            window.alert(
-              'Your session could not be authenticated. Please try again.',
-            );
-
-
-            return;
-
-          }
-
-
-          window.alert(
-            error.error?.detail ||
-            'Unable to delete this routine. Please try again.',
-          );
-
-        },
-
-      });
+    return;
 
   }
+
+
+  /* =====================================================
+     CLOSE CONFIRMATION
+  ===================================================== */
+
+  this.showDeleteRoutineDialog =
+    false;
+
+
+  this.pendingDeleteRoutine =
+    null;
+
+
+  /* =====================================================
+     OPTIMISTIC UI DELETE
+
+     Remove immediately instead of waiting for the API.
+  ===================================================== */
+
+  const originalRoutines =
+    [...this.routines];
+
+
+  this.routines =
+    this.routines.filter(
+      item =>
+        item.routine_id !==
+        routine.routine_id,
+    );
+
+
+  this.changeDetector
+    .detectChanges();
+
+
+  /* =====================================================
+     DELETE FROM BACKEND
+  ===================================================== */
+
+  this.http
+    .delete<void>(
+      `${this.apiBaseUrl}/routines/${routine.routine_id}`,
+    )
+    .subscribe({
+
+      next: () => {
+
+        /*
+         * UI is already updated.
+         * Only clean related local state.
+         */
+
+        const activeRoutineId =
+          localStorage.getItem(
+            this.ACTIVE_ROUTINE_ID_KEY,
+          );
+
+
+        if (
+          activeRoutineId &&
+          Number(
+            activeRoutineId,
+          ) ===
+            routine.routine_id
+        ) {
+
+          localStorage.removeItem(
+            this.ACTIVE_ROUTINE_ID_KEY,
+          );
+
+        }
+
+      },
+
+
+      error: error => {
+
+        console.error(
+          'DELETE routine failed:',
+          error,
+        );
+
+
+        /*
+         * A 404 means the routine is already gone,
+         * so keep it removed from the UI.
+         */
+
+        if (
+          error.status ===
+          404
+        ) {
+
+          return;
+
+        }
+
+
+        /*
+         * Real delete failure:
+         * restore the routine.
+         */
+
+        this.routines =
+          originalRoutines;
+
+
+        this.changeDetector
+          .detectChanges();
+
+
+        if (
+          error.status ===
+          401
+        ) {
+
+          window.alert(
+            'Your session could not be authenticated. Please try again.',
+          );
+
+
+          return;
+
+        }
+
+
+        window.alert(
+          error.error?.detail ||
+          'Unable to delete this routine. Please try again.',
+        );
+
+      },
+
+    });
+
+}
 
 
   /* =====================================================
