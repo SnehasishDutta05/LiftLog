@@ -46,9 +46,7 @@
 
 
           @if (hasUnreadNotifications) {
-
             <span class="notification-dot"></span>
-
           }
 
         </button>
@@ -226,23 +224,11 @@
 
           </div>
 
-
-          @if (
-            locationStatus === 'ready' &&
-            nearbyGyms.length > 0
-          ) {
-
-            <span class="gym-count">
-              {{ nearbyGyms.length }}
-            </span>
-
-          }
-
         </div>
 
 
         <!-- ===============================================
-             LOCATION LOADING
+             GETTING LOCATION
         ================================================ -->
 
         @if (locationStatus === 'loading') {
@@ -254,12 +240,51 @@
             <div>
 
               <strong>
-                Finding gyms near you
+                Finding your location
               </strong>
 
               <p>
                 Getting your current location…
               </p>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ===============================================
+             LOCATION READY
+        ================================================ -->
+
+        @if (locationStatus === 'ready') {
+
+          <div class="gym-state-card">
+
+            <span class="state-icon">
+              📍
+            </span>
+
+
+            <div class="state-copy">
+
+              <strong>
+                Location found
+              </strong>
+
+              <p>
+                Find gyms around your current location on Google Maps.
+              </p>
+
+
+              <button
+                type="button"
+                (click)="findNearbyGyms()"
+              >
+                Find gyms within 5 km
+                <span aria-hidden="true">→</span>
+              </button>
 
             </div>
 
@@ -284,6 +309,7 @@
               📍
             </span>
 
+
             <div class="state-copy">
 
               <strong>
@@ -301,250 +327,6 @@
               >
                 Try Again
               </button>
-
-            </div>
-
-          </div>
-
-        }
-
-
-        <!-- ===============================================
-             GYM API LOADING
-        ================================================ -->
-
-        @if (
-          locationStatus === 'ready' &&
-          isLoadingGyms
-        ) {
-
-          <div class="gym-state-card">
-
-            <span class="location-loader"></span>
-
-            <div>
-
-              <strong>
-                Searching nearby
-              </strong>
-
-              <p>
-                Looking for gyms around your location…
-              </p>
-
-            </div>
-
-          </div>
-
-        }
-
-
-        <!-- ===============================================
-             GYM API ERROR
-        ================================================ -->
-
-        @if (
-          locationStatus === 'ready' &&
-          !isLoadingGyms &&
-          gymErrorMessage
-        ) {
-
-          <div class="gym-state-card location-error">
-
-            <span class="state-icon">
-              🏋️
-            </span>
-
-            <div class="state-copy">
-
-              <strong>
-                Couldn't load nearby gyms
-              </strong>
-
-              <p>
-                {{ gymErrorMessage }}
-              </p>
-
-            </div>
-
-          </div>
-
-        }
-
-
-        <!-- ===============================================
-             REAL GYM RESULTS
-        ================================================ -->
-
-        @if (
-          locationStatus === 'ready' &&
-          !isLoadingGyms &&
-          nearbyGyms.length > 0
-        ) {
-
-          <div class="gym-list">
-
-            @for (
-              gym of nearbyGyms;
-              track gym.id
-            ) {
-
-              <article class="gym-card">
-
-                @if (gym.photoUrl) {
-
-                  <div class="gym-photo">
-
-                    <img
-                      [src]="gym.photoUrl"
-                      [alt]="gym.name"
-                    >
-
-                  </div>
-
-                } @else {
-
-                  <div
-                    class="gym-photo gym-photo-placeholder"
-                    aria-hidden="true"
-                  >
-                    🏋️
-                  </div>
-
-                }
-
-
-                <div class="gym-card-body">
-
-                  <div class="gym-title-row">
-
-                    <h3>
-                      {{ gym.name }}
-                    </h3>
-
-
-                    @if (gym.rating !== null) {
-
-                      <span class="gym-rating">
-                        ★ {{ gym.rating }}
-                      </span>
-
-                    }
-
-                  </div>
-
-
-                  @if (gym.address) {
-
-                    <p class="gym-address">
-                      {{ gym.address }}
-                    </p>
-
-                  }
-
-
-                  <div class="gym-meta">
-
-                    @if (
-                      gym.distanceMeters !== null
-                    ) {
-
-                      <span>
-
-                        📍
-
-                        @if (
-                          gym.distanceMeters < 1000
-                        ) {
-
-                          {{ gym.distanceMeters }} m
-
-                        } @else {
-
-                          {{ gym.distanceMeters / 1000 | number:'1.1-1' }} km
-
-                        }
-
-                      </span>
-
-                    }
-
-
-                    @if (
-                      gym.isOpen !== null
-                    ) {
-
-                      <span
-                        class="open-status"
-                        [class.closed]="!gym.isOpen"
-                      >
-
-                        {{ gym.isOpen ? 'Open now' : 'Closed' }}
-
-                      </span>
-
-                    }
-
-                  </div>
-
-
-                  <button
-                    class="directions-button"
-                    type="button"
-                    (click)="openDirections(gym)"
-                  >
-
-                    <span>
-                      Directions
-                    </span>
-
-                    <span aria-hidden="true">
-                      →
-                    </span>
-
-                  </button>
-
-                </div>
-
-              </article>
-
-            }
-
-          </div>
-
-        }
-
-
-        <!--
-          IMPORTANT:
-          We intentionally do not display fake gyms here.
-
-          Until the real Places service is connected,
-          location can succeed while nearbyGyms remains empty.
-        -->
-
-        @if (
-          locationStatus === 'ready' &&
-          !isLoadingGyms &&
-          nearbyGyms.length === 0 &&
-          !gymErrorMessage
-        ) {
-
-          <div class="gym-state-card">
-
-            <span class="state-icon">
-              📍
-            </span>
-
-            <div>
-
-              <strong>
-                Location found
-              </strong>
-
-              <p>
-                Nearby gym search is ready to connect.
-              </p>
 
             </div>
 
