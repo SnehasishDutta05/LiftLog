@@ -5,13 +5,19 @@ import {
   Output,
 } from '@angular/core';
 
+import {
+  FormsModule,
+} from '@angular/forms';
+
 
 @Component({
   selector: 'app-confirm-dialog',
 
   standalone: true,
 
-  imports: [],
+  imports: [
+    FormsModule,
+  ],
 
   templateUrl:
     './confirm-dialog.html',
@@ -52,6 +58,45 @@ export class ConfirmDialog {
 
 
   /* =====================================================
+     OPTIONAL TEXT INPUT
+  ===================================================== */
+
+  @Input()
+  showInput =
+    false;
+
+
+  @Input()
+  inputLabel =
+    'Name';
+
+
+  @Input()
+  inputPlaceholder =
+    'Enter a name';
+
+
+  @Input()
+  inputValue =
+    '';
+
+
+  @Input()
+  inputError =
+    '';
+
+
+  @Input()
+  inputMaxLength =
+    120;
+
+
+  @Output()
+  inputValueChange =
+    new EventEmitter<string>();
+
+
+  /* =====================================================
      EVENTS
   ===================================================== */
 
@@ -63,6 +108,25 @@ export class ConfirmDialog {
   @Output()
   cancelled =
     new EventEmitter<void>();
+
+
+  /* =====================================================
+     INPUT
+  ===================================================== */
+
+  onInputChange(
+    value: string,
+  ): void {
+
+    this.inputValue =
+      value;
+
+
+    this.inputValueChange.emit(
+      value,
+    );
+
+  }
 
 
   /* =====================================================
@@ -92,8 +156,7 @@ export class ConfirmDialog {
   ===================================================== */
 
   onBackdropClick(
-    event:
-      MouseEvent,
+    event: MouseEvent,
   ): void {
 
     if (

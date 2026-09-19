@@ -232,6 +232,10 @@ export class WorkoutDetailPage
   }
 
 
+  /* =====================================================
+     NAVIGATION
+  ===================================================== */
+
   goBack(): void {
 
     this.router.navigate([
@@ -240,6 +244,49 @@ export class WorkoutDetailPage
 
   }
 
+
+  /* =====================================================
+     WORKOUT NAME
+  ===================================================== */
+
+  get workoutName(): string {
+
+    if (!this.workout) {
+      return 'Workout';
+    }
+
+
+    /*
+     * Backend now returns workout_name.
+     *
+     * Keep this compatible even if WorkoutDetail
+     * has not yet been updated in the API service.
+     */
+    const workoutWithName =
+      this.workout as WorkoutDetail & {
+        workout_name?:
+          string |
+          null;
+      };
+
+
+    const name =
+      workoutWithName
+        .workout_name
+        ?.trim();
+
+
+    return (
+      name ||
+      'Workout'
+    );
+
+  }
+
+
+  /* =====================================================
+     COMPLETED DATE
+  ===================================================== */
 
   get completedDate(): string {
 
@@ -287,6 +334,10 @@ export class WorkoutDetailPage
   }
 
 
+  /* =====================================================
+     DURATION
+  ===================================================== */
+
   get durationLabel(): string {
 
     const seconds =
@@ -329,12 +380,18 @@ export class WorkoutDetailPage
       60;
 
 
-    if (hours === 0) {
+    if (
+      hours ===
+      0
+    ) {
       return `${remaining} min`;
     }
 
 
-    if (remaining === 0) {
+    if (
+      remaining ===
+      0
+    ) {
       return `${hours} hr`;
     }
 
@@ -345,6 +402,10 @@ export class WorkoutDetailPage
 
   }
 
+
+  /* =====================================================
+     TOTAL VOLUME
+  ===================================================== */
 
   get totalVolume(): number {
 
@@ -370,6 +431,10 @@ export class WorkoutDetailPage
 
   }
 
+
+  /* =====================================================
+     EXERCISE VOLUME
+  ===================================================== */
 
   exerciseVolume(
     exercise:
@@ -425,6 +490,10 @@ export class WorkoutDetailPage
   }
 
 
+  /* =====================================================
+     SET SUMMARY
+  ===================================================== */
+
   setSummary(
     exercise:
       WorkoutExerciseDetail,
@@ -448,7 +517,7 @@ export class WorkoutDetailPage
           set =>
             Number(
               set.reps ??
-              0,
+                0,
             ),
         );
 
@@ -484,6 +553,10 @@ export class WorkoutDetailPage
 
   }
 
+
+  /* =====================================================
+     FORMAT VOLUME
+  ===================================================== */
 
   formatVolume(
     value: number,

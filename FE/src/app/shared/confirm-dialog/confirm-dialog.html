@@ -34,9 +34,51 @@
 
 
     <!-- Message -->
-    <p class="confirm-message">
+    <p
+      class="confirm-message"
+      [class.confirm-message-with-input]="showInput"
+    >
       {{ message }}
     </p>
+
+
+    <!-- Optional Input -->
+    @if (showInput) {
+
+      <div class="confirm-input-field">
+
+        <label
+          class="confirm-input-label"
+          for="confirmDialogInput"
+        >
+          {{ inputLabel }}
+        </label>
+
+
+        <input
+          id="confirmDialogInput"
+          class="confirm-input"
+          type="text"
+          autocomplete="off"
+          [maxlength]="inputMaxLength"
+          [placeholder]="inputPlaceholder"
+          [ngModel]="inputValue"
+          (ngModelChange)="onInputChange($event)"
+          (keyup.enter)="confirm()"
+        />
+
+
+        @if (inputError) {
+
+          <div class="confirm-input-error">
+            {{ inputError }}
+          </div>
+
+        }
+
+      </div>
+
+    }
 
 
     <!-- Actions -->

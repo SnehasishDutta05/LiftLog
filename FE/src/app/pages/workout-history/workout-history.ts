@@ -34,37 +34,61 @@ interface WorkoutHistoryItem {
 
 @Component({
   selector: 'app-workout-history',
+
   imports: [],
-  templateUrl: './workout-history.html',
-  styleUrl: './workout-history.css',
+
+  templateUrl:
+    './workout-history.html',
+
+  styleUrl:
+    './workout-history.css',
 })
-export class WorkoutHistory implements OnInit {
+export class WorkoutHistory
+  implements OnInit {
+
 
   selectedFilter:
-    HistoryFilter = 'all';
+    HistoryFilter =
+      'all';
+
 
   allWorkouts:
-    WorkoutHistoryItem[] = [];
+    WorkoutHistoryItem[] =
+      [];
+
 
   filteredWorkouts:
-    WorkoutHistoryItem[] = [];
+    WorkoutHistoryItem[] =
+      [];
 
-  isLoading = false;
 
-  errorMessage = '';
+  isLoading =
+    false;
 
+
+  errorMessage =
+    '';
+
+
+  /* =====================================================
+     CONSTRUCTOR
+  ===================================================== */
 
   constructor(
-  private readonly router:
-    Router,
+    private readonly router:
+      Router,
 
-  private readonly liftlogApi:
-    LiftlogApiService,
+    private readonly liftlogApi:
+      LiftlogApiService,
 
-  private readonly changeDetector:
-    ChangeDetectorRef,
-) {}
+    private readonly changeDetector:
+      ChangeDetectorRef,
+  ) {}
 
+
+  /* =====================================================
+     INIT
+  ===================================================== */
 
   ngOnInit(): void {
 
@@ -98,13 +122,20 @@ export class WorkoutHistory implements OnInit {
     }
 
 
-    this.isLoading = true;
+    this.isLoading =
+      true;
 
-    this.errorMessage = '';
 
-    this.allWorkouts = [];
+    this.errorMessage =
+      '';
 
-    this.filteredWorkouts = [];
+
+    this.allWorkouts =
+      [];
+
+
+    this.filteredWorkouts =
+      [];
 
 
     this.loadWorkoutPage(
@@ -120,7 +151,8 @@ export class WorkoutHistory implements OnInit {
     offset: number,
   ): void {
 
-    const limit = 50;
+    const limit =
+      50;
 
 
     this.liftlogApi
@@ -155,13 +187,18 @@ export class WorkoutHistory implements OnInit {
           ];
 
 
+          /*
+           * Keep loading until the backend
+           * reports that there are no more pages.
+           */
           if (
             response.has_more
           ) {
 
             this.loadWorkoutPage(
               token,
-              offset + response.limit,
+              offset +
+                response.limit,
             );
 
             return;
@@ -170,38 +207,35 @@ export class WorkoutHistory implements OnInit {
 
 
           /*
- * Create a NEW sorted array instead of sorting
- * the existing array in place.
- *
- * This guarantees Angular receives a new
- * reference when the API finishes loading.
- */
-this.allWorkouts = [
-  ...this.allWorkouts,
-].sort(
-  (
-    first,
-    second,
-  ) =>
-    second.completedAt.getTime() -
-    first.completedAt.getTime(),
-);
+           * Newest completed workouts first.
+           */
+          this.allWorkouts = [
+            ...this.allWorkouts,
+          ].sort(
+            (
+              first,
+              second,
+            ) =>
+              second.completedAt
+                .getTime() -
+              first.completedAt
+                .getTime(),
+          );
 
 
-/*
- * Explicitly calculate the currently selected
- * filter after ALL workout pages have loaded.
- */
-this.applyFilter();
+          /*
+           * Apply whichever filter is
+           * currently selected.
+           */
+          this.applyFilter();
 
 
-/*
- * Loading must finish only after the filtered
- * list has been populated.
- */
-this.isLoading = false;
-this.changeDetector
-  .detectChanges();
+          this.isLoading =
+            false;
+
+
+          this.changeDetector
+            .detectChanges();
 
         },
 
@@ -214,14 +248,16 @@ this.changeDetector
           );
 
 
-          this.isLoading = false;
-
-this.errorMessage =
-  'Could not load your workout history.';
+          this.isLoading =
+            false;
 
 
-this.changeDetector
-  .detectChanges();
+          this.errorMessage =
+            'Could not load your workout history.';
+
+
+          this.changeDetector
+            .detectChanges();
 
         },
 
@@ -258,6 +294,11 @@ this.changeDetector
       this.selectedFilter
     ) {
 
+
+      /* -------------------------------------------------
+         THIS WEEK
+      ------------------------------------------------- */
+
       case 'week': {
 
         const start =
@@ -281,14 +322,21 @@ this.changeDetector
         this.filteredWorkouts =
           this.allWorkouts.filter(
             workout =>
-              workout.completedAt >= start &&
-              workout.completedAt < end,
+              workout.completedAt >=
+                start &&
+              workout.completedAt <
+                end,
           );
+
 
         break;
 
       }
 
+
+      /* -------------------------------------------------
+         THIS MONTH
+      ------------------------------------------------- */
 
       case 'month': {
 
@@ -303,7 +351,8 @@ this.changeDetector
         const end =
           new Date(
             now.getFullYear(),
-            now.getMonth() + 1,
+            now.getMonth() +
+              1,
             1,
           );
 
@@ -311,14 +360,21 @@ this.changeDetector
         this.filteredWorkouts =
           this.allWorkouts.filter(
             workout =>
-              workout.completedAt >= start &&
-              workout.completedAt < end,
+              workout.completedAt >=
+                start &&
+              workout.completedAt <
+                end,
           );
+
 
         break;
 
       }
 
+
+      /* -------------------------------------------------
+         THIS YEAR
+      ------------------------------------------------- */
 
       case 'year': {
 
@@ -332,7 +388,8 @@ this.changeDetector
 
         const end =
           new Date(
-            now.getFullYear() + 1,
+            now.getFullYear() +
+              1,
             0,
             1,
           );
@@ -341,31 +398,34 @@ this.changeDetector
         this.filteredWorkouts =
           this.allWorkouts.filter(
             workout =>
-              workout.completedAt >= start &&
-              workout.completedAt < end,
+              workout.completedAt >=
+                start &&
+              workout.completedAt <
+                end,
           );
+
 
         break;
 
       }
 
 
+      /* -------------------------------------------------
+         ALL
+      ------------------------------------------------- */
+
       default: {
 
-  /*
-   * "All" must always receive a new array
-   * containing the completed workouts.
-   */
-  this.filteredWorkouts =
-    this.allWorkouts.map(
-      workout => workout,
-    );
+        this.filteredWorkouts = [
+          ...this.allWorkouts,
+        ];
 
-  break;
 
-}
+        break;
 
-}
+      }
+
+    }
 
   }
 
@@ -400,7 +460,7 @@ this.changeDetector
 
     result.setDate(
       result.getDate() -
-      daysSinceMonday,
+        daysSinceMonday,
     );
 
 
@@ -425,34 +485,62 @@ this.changeDetector
       new Date();
 
 
+    /*
+     * Backend now returns workout_name.
+     *
+     * Keep this compatibility cast so this page
+     * continues compiling even if WorkoutDetail
+     * has not yet been updated with workout_name.
+     */
+    const workoutWithName =
+      workout as WorkoutDetail & {
+        workout_name?:
+          string |
+          null;
+      };
+
+
+    const workoutName =
+      workoutWithName
+        .workout_name
+        ?.trim();
+
+
     return {
 
       workoutId:
         workout.workout_id,
 
+
       /*
-       * The workout response currently has routine_id
-       * but does not return the routine name.
+       * New workouts use their saved workout name.
        *
-       * Do not invent Push Day / Leg Day names.
+       * Older workouts that were created before
+       * workout_name existed safely remain "Workout".
        */
       title:
+        workoutName ||
         'Workout',
 
+
       completedAt,
+
 
       dateLabel:
         this.formatDate(
           completedAt,
         ),
 
+
       durationLabel:
         this.formatDuration(
           workout.duration_seconds,
         ),
 
+
       exerciseCount:
         workout.exercises.length,
+
 
       volume:
         Math.round(
@@ -476,7 +564,9 @@ this.changeDetector
 
 
     if (!value) {
+
       return null;
+
     }
 
 
@@ -504,70 +594,71 @@ this.changeDetector
       WorkoutDetail,
   ): number {
 
-    return workout.exercises.reduce(
-      (
-        workoutTotal,
-        exercise,
-      ) => {
+    return workout.exercises
+      .reduce(
+        (
+          workoutTotal,
+          exercise,
+        ) => {
 
-        const exerciseVolume =
-          exercise.sets.reduce(
-            (
-              setTotal,
-              set,
-            ) => {
+          const exerciseVolume =
+            exercise.sets.reduce(
+              (
+                setTotal,
+                set,
+              ) => {
 
-              const weight =
-                Number(
-                  set.weight ??
-                  0,
+                const weight =
+                  Number(
+                    set.weight ??
+                      0,
+                  );
+
+
+                const reps =
+                  Number(
+                    set.reps ??
+                      0,
+                  );
+
+
+                const safeWeight =
+                  Number.isFinite(
+                    weight,
+                  )
+                    ? weight
+                    : 0;
+
+
+                const safeReps =
+                  Number.isFinite(
+                    reps,
+                  )
+                    ? reps
+                    : 0;
+
+
+                return (
+                  setTotal +
+                  (
+                    safeWeight *
+                    safeReps
+                  )
                 );
 
-
-              const reps =
-                Number(
-                  set.reps ??
-                  0,
-                );
+              },
+              0,
+            );
 
 
-              const safeWeight =
-                Number.isFinite(
-                  weight,
-                )
-                  ? weight
-                  : 0;
-
-
-              const safeReps =
-                Number.isFinite(
-                  reps,
-                )
-                  ? reps
-                  : 0;
-
-
-              return (
-                setTotal +
-                (
-                  safeWeight *
-                  safeReps
-                )
-              );
-
-            },
-            0,
+          return (
+            workoutTotal +
+            exerciseVolume
           );
 
-
-        return (
-          workoutTotal +
-          exerciseVolume
-        );
-
-      },
-      0,
-    );
+        },
+        0,
+      );
 
   }
 
@@ -602,7 +693,7 @@ this.changeDetector
     const seconds =
       Number(
         secondsValue ??
-        0,
+          0,
       );
 
 
@@ -610,9 +701,12 @@ this.changeDetector
       !Number.isFinite(
         seconds,
       ) ||
-      seconds <= 0
+      seconds <=
+        0
     ) {
+
       return '0 min';
+
     }
 
 
@@ -621,7 +715,7 @@ this.changeDetector
         1,
         Math.round(
           seconds /
-          60,
+            60,
         ),
       );
 
@@ -629,26 +723,36 @@ this.changeDetector
     const hours =
       Math.floor(
         totalMinutes /
-        60,
+          60,
       );
 
 
     const minutes =
       totalMinutes %
-      60;
+        60;
 
 
     if (
-      hours === 0
+      hours ===
+        0
     ) {
-      return `${minutes} min`;
+
+      return (
+        `${minutes} min`
+      );
+
     }
 
 
     if (
-      minutes === 0
+      minutes ===
+        0
     ) {
-      return `${hours} hr`;
+
+      return (
+        `${hours} hr`
+      );
+
     }
 
 
@@ -695,21 +799,27 @@ this.changeDetector
           today.getTime() -
           workoutDate.getTime()
         ) /
-        86_400_000,
+          86_400_000,
       );
 
 
     if (
-      difference === 0
+      difference ===
+        0
     ) {
+
       return 'Today';
+
     }
 
 
     if (
-      difference === 1
+      difference ===
+        1
     ) {
+
       return 'Yesterday';
+
     }
 
 
@@ -752,14 +862,10 @@ this.changeDetector
     workoutId: number,
   ): void {
 
-    /*
-     * Workout Detail is our next page.
-     * We will activate this navigation when that route exists.
-     */
-    console.log(
-      'Selected completed workout:',
+    this.router.navigate([
+      '/workout-history',
       workoutId,
-    );
+    ]);
 
   }
 

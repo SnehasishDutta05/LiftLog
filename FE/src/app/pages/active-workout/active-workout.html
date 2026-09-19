@@ -598,6 +598,13 @@
     message="Ready to save and finish this workout?"
     confirmText="Save"
     cancelText="Continue"
+
+    [showInput]="true"
+    inputLabel="Workout Name"
+    inputPlaceholder="e.g. Push Day"
+    [(inputValue)]="workoutName"
+    [inputError]="workoutNameError"
+
     (confirmed)="saveFinishedWorkout()"
     (cancelled)="continueWorkout()"
   />

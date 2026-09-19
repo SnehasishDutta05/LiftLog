@@ -116,6 +116,7 @@ interface WorkoutExerciseRequest {
 
 interface SaveWorkoutRequest {
   routine_id: number | null;
+  workout_name: string;
   started_at: string;
   finished_at: string;
   exercises: WorkoutExerciseRequest[];
@@ -140,6 +141,7 @@ interface SavedWorkoutExerciseResponse {
 interface SaveWorkoutResponse {
   workout_id: number;
   routine_id: number | null;
+  workout_name: string;
   started_at: string;
   finished_at: string;
   duration_seconds: number;
@@ -232,6 +234,9 @@ export class ActiveWorkout
 
   showFinishWorkoutDialog =
     false;
+    workoutName = '';
+
+    workoutNameError = '';
 
 
   /* =====================================================
@@ -2041,7 +2046,8 @@ export class ActiveWorkout
 
     }
 
-
+    this.workoutName = '';
+    this.workoutNameError = '';
     this.showFinishWorkoutDialog =
       true;
 
@@ -2066,14 +2072,28 @@ export class ActiveWorkout
   saveFinishedWorkout(): void {
 
     if (
-      this.isFinishingWorkout
-    ) {
-      return;
-    }
+    this.isFinishingWorkout
+  ) {
+    return;
+  }
 
 
-    this.showFinishWorkoutDialog =
-      false;
+  const workoutName =
+    this.workoutName.trim();
+
+
+  if (!workoutName) {
+
+    this.workoutNameError =
+      'Please enter a workout name.';
+
+    return;
+
+  }
+  this.workoutNameError = '';
+
+  this.showFinishWorkoutDialog =
+    false;
 
 
     const storedStartTime =
@@ -2171,12 +2191,15 @@ export class ActiveWorkout
 
 
     const requestBody:
-      SaveWorkoutRequest = {
+  SaveWorkoutRequest = {
 
-        routine_id:
-          this.getActiveRoutineId(),
+    routine_id:
+      this.getActiveRoutineId(),
 
-        started_at:
+    workout_name:
+      workoutName,
+
+    started_at:
           new Date(
             startTimestamp,
           ).toISOString(),

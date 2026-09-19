@@ -848,18 +848,35 @@ export class Profile
       );
 
 
+    /*
+     * workout_name was added to the backend workout
+     * response. Older saved workouts may not have one,
+     * so keep "Workout" as a safe fallback.
+     *
+     * The cast keeps this compatible until WorkoutDetail
+     * is updated in liftlog-api.service.ts.
+     */
+    const workoutWithName =
+      workout as WorkoutDetail & {
+        workout_name?:
+          string |
+          null;
+      };
+
+
+    const workoutName =
+      workoutWithName
+        .workout_name
+        ?.trim();
+
+
     return {
 
       workoutId:
         workout.workout_id,
 
-      /*
-       * Backend currently does not return
-       * the routine name in workout history.
-       *
-       * Do not invent workout names.
-       */
       title:
+        workoutName ||
         'Workout',
 
       dateLabel:
