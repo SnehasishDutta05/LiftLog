@@ -100,6 +100,16 @@ class UserProfileResponse(BaseModel):
         from_attributes = True
 
 
+class ProfileHistoryEntry(BaseModel):
+    value: Optional[str] = None
+    recorded_at: datetime
+
+
+class ProfileHistoryResponse(BaseModel):
+    weight: list[ProfileHistoryEntry] = Field(default_factory=list)
+    height: list[ProfileHistoryEntry] = Field(default_factory=list)
+    available_training_time: list[ProfileHistoryEntry] = Field(default_factory=list)
+
 
 class WorkoutCreate(BaseModel):
     name: Optional[str] = None

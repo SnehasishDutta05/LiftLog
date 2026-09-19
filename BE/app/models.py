@@ -108,9 +108,11 @@ class WorkoutSet(Base):
 
 class UserProfile(Base):
     __tablename__ = "user_profiles"
+    __table_args__ = (UniqueConstraint("user_id", "version", name="uq_user_profile_version"),)
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    version = Column(Integer, nullable=False, default=1)
 
     # Physical data
     dob = Column(String, nullable=True)
@@ -156,7 +158,6 @@ class UserProfile(Base):
     inspiration_description = Column(String, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     user = relationship("User", backref="profile")
 
