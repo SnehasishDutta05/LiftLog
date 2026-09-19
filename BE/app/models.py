@@ -70,6 +70,7 @@ class Workout(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     routine_id = Column(Integer, ForeignKey("routines.id"), nullable=True, index=True)
+    workout_name = Column(String, nullable=False, default="")
     started_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     finished_at = Column(DateTime, nullable=True)
     duration_seconds = Column(Integer, nullable=True)

@@ -156,6 +156,17 @@ def ensure_profile_version_columns() -> None:
         conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS uq_user_profile_version ON user_profiles (user_id, version)"))
 
 
+def ensure_workout_name_column() -> None:
+    with engine.begin() as conn:
+        try:
+            conn.execute(text("SELECT workout_name FROM workouts LIMIT 1"))
+        except exc.DatabaseError:
+            logger.warning("DB migration: adding missing workout_name column to workouts")
+            conn.execute(text("ALTER TABLE workouts ADD COLUMN workout_name VARCHAR NOT NULL DEFAULT ''"))
+
+        conn.execute(text("UPDATE workouts SET workout_name = CAST(id AS VARCHAR) WHERE workout_name IS NULL OR workout_name = ''"))
+
+
 def init_db() -> None:
     from BE.app.models import Base as ModelsBase
 
@@ -166,6 +177,7 @@ def init_db() -> None:
         ensure_user_token_columns()
         ensure_diet_log_item_columns()
         ensure_profile_version_columns()
+        ensure_workout_name_column()
         logger.info("DB init: complete")
     except Exception:
         logger.exception("DB init failed during schema creation or migration")

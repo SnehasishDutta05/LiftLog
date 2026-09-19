@@ -27,13 +27,15 @@ def save_completed_workout(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    effective_routine_id = payload.routine_id if payload.routine_id and payload.routine_id > 0 else None
+
     if payload.finished_at < payload.started_at:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="finished_at must be after started_at")
 
-    if payload.routine_id is not None:
+    if effective_routine_id is not None:
         routine_exists = (
             db.query(Routine)
-            .filter(Routine.id == payload.routine_id, Routine.user_id == current_user.id)
+            .filter(Routine.id == effective_routine_id, Routine.user_id == current_user.id)
             .first()
         )
         if routine_exists is None:
@@ -45,13 +47,22 @@ def save_completed_workout(
 
     workout = Workout(
         user_id=current_user.id,
-        routine_id=payload.routine_id,
+        routine_id=effective_routine_id,
+        workout_name="",
         started_at=started_at,
         finished_at=finished_at,
         duration_seconds=duration_seconds,
     )
     db.add(workout)
     db.flush()
+
+    if payload.workout_name is not None and payload.workout_name.strip():
+        workout.workout_name = payload.workout_name.strip()
+    elif effective_routine_id is not None:
+        routine = db.query(Routine).filter(Routine.id == effective_routine_id, Routine.user_id == current_user.id).first()
+        workout.workout_name = routine.name if routine else str(workout.id)
+    else:
+        workout.workout_name = str(workout.id)
 
     exercise_summaries: list[WorkoutExerciseSummary] = []
     for order_index, exercise_payload in enumerate(payload.exercises):
@@ -99,7 +110,8 @@ def save_completed_workout(
     db.commit()
     return WorkoutCompleteResponse(
         workout_id=workout.id,
-        routine_id=payload.routine_id,
+        routine_id=effective_routine_id,
+        workout_name=workout.workout_name,
         started_at=workout.started_at,
         finished_at=workout.finished_at,
         duration_seconds=workout.duration_seconds,
@@ -158,10 +170,12 @@ def list_workouts(
                 )
             )
 
+        effective_name = workout.workout_name or (workout.routine.name if workout.routine_id else str(workout.id))
         items.append(
             WorkoutDetailResponse(
                 workout_id=workout.id,
                 routine_id=workout.routine_id,
+                workout_name=effective_name,
                 started_at=workout.started_at,
                 finished_at=workout.finished_at,
                 duration_seconds=workout.duration_seconds,

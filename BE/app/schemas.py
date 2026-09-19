@@ -126,7 +126,8 @@ class WorkoutExerciseInput(BaseModel):
 
 
 class WorkoutCompleteRequest(BaseModel):
-    routine_id: Optional[int] = None
+    routine_id: Optional[int] = Field(default=None, ge=0)
+    workout_name: Optional[str] = None
     started_at: datetime
     finished_at: datetime
     exercises: list[WorkoutExerciseInput]
@@ -138,6 +139,7 @@ class WorkoutRead(BaseModel):
     id: int
     user_id: int
     routine_id: Optional[int] = None
+    workout_name: str
     started_at: datetime
     finished_at: Optional[datetime] = None
     duration_seconds: Optional[int] = None
@@ -165,6 +167,7 @@ class WorkoutExerciseDetail(BaseModel):
 class WorkoutDetailResponse(BaseModel):
     workout_id: int
     routine_id: Optional[int] = None
+    workout_name: str
     started_at: datetime
     finished_at: Optional[datetime] = None
     duration_seconds: Optional[int] = None
@@ -195,6 +198,7 @@ class WorkoutExerciseSummary(BaseModel):
 class WorkoutCompleteResponse(BaseModel):
     workout_id: int
     routine_id: Optional[int] = None
+    workout_name: str
     started_at: datetime
     finished_at: datetime
     duration_seconds: int
