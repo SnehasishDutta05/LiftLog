@@ -1170,7 +1170,7 @@ export class Profile
   goHome(): void {
 
     this.router.navigate([
-      '/dashboard',
+      '/home',
     ]);
 
   }

@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { Signup } from './pages/signup/signup';
 import { Onboarding } from './pages/onboarding/onboarding';
+import { Home } from './pages/home/home';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { ActiveWorkout } from './pages/active-workout/active-workout';
 import { ExercisePicker } from './pages/exercise-picker/exercise-picker';
@@ -10,8 +11,11 @@ import { FoodPicker } from './pages/food-picker/food-picker';
 import { Profile } from './pages/profile/profile';
 import { Healthify } from './pages/healthify/healthify';
 import { WorkoutHistory } from './pages/workout-history/workout-history';
-import { WorkoutDetailPage} from './pages/workout-detail/workout-detail';
+import { WorkoutDetailPage } from './pages/workout-detail/workout-detail';
 import { Account } from './pages/account/account';
+import {
+  rootRedirectGuard,
+} from './core/guards/root-redirect-guard';
 
 export const routes: Routes = [
 
@@ -30,24 +34,22 @@ export const routes: Routes = [
     component: Onboarding,
   },
 
+  /* =====================================================
+     HOME
+  ===================================================== */
+
+  {
+    path: 'home',
+    component: Home,
+  },
+
+  /* =====================================================
+     WORKOUTS
+  ===================================================== */
+
   {
     path: 'dashboard',
     component: Dashboard,
-  },
-
-  {
-    path: 'healthify',
-    component: Healthify,
-  },
-
-  {
-    path: 'food-picker',
-    component: FoodPicker,
-  },
-
-  {
-    path: 'profile',
-    component: Profile,
   },
 
   {
@@ -66,20 +68,49 @@ export const routes: Routes = [
   },
 
   {
-  path: 'workout-history/:workoutId',
-  component: WorkoutDetailPage,
-},
+    path: 'workout-history/:workoutId',
+    component: WorkoutDetailPage,
+  },
 
-{
-  path: 'account',
-  component: Account,
-},
+  /* =====================================================
+     NUTRITION
+  ===================================================== */
 
   {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
+    path: 'healthify',
+    component: Healthify,
   },
+
+  {
+    path: 'food-picker',
+    component: FoodPicker,
+  },
+
+  /* =====================================================
+     PROFILE
+  ===================================================== */
+
+  {
+    path: 'profile',
+    component: Profile,
+  },
+
+  {
+    path: 'account',
+    component: Account,
+  },
+
+  /* =====================================================
+     DEFAULT
+  ===================================================== */
+
+  {
+  path: '',
+  canActivate: [
+    rootRedirectGuard,
+  ],
+  component: Home,
+},
 
   /*
    * IMPORTANT:

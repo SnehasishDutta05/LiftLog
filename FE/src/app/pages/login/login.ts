@@ -175,9 +175,9 @@ export class Login {
            * full name
            */
 
-          this.router.navigate([
-            '/dashboard',
-          ]);
+         this.router.navigate([
+  '/home',
+]);
 
         },
 

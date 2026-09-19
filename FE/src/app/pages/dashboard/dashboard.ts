@@ -868,24 +868,33 @@ export class Dashboard
 
 
   /* =====================================================
-     BOTTOM NAVIGATION
-  ===================================================== */
+   BOTTOM NAVIGATION
+===================================================== */
 
-  goToHealthify(): void {
+goToHome(): void {
 
-    this.router.navigate([
-      '/healthify',
-    ]);
+  this.router.navigate([
+    '/home',
+  ]);
 
-  }
+}
 
 
-  goToProfile(): void {
+goToHealthify(): void {
 
-    this.router.navigate([
-      '/profile',
-    ]);
+  this.router.navigate([
+    '/healthify',
+  ]);
 
-  }
+}
+
+
+goToProfile(): void {
+
+  this.router.navigate([
+    '/profile',
+  ]);
+
+}
 
 }

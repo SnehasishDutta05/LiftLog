@@ -2039,28 +2039,43 @@ implements OnInit {
   }
 
 
-  /* =====================================================
-     NAVIGATION
-  ===================================================== */
+ /* =====================================================
+   NAVIGATION
+===================================================== */
 
-  goToWorkouts(): void {
-    this.router.navigate([
-      '/dashboard',
-    ]);
-  }
+goToHome(): void {
 
+  this.router.navigate([
+    '/home',
+  ]);
 
-  goToHealthify(): void {
-    this.router.navigate([
-      '/healthify',
-    ]);
-  }
+}
 
 
-  goToProfile(): void {
-    this.router.navigate([
-      '/profile',
-    ]);
-  }
+goToWorkouts(): void {
+
+  this.router.navigate([
+    '/dashboard',
+  ]);
+
+}
+
+
+goToHealthify(): void {
+
+  this.router.navigate([
+    '/healthify',
+  ]);
+
+}
+
+
+goToProfile(): void {
+
+  this.router.navigate([
+    '/profile',
+  ]);
+
+}
 
 }

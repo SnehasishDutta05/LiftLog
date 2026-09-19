@@ -737,7 +737,7 @@ export class Onboarding implements OnDestroy {
   finishOnboarding(): void {
 
     this.router.navigateByUrl(
-      '/dashboard',
+      '/home',
     );
 
   }

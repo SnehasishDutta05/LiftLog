@@ -1,0 +1,756 @@
+<div class="home-shell">
+
+  <main class="home-main">
+
+    <div class="home-content">
+
+      <!-- =================================================
+           HEADER
+      ================================================== -->
+
+      <header class="home-header">
+
+        <div class="home-heading">
+
+          <p class="greeting">
+            {{ greeting }} 👋
+          </p>
+
+          <h1>
+            Ready to make<br>
+            today count?
+          </h1>
+
+        </div>
+
+
+        <button
+          class="notification-button"
+          type="button"
+          aria-label="Open notifications"
+          (click)="toggleNotifications()"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
+            ></path>
+
+            <path
+              d="M10 21h4"
+            ></path>
+          </svg>
+
+
+          @if (hasUnreadNotifications) {
+
+            <span class="notification-dot"></span>
+
+          }
+
+        </button>
+
+      </header>
+
+
+      <!-- =================================================
+           TODAY'S WORKOUT
+      ================================================== -->
+
+      <section class="today-workout-card">
+
+        <div class="today-workout-copy">
+
+          <span class="eyebrow">
+            TODAY'S WORKOUT
+          </span>
+
+          <h2>
+            Ready when you are 💪
+          </h2>
+
+          <p>
+            Start a workout and keep your momentum going.
+          </p>
+
+
+          <button
+            class="start-workout-button"
+            type="button"
+            (click)="startWorkout()"
+          >
+            Start Workout
+
+            <span aria-hidden="true">
+              →
+            </span>
+          </button>
+
+        </div>
+
+
+        <div
+          class="workout-card-decoration"
+          aria-hidden="true"
+        >
+
+          <div class="home-dumbbell">
+
+            <span class="home-dumbbell-weight left"></span>
+
+            <span class="home-dumbbell-bar"></span>
+
+            <span class="home-dumbbell-weight right"></span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           QUICK ACTIONS
+      ================================================== -->
+
+      <section class="quick-section">
+
+        <h2>
+          Quick Actions
+        </h2>
+
+
+        <div class="quick-actions">
+
+          <button
+            class="quick-action-card"
+            type="button"
+            (click)="goToWorkouts()"
+          >
+
+            <span class="quick-icon">
+              🏋️
+            </span>
+
+            <span class="quick-copy">
+
+              <strong>
+                Workouts
+              </strong>
+
+              <span>
+                Start training
+              </span>
+
+            </span>
+
+            <span
+              class="quick-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
+
+          </button>
+
+
+          <button
+            class="quick-action-card"
+            type="button"
+            (click)="goToNutrition()"
+          >
+
+            <span class="quick-icon">
+              🥗
+            </span>
+
+            <span class="quick-copy">
+
+              <strong>
+                Nutrition
+              </strong>
+
+              <span>
+                Track your meals
+              </span>
+
+            </span>
+
+            <span
+              class="quick-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
+
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           NEARBY GYMS
+      ================================================== -->
+
+      <section class="gyms-section">
+
+        <div class="section-heading-row">
+
+          <div>
+
+            <h2>
+              Gyms near you
+            </h2>
+
+
+            @if (locationStatus === 'ready') {
+
+              <p class="location-label">
+                <span>📍</span>
+                Using your current location
+              </p>
+
+            } @else {
+
+              <p class="location-label">
+                <span>📍</span>
+                Find gyms around you
+              </p>
+
+            }
+
+          </div>
+
+
+          @if (
+            locationStatus === 'ready' &&
+            nearbyGyms.length > 0
+          ) {
+
+            <span class="gym-count">
+              {{ nearbyGyms.length }}
+            </span>
+
+          }
+
+        </div>
+
+
+        <!-- ===============================================
+             LOCATION LOADING
+        ================================================ -->
+
+        @if (locationStatus === 'loading') {
+
+          <div class="gym-state-card">
+
+            <span class="location-loader"></span>
+
+            <div>
+
+              <strong>
+                Finding gyms near you
+              </strong>
+
+              <p>
+                Getting your current location…
+              </p>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ===============================================
+             LOCATION ERROR / DENIED
+        ================================================ -->
+
+        @if (
+          locationStatus === 'denied' ||
+          locationStatus === 'unavailable' ||
+          locationStatus === 'error'
+        ) {
+
+          <div class="gym-state-card location-error">
+
+            <span class="state-icon">
+              📍
+            </span>
+
+            <div class="state-copy">
+
+              <strong>
+                Location needed
+              </strong>
+
+              <p>
+                {{ locationErrorMessage }}
+              </p>
+
+
+              <button
+                type="button"
+                (click)="requestLocation()"
+              >
+                Try Again
+              </button>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ===============================================
+             GYM API LOADING
+        ================================================ -->
+
+        @if (
+          locationStatus === 'ready' &&
+          isLoadingGyms
+        ) {
+
+          <div class="gym-state-card">
+
+            <span class="location-loader"></span>
+
+            <div>
+
+              <strong>
+                Searching nearby
+              </strong>
+
+              <p>
+                Looking for gyms around your location…
+              </p>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ===============================================
+             GYM API ERROR
+        ================================================ -->
+
+        @if (
+          locationStatus === 'ready' &&
+          !isLoadingGyms &&
+          gymErrorMessage
+        ) {
+
+          <div class="gym-state-card location-error">
+
+            <span class="state-icon">
+              🏋️
+            </span>
+
+            <div class="state-copy">
+
+              <strong>
+                Couldn't load nearby gyms
+              </strong>
+
+              <p>
+                {{ gymErrorMessage }}
+              </p>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ===============================================
+             REAL GYM RESULTS
+        ================================================ -->
+
+        @if (
+          locationStatus === 'ready' &&
+          !isLoadingGyms &&
+          nearbyGyms.length > 0
+        ) {
+
+          <div class="gym-list">
+
+            @for (
+              gym of nearbyGyms;
+              track gym.id
+            ) {
+
+              <article class="gym-card">
+
+                @if (gym.photoUrl) {
+
+                  <div class="gym-photo">
+
+                    <img
+                      [src]="gym.photoUrl"
+                      [alt]="gym.name"
+                    >
+
+                  </div>
+
+                } @else {
+
+                  <div
+                    class="gym-photo gym-photo-placeholder"
+                    aria-hidden="true"
+                  >
+                    🏋️
+                  </div>
+
+                }
+
+
+                <div class="gym-card-body">
+
+                  <div class="gym-title-row">
+
+                    <h3>
+                      {{ gym.name }}
+                    </h3>
+
+
+                    @if (gym.rating !== null) {
+
+                      <span class="gym-rating">
+                        ★ {{ gym.rating }}
+                      </span>
+
+                    }
+
+                  </div>
+
+
+                  @if (gym.address) {
+
+                    <p class="gym-address">
+                      {{ gym.address }}
+                    </p>
+
+                  }
+
+
+                  <div class="gym-meta">
+
+                    @if (
+                      gym.distanceMeters !== null
+                    ) {
+
+                      <span>
+
+                        📍
+
+                        @if (
+                          gym.distanceMeters < 1000
+                        ) {
+
+                          {{ gym.distanceMeters }} m
+
+                        } @else {
+
+                          {{ gym.distanceMeters / 1000 | number:'1.1-1' }} km
+
+                        }
+
+                      </span>
+
+                    }
+
+
+                    @if (
+                      gym.isOpen !== null
+                    ) {
+
+                      <span
+                        class="open-status"
+                        [class.closed]="!gym.isOpen"
+                      >
+
+                        {{ gym.isOpen ? 'Open now' : 'Closed' }}
+
+                      </span>
+
+                    }
+
+                  </div>
+
+
+                  <button
+                    class="directions-button"
+                    type="button"
+                    (click)="openDirections(gym)"
+                  >
+
+                    <span>
+                      Directions
+                    </span>
+
+                    <span aria-hidden="true">
+                      →
+                    </span>
+
+                  </button>
+
+                </div>
+
+              </article>
+
+            }
+
+          </div>
+
+        }
+
+
+        <!--
+          IMPORTANT:
+          We intentionally do not display fake gyms here.
+
+          Until the real Places service is connected,
+          location can succeed while nearbyGyms remains empty.
+        -->
+
+        @if (
+          locationStatus === 'ready' &&
+          !isLoadingGyms &&
+          nearbyGyms.length === 0 &&
+          !gymErrorMessage
+        ) {
+
+          <div class="gym-state-card">
+
+            <span class="state-icon">
+              📍
+            </span>
+
+            <div>
+
+              <strong>
+                Location found
+              </strong>
+
+              <p>
+                Nearby gym search is ready to connect.
+              </p>
+
+            </div>
+
+          </div>
+
+        }
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+  <!-- =====================================================
+       BOTTOM NAVIGATION
+  ====================================================== -->
+
+  <nav class="mobile-bottom-nav">
+
+    <button
+      class="mobile-nav-item active"
+      type="button"
+      (click)="goToHome()"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        🏠
+      </span>
+
+      <span class="nav-label">
+        Home
+      </span>
+
+    </button>
+
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToWorkouts()"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        🏋️
+      </span>
+
+      <span class="nav-label">
+        Workouts
+      </span>
+
+    </button>
+
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToNutrition()"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        🥗
+      </span>
+
+      <span class="nav-label">
+        Nutrition
+      </span>
+
+    </button>
+
+
+    <button
+      class="mobile-nav-item"
+      type="button"
+      (click)="goToProfile()"
+    >
+
+      <span class="nav-icon-circle emoji-icon">
+        👤
+      </span>
+
+      <span class="nav-label">
+        Profile
+      </span>
+
+    </button>
+
+  </nav>
+
+
+  <!-- =====================================================
+       NOTIFICATIONS
+  ====================================================== -->
+
+  @if (showNotifications) {
+
+    <div
+      class="notification-backdrop"
+      (click)="closeNotifications()"
+    ></div>
+
+
+    <section class="notification-sheet">
+
+      <div class="notification-sheet-handle"></div>
+
+
+      <div class="notification-sheet-header">
+
+        <div>
+
+          <span class="sheet-eyebrow">
+            PULSEOS
+          </span>
+
+          <h2>
+            Notifications
+          </h2>
+
+        </div>
+
+
+        <button
+          class="notification-close"
+          type="button"
+          aria-label="Close notifications"
+          (click)="closeNotifications()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      @if (notifications.length === 0) {
+
+        <div class="empty-notifications">
+
+          <span>
+            🔔
+          </span>
+
+          <strong>
+            You're all caught up
+          </strong>
+
+          <p>
+            Your PulseOS updates will appear here.
+          </p>
+
+        </div>
+
+      } @else {
+
+        @if (hasUnreadNotifications) {
+
+          <button
+            class="mark-read-button"
+            type="button"
+            (click)="markAllNotificationsRead()"
+          >
+            Mark all as read
+          </button>
+
+        }
+
+
+        <div class="notification-list">
+
+          @for (
+            notification of notifications;
+            track notification.id
+          ) {
+
+            <button
+              class="notification-item"
+              [class.unread]="!notification.isRead"
+              type="button"
+              (click)="markNotificationRead(notification)"
+            >
+
+              <span class="notification-item-dot"></span>
+
+
+              <span class="notification-copy">
+
+                <strong>
+                  {{ notification.title }}
+                </strong>
+
+                <span>
+                  {{ notification.message }}
+                </span>
+
+              </span>
+
+            </button>
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+  }
+
+</div>
