@@ -56,7 +56,7 @@ def _validate_query_date(value: str | None, *, required: bool = False) -> str | 
 
 def _nutrition(source: Any) -> FoodNutrition:
     return FoodNutrition(
-        calories=source.calories_per_100g,
+        calories=int(round(source.calories_per_100g)),
         protein_g=source.protein_per_100g,
         carbs_g=source.carbs_per_100g,
         fat_g=source.fat_per_100g,
@@ -67,7 +67,7 @@ def _nutrition(source: Any) -> FoodNutrition:
 def _scaled_nutrition(source: Any, quantity_g: float) -> NutritionValues:
     factor = quantity_g / 100
     return NutritionValues(
-        calories=source.calories_per_100g * factor,
+        calories=int(round(source.calories_per_100g * factor)),
         protein_g=source.protein_per_100g * factor,
         carbs_g=source.carbs_per_100g * factor,
         fat_g=source.fat_per_100g * factor,
@@ -142,7 +142,13 @@ def _build_meal_response(db: Session, meal: Meal) -> MealRead:
             name=source.name,
             quantity_g=item.quantity_g,
         ))
-    return MealRead(meal_id=meal.id, name=meal.name, description=meal.description, nutrition=total, item_count=len(items), items=items)
+    return MealRead(meal_id=meal.id, name=meal.name, description=meal.description, nutrition=NutritionValues(
+        calories=total.calories,
+        protein_g=total.protein_g,
+        carbs_g=total.carbs_g,
+        fat_g=total.fat_g,
+        fiber_g=total.fiber_g,
+    ), item_count=len(items), items=items)
 
 
 def _build_log_response(log: DietLog) -> DietLogRead:
@@ -152,7 +158,7 @@ def _build_log_response(log: DietLog) -> DietLogRead:
     meals = []
     for meal_name, items in grouped.items():
         nutrition = NutritionValues(
-            calories=sum(item.calories for item in items),
+            calories=int(round(sum(item.calories for item in items))),
             protein_g=sum(item.protein_g for item in items),
             carbs_g=sum(item.carbs_g for item in items),
             fat_g=sum(item.fat_g for item in items),
@@ -214,7 +220,7 @@ def _replace_log_items(db: Session, log: DietLog, payload: DietLogCreate, curren
                 fat_g=values.fat_g,
                 fiber_g=values.fiber_g,
             ))
-    log.calories = totals.calories
+    log.calories = float(totals.calories)
     log.protein_g = totals.protein_g
     log.carbs_g = totals.carbs_g
     log.fat_g = totals.fat_g
@@ -435,7 +441,7 @@ def get_diet_summary(log_date: str | None = Query(None, alias="date"), db: Sessi
     goal = db.query(DietGoal).filter(DietGoal.user_id == current_user.id).first()
     targets = goal or DietGoal(calorie_target=0, protein_target_g=0, carbs_target_g=0, fat_target_g=0)
     consumed = NutritionValues(
-        calories=log.calories if log else 0,
+        calories=int(round(log.calories)) if log else 0,
         protein_g=log.protein_g if log else 0,
         carbs_g=log.carbs_g if log else 0,
         fat_g=log.fat_g if log else 0,
@@ -454,7 +460,11 @@ def get_diet_summary(log_date: str | None = Query(None, alias="date"), db: Sessi
             )
     return DietSummary(
         date=target_date,
-        calories={"consumed": consumed.calories, "target": targets.calorie_target, "remaining": targets.calorie_target - consumed.calories},
+        calories={
+            "consumed": int(round(consumed.calories)),
+            "target": int(round(targets.calorie_target)),
+            "remaining": int(round(targets.calorie_target - consumed.calories)),
+        },
         macros={
             "protein": {"consumed_g": consumed.protein_g, "target_g": targets.protein_target_g, "remaining_g": targets.protein_target_g - consumed.protein_g},
             "carbs": {"consumed_g": consumed.carbs_g, "target_g": targets.carbs_target_g, "remaining_g": targets.carbs_target_g - consumed.carbs_g},
@@ -469,14 +479,14 @@ def get_diet_history(start_date: str, end_date: str, db: Session = Depends(get_d
     start_date = _validate_query_date(start_date, required=True)
     end_date = _validate_query_date(end_date, required=True)
     logs = db.query(DietLog).filter(DietLog.user_id == current_user.id, DietLog.date >= start_date, DietLog.date <= end_date).order_by(DietLog.date.asc()).all()
-    days = [DietHistoryDay(date=log.date, calories=log.calories, protein_g=log.protein_g, carbs_g=log.carbs_g, fat_g=log.fat_g) for log in logs]
+    days = [DietHistoryDay(date=log.date, calories=int(round(log.calories)), protein_g=log.protein_g, carbs_g=log.carbs_g, fat_g=log.fat_g) for log in logs]
     count = len(days) or 1
     return DietHistoryResponse(
         start_date=start_date,
         end_date=end_date,
         days=days,
         average=NutritionValues(
-            calories=sum(day.calories for day in days) / count,
+            calories=int(round(sum(day.calories for day in days) / count)),
             protein_g=sum(day.protein_g for day in days) / count,
             carbs_g=sum(day.carbs_g for day in days) / count,
             fat_g=sum(day.fat_g for day in days) / count,
@@ -489,7 +499,7 @@ def get_diet_goals(db: Session = Depends(get_db), current_user: User = Depends(g
     goal = db.query(DietGoal).filter(DietGoal.user_id == current_user.id).first()
     if goal is None:
         return DietGoalRead(calories=0, protein_g=0, carbs_g=0, fat_g=0)
-    return DietGoalRead(calories=goal.calorie_target, protein_g=goal.protein_target_g, carbs_g=goal.carbs_target_g, fat_g=goal.fat_target_g)
+    return DietGoalRead(calories=int(round(goal.calorie_target)), protein_g=goal.protein_target_g, carbs_g=goal.carbs_target_g, fat_g=goal.fat_target_g)
 
 
 @router.put("/goals", response_model=DietGoalRead, tags=["goals"], summary="Update nutrition goals", description="Create or replace the authenticated user's calorie and macro targets.")
@@ -498,9 +508,9 @@ def update_diet_goals(payload: DietGoalRequest, db: Session = Depends(get_db), c
     if goal is None:
         goal = DietGoal(user_id=current_user.id)
         db.add(goal)
-    goal.calorie_target = payload.calories
+    goal.calorie_target = float(payload.calories)
     goal.protein_target_g = payload.protein_g
     goal.carbs_target_g = payload.carbs_g
     goal.fat_target_g = payload.fat_g
     db.commit()
-    return DietGoalRead(calories=goal.calorie_target, protein_g=goal.protein_target_g, carbs_g=goal.carbs_target_g, fat_g=goal.fat_target_g)
+    return DietGoalRead(calories=int(round(goal.calorie_target)), protein_g=goal.protein_target_g, carbs_g=goal.carbs_target_g, fat_g=goal.fat_target_g)

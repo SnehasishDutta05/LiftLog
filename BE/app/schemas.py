@@ -413,7 +413,7 @@ class RoutineListResponse(BaseModel):
 
 
 class NutritionValues(BaseModel):
-    calories: float = 0
+    calories: int = 0
     protein_g: float = 0
     carbs_g: float = 0
     fat_g: float = 0
@@ -421,7 +421,7 @@ class NutritionValues(BaseModel):
 
 
 class FoodNutrition(BaseModel):
-    calories: float = 0
+    calories: int = 0
     protein_g: float = 0
     carbs_g: float = 0
     fat_g: float = 0
@@ -438,7 +438,7 @@ class FoodServingRead(BaseModel):
     serving_id: int
     name: str
     quantity_g: float
-    calories: float
+    calories: int
     protein_g: float
     carbs_g: float
     fat_g: float
@@ -580,7 +580,7 @@ class DietLogItemRead(BaseModel):
     serving_id: Optional[int] = None
     food_name: str
     quantity_g: float
-    calories: float
+    calories: int
     protein_g: float
     carbs_g: float
     fat_g: float
@@ -602,14 +602,14 @@ class DietLogRead(BaseModel):
 
 class DietSummary(BaseModel):
     date: str
-    calories: dict[str, float]
+    calories: dict[str, int]
     macros: dict[str, dict[str, float]]
     meals: dict[str, NutritionValues]
 
 
 class DietHistoryDay(BaseModel):
     date: str
-    calories: float
+    calories: int
     protein_g: float
     carbs_g: float
     fat_g: float
@@ -623,7 +623,7 @@ class DietHistoryResponse(BaseModel):
 
 
 class DietGoalRequest(BaseModel):
-    calories: float = Field(ge=0)
+    calories: int = Field(ge=0)
     protein_g: float = Field(ge=0)
     carbs_g: float = Field(ge=0)
     fat_g: float = Field(ge=0)

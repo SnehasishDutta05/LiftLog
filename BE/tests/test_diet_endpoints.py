@@ -57,3 +57,23 @@ def test_diet_log_defaults_date_and_rejects_invalid_date():
     )
     assert invalid.status_code == 422
     assert "YYYY-MM-DD" in invalid.text
+
+    meal = client.post(
+        "/api/v1/diet/meals",
+        headers=headers,
+        json={
+            "name": "Test Meal",
+            "items": [{"custom_food_id": custom_food_id, "quantity_g": 50}],
+        },
+    )
+    assert meal.status_code == 201, meal.text
+    assert isinstance(meal.json()["nutrition"]["calories"], int)
+
+    summary = client.get(
+        "/api/v1/diet/summary",
+        params={"date": date.today().isoformat()},
+        headers=headers,
+    )
+    assert summary.status_code == 200, summary.text
+    assert isinstance(summary.json()["calories"]["consumed"], int)
+    assert isinstance(log.json()["meals"][0]["items"][0]["calories"], int)
