@@ -129,6 +129,77 @@ class ProfileHistoryResponse(BaseModel):
     available_training_time: list[ProfileHistoryEntry] = Field(default_factory=list)
 
 
+class GymNearbyItem(BaseModel):
+    gym_id: int
+    name: str
+    image_url: Optional[str] = None
+    distance_km: float
+
+
+class GymLocation(BaseModel):
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
+
+class GymDetailResponse(BaseModel):
+    gym_id: int
+    name: str
+    about: Optional[str] = None
+    address: Optional[str] = None
+    location: GymLocation
+    maps_url: Optional[str] = None
+    contact: dict
+    timings: dict
+    equipment: list[str] = Field(default_factory=list)
+    photos: list[str] = Field(default_factory=list)
+
+
+class GymSlotItem(BaseModel):
+    slot_id: int
+    start_time: str
+    end_time: str
+    available: bool
+
+
+class GymSlotDate(BaseModel):
+    date: str
+    slots: list[GymSlotItem] = Field(default_factory=list)
+
+
+class GymSlotRead(BaseModel):
+    gym_id: int
+    slots: list[GymSlotDate] = Field(default_factory=list)
+
+
+class BookingCreate(BaseModel):
+    gym_id: int
+    slot_id: int
+    date: str
+
+    @field_validator("date")
+    @classmethod
+    def validate_date(cls, value: str) -> str:
+        try:
+            datetime.strptime(value, "%Y-%m-%d")
+        except ValueError as exc:
+            raise ValueError("date needs to be in YYYY-MM-DD format") from exc
+        return value
+
+
+class BookingGymSummary(BaseModel):
+    gym_id: int
+    name: str
+
+
+class BookingRead(BaseModel):
+    booking_id: int
+    status: str
+    gym: BookingGymSummary
+    date: str
+    start_time: str
+    end_time: str
+
+
 class WorkoutCreate(BaseModel):
     name: Optional[str] = None
 

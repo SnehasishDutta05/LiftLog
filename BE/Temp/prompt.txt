@@ -1,0 +1,311 @@
+now i want to design a page for booking gym session.
+so the story is 
+user goes to the page. 
+sees the list of all the gyms near him  , closest one first. (the FE sends the Lagitude and logitude data)- (a image if the gym , name of the gym and dist from his current location)
+user clicks on the gym that he likes that takes him to the Booking page
+here the user sees all the previous details and the available slots for the gym for the next 7 days. 
+
+1. if user clicks on the time slot that he likes for the date he like that takes him to a page where he sees the get directions button that takes him to the google maps location of that gym and a confirm booking option for the selected time and date. 
+2. user clicks on the gym name where the user can see all the previous details about the gym  + the google location button (direction) , list of equipements that the gym has, its gym email address , gym comntat number , gym open and close timings , gym photos and about the gym. 
+
+NOTE : all the data about the gyms will be coming for the .xlsx file and will be loaded in the DB. 
+
+GYM
+│
+├── Basic Information
+│   ├── gym_id
+│   ├── name
+│   ├── about
+│   └── status
+│
+├── Location
+│   ├── address
+│   ├── city
+│   ├── state
+│   ├── pincode
+│   ├── latitude
+│   ├── longitude
+│   └── google_maps_url
+│
+├── Contact
+│   ├── phone
+│   └── email
+│
+├── Operating Hours
+│   ├── Monday
+│   ├── Tuesday
+│   ├── Wednesday
+│   ├── Thursday
+│   ├── Friday
+│   ├── Saturday
+│   └── Sunday
+│
+├── Equipment
+│   ├── Treadmill
+│   ├── Squat Rack
+│   ├── Bench Press
+│   └── ...
+│
+├── Photos
+│   ├── Main photo
+│   ├── Interior
+│   ├── Equipment
+│   └── ...
+│
+└── Booking Configuration
+    ├── slot_duration_minutes
+    └── max_bookings_per_slot
+
+i want you to create the following APIs for this:
+
+GET    /gyms/nearby
+eg : GET /gyms/nearby?lat=22.5958&lng=88.4797&radius=10
+
+The FE gets the user's latitude/longitude and sends it to the BE.
+
+response : [
+  {
+    "gym_id": 101,
+    "name": "IronCore Fitness",
+    "image_url": "https://cdn.liftlog.com/gyms/101/main.jpg",
+    "distance_km": 1.2
+  },
+  {
+    "gym_id": 105,
+    "name": "FitZone New Town",
+    "image_url": "https://cdn.liftlog.com/gyms/105/main.jpg",
+    "distance_km": 2.4
+  },
+  {
+    "gym_id": 109,
+    "name": "PowerHouse Gym",
+    "image_url": "https://cdn.liftlog.com/gyms/109/main.jpg",
+    "distance_km": 3.1
+  }
+]
+
+
+note that we have the latitude/longitude f each gym so the backedn calulate the distance from the user send latitude/longitude data and finds the nearest gyms. 
+apply pagination
+
+GET    /gyms/{gym_id}
+eg : GET /gyms/101
+
+response:
+{
+  "gym_id": 101,
+  "name": "IronCore Fitness",
+  "image_url": "https://cdn.liftlog.com/gyms/101/main.jpg",
+  "address": "Action Area 1, New Town, Kolkata",
+  "distance_km": 1.2,
+}
+
+
+GET    /gyms/{gym_id}/slots
+eg : GET /gyms/101/slots?from=2026-09-21&to=2026-09-27
+
+response: 
+{
+  "gym_id": 101,
+  "slots": [
+    {
+      "date": "2026-09-21",
+      "slots": [
+        {
+          "slot_id": 5001,
+          "start_time": "06:00",
+          "end_time": "07:00",
+          "available": true
+        },
+        {
+          "slot_id": 5002,
+          "start_time": "07:00",
+          "end_time": "08:00",
+          "available": false
+        },
+        {
+          "slot_id": 5003,
+          "start_time": "08:00",
+          "end_time": "09:00",
+          "available": true
+        }
+      ]
+    },
+    {
+      "date": "2026-09-22",
+      "slots": [
+        {
+          "slot_id": 5010,
+          "start_time": "06:00",
+          "end_time": "07:00",
+          "available": true
+        },
+        {
+          "slot_id": 5011,
+          "start_time": "07:00",
+          "end_time": "08:00",
+          "available": true
+        }
+      ]
+    }
+  ]
+}
+
+note there is a limit to how many bookings we can take for each slot , the BE check the no. of bookings for each slot only if it doesnt cross that threshold then it shows that slot as available , and every 30 mins. we have a slot eg : 6:00 AM , 6:30 AM. 
+
+
+GET    /gyms/{gym_id}/slots/{slot_id}
+eg : GET /gyms/101/slots/5003
+response:
+{
+  "gym": {
+    "gym_id": 101,
+    "name": "IronCore Fitness",
+    "address": "Action Area 1, New Town, Kolkata",
+    "image_url": "https://cdn.liftlog.com/gyms/101/main.jpg"
+  },
+  "slot": {
+    "slot_id": 5003,
+    "date": "2026-09-21",
+    "start_time": "08:00",
+    "end_time": "09:00"
+  },
+  "maps_url": "https://maps.google.com/?q=22.5958,88.4797"
+}
+
+
+
+
+
+POST   /bookings
+eg : request :
+{
+  "gym_id": 101,
+  "slot_id": 5003,
+  "date": "2026-09-21"
+}
+Note : The user's identity should come from the authentication token
+
+response :
+{
+  "booking_id": 90001,
+  "status": "confirmed",
+  "gym": {
+    "gym_id": 101,
+    "name": "IronCore Fitness"
+  },
+  "date": "2026-09-21",
+  "start_time": "08:00",
+  "end_time": "09:00"
+}
+
+GET    /gyms/{gym_id}/details
+eg: GET /gyms/101/details
+response : 
+{
+  "gym_id": 101,
+  "name": "IronCore Fitness",
+
+  "about": "Premium fitness center with strength,
+  cardio and functional training facilities.",
+
+  "address": "Action Area 1, New Town, Kolkata",
+
+  "location": {
+    "latitude": 22.5958,
+    "longitude": 88.4797
+  },
+
+  "maps_url": "https://maps.google.com/?q=22.5958,88.4797",
+
+  "contact": {
+    "phone": "+91XXXXXXXXXX",
+    "email": "contact@ironcorefitness.com"
+  },
+
+  "timings": {
+    "monday": {
+      "open": "06:00",
+      "close": "22:00"
+    },
+    "tuesday": {
+      "open": "06:00",
+      "close": "22:00"
+    },
+    "wednesday": {
+      "open": "06:00",
+      "close": "22:00"
+    }
+  },
+
+  "equipment": [
+    "Treadmill",
+    "Squat Rack",
+    "Bench Press",
+    "Cable Machine",
+    "Dumbbells",
+    "Leg Press",
+    "Smith Machine"
+  ],
+
+  "photos": [
+    "https://cdn.liftlog.com/gyms/101/1.jpg",
+    "https://cdn.liftlog.com/gyms/101/2.jpg",
+    "https://cdn.liftlog.com/gyms/101/3.jpg"
+  ]
+}
+
+
+
+GET    /bookings
+eg response :
+[
+  {
+    "booking_id": 90001,
+    "gym": {
+      "gym_id": 101,
+      "name": "IronCore Fitness"
+      
+    },
+    "date": "2026-09-21",
+    "start_time": "08:00",
+    "end_time": "09:00",
+    "status": "confirmed"
+  }
+]
+
+GET    /bookings/{booking_id}
+eg response :
+{
+  "booking_id": 90001,
+  "status": "confirmed",
+
+  "gym": {
+    "gym_id": 101,
+    "name": "IronCore Fitness",
+    "address": "Action Area 1, New Town, Kolkata",
+    "maps_url": "https://maps.google.com/?q=22.5958,88.4797"
+  },
+
+  "slot": {
+    "date": "2026-09-21",
+    "start_time": "08:00",
+    "end_time": "09:00"
+  }
+}
+
+DELETE /bookings/{booking_id}
+eg response :
+
+{
+  "booking_id": 90001,
+  "status": "cancelled"
+}
+
+
+
+now write the code, expose the APIs and also create a .xlsx file and store it in the path : LiftLog/BE/Temp
+
+
+
+

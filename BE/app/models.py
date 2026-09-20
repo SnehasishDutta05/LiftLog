@@ -20,6 +20,7 @@ class User(Base):
 
     routines = relationship("Routine", back_populates="user")
     workouts = relationship("Workout", back_populates="user")
+    bookings = relationship("Booking", back_populates="user")
 
 
 class Exercise(Base):
@@ -161,6 +162,79 @@ class UserProfile(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     user = relationship("User", backref="profile")
+
+
+class Gym(Base):
+    __tablename__ = "gyms"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False, index=True)
+    about = Column(String, nullable=True)
+    status = Column(String, nullable=False, default="active")
+    address = Column(String, nullable=True)
+    city = Column(String, nullable=True)
+    state = Column(String, nullable=True)
+    pincode = Column(String, nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    google_maps_url = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    email = Column(String, nullable=True)
+    image_url = Column(String, nullable=True)
+    monday_open = Column(String, nullable=True)
+    monday_close = Column(String, nullable=True)
+    tuesday_open = Column(String, nullable=True)
+    tuesday_close = Column(String, nullable=True)
+    wednesday_open = Column(String, nullable=True)
+    wednesday_close = Column(String, nullable=True)
+    thursday_open = Column(String, nullable=True)
+    thursday_close = Column(String, nullable=True)
+    friday_open = Column(String, nullable=True)
+    friday_close = Column(String, nullable=True)
+    saturday_open = Column(String, nullable=True)
+    saturday_close = Column(String, nullable=True)
+    sunday_open = Column(String, nullable=True)
+    sunday_close = Column(String, nullable=True)
+    equipment_json = Column(String, nullable=True)
+    photos_json = Column(String, nullable=True)
+    slot_duration_minutes = Column(Integer, nullable=False, default=30)
+    max_bookings_per_slot = Column(Integer, nullable=False, default=1)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    slots = relationship("GymSlot", back_populates="gym", cascade="all, delete-orphan")
+    bookings = relationship("Booking", back_populates="gym", cascade="all, delete-orphan")
+
+
+class GymSlot(Base):
+    __tablename__ = "gym_slots"
+
+    id = Column(Integer, primary_key=True, index=True)
+    gym_id = Column(Integer, ForeignKey("gyms.id"), nullable=False, index=True)
+    date = Column(String, nullable=False, index=True)
+    start_time = Column(String, nullable=False)
+    end_time = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    gym = relationship("Gym", back_populates="slots")
+    bookings = relationship("Booking", back_populates="slot", cascade="all, delete-orphan")
+
+
+class Booking(Base):
+    __tablename__ = "bookings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    gym_id = Column(Integer, ForeignKey("gyms.id"), nullable=False, index=True)
+    slot_id = Column(Integer, ForeignKey("gym_slots.id"), nullable=False, index=True)
+    date = Column(String, nullable=False, index=True)
+    status = Column(String, nullable=False, default="confirmed")
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    cancelled_at = Column(DateTime, nullable=True)
+
+    user = relationship("User", back_populates="bookings")
+    gym = relationship("Gym", back_populates="bookings")
+    slot = relationship("GymSlot", back_populates="bookings")
 
 
 class Food(Base):

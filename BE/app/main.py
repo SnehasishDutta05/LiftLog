@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from BE.app.api.routes.auth import router as auth_router
 from BE.app.api.routes.diet import router as diet_router
 from BE.app.api.routes.exercises import router as exercises_router
+from BE.app.api.routes.gyms import router as gyms_router
 from BE.app.api.routes.profile import router as profile_router
 from BE.app.api.routes.routines import router as routines_router
 from BE.app.api.routes.workouts import router as workouts_router
@@ -104,6 +105,7 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(diet_router, prefix="/api/v1")
 app.include_router(exercises_router, prefix="/api/v1")
+app.include_router(gyms_router, prefix="/api/v1")
 app.include_router(profile_router, prefix="/api/v1")
 app.include_router(routines_router, prefix="/api/v1")
 app.include_router(workouts_router, prefix="/api/v1")
