@@ -106,6 +106,18 @@ implements OnInit {
     null;
 
 
+  quantityGrams =
+    100;
+
+
+  readonly quantityStep =
+    10;
+
+
+  readonly minimumQuantity =
+    1;
+
+
   isLoadingDetails =
     false;
 
@@ -278,7 +290,7 @@ implements OnInit {
         ) => {
 
           /*
-           * 404 means there is simply no diet log
+           * 404 simply means there is no diet log
            * for today yet.
            */
           if (
@@ -514,6 +526,10 @@ implements OnInit {
       null;
 
 
+    this.quantityGrams =
+      100;
+
+
     this.loadFoods();
 
   }
@@ -535,6 +551,10 @@ implements OnInit {
 
     this.selectedServing =
       null;
+
+
+    this.quantityGrams =
+      100;
 
 
     this.loadFoods();
@@ -648,6 +668,10 @@ implements OnInit {
       null;
 
 
+    this.quantityGrams =
+      100;
+
+
     console.log(
       'Loading food details:',
       food.food_id,
@@ -700,6 +724,14 @@ implements OnInit {
                 response;
 
 
+              /*
+               * If the API has exactly one real serving,
+               * select it automatically and synchronize
+               * the gram quantity with that serving.
+               *
+               * If there are no servings, quantityGrams
+               * remains at the universal 100g default.
+               */
               if (
                 Array.isArray(
                   response.servings,
@@ -710,6 +742,20 @@ implements OnInit {
 
                 this.selectedServing =
                   response.servings[0];
+
+
+                const servingQuantity =
+                  this.safeNumber(
+                    response.servings[0]
+                      .quantity_g,
+                  );
+
+
+                this.quantityGrams =
+                  servingQuantity >=
+                  this.minimumQuantity
+                    ? servingQuantity
+                    : 100;
 
               }
 
@@ -764,6 +810,10 @@ implements OnInit {
       null;
 
 
+    this.quantityGrams =
+      100;
+
+
     this.detailsError =
       '';
 
@@ -775,8 +825,83 @@ implements OnInit {
 
 
   /* =====================================================
-     SERVING
+     QUANTITY / SERVING
   ===================================================== */
+
+  decreaseQuantity(): void {
+
+    const current =
+      this.safeNumber(
+        this.quantityGrams,
+      );
+
+
+    this.quantityGrams =
+      Math.max(
+        this.minimumQuantity,
+        current -
+          this.quantityStep,
+      );
+
+
+    this.saveError =
+      '';
+
+  }
+
+
+  increaseQuantity(): void {
+
+    const current =
+      this.safeNumber(
+        this.quantityGrams,
+      );
+
+
+    this.quantityGrams =
+      Math.max(
+        this.minimumQuantity,
+        current +
+          this.quantityStep,
+      );
+
+
+    this.saveError =
+      '';
+
+  }
+
+
+  onQuantityChange(): void {
+
+    const quantity =
+      this.safeNumber(
+        this.quantityGrams,
+      );
+
+
+    if (
+      quantity <
+      this.minimumQuantity
+    ) {
+
+      this.quantityGrams =
+        this.minimumQuantity;
+
+    }
+    else {
+
+      this.quantityGrams =
+        quantity;
+
+    }
+
+
+    this.saveError =
+      '';
+
+  }
+
 
   selectServing(
     serving:
@@ -785,6 +910,19 @@ implements OnInit {
 
     this.selectedServing =
       serving;
+
+
+    const servingQuantity =
+      this.safeNumber(
+        serving.quantity_g,
+      );
+
+
+    this.quantityGrams =
+      servingQuantity >=
+      this.minimumQuantity
+        ? servingQuantity
+        : 100;
 
 
     this.saveError =
@@ -815,13 +953,25 @@ implements OnInit {
 
     if (
       !this.selectedFood ||
-      !this.selectedServing ||
       this.isSaving
     ) {
 
       return;
 
     }
+
+
+    const quantity =
+      Math.max(
+        this.minimumQuantity,
+        this.safeNumber(
+          this.quantityGrams,
+        ),
+      );
+
+
+    this.quantityGrams =
+      quantity;
 
 
     this.isSaving =
@@ -832,6 +982,12 @@ implements OnInit {
       '';
 
 
+    /*
+     * serving_id may legitimately be null.
+     *
+     * This allows foods without a FoodServing row to
+     * still be logged using an explicit gram quantity.
+     */
     const newItem:
       DietLogRequestItem = {
 
@@ -842,12 +998,12 @@ implements OnInit {
         null,
 
       serving_id:
-        this.selectedServing.serving_id,
+        this.selectedServing
+          ?.serving_id ??
+        null,
 
       quantity_g:
-        this.safeNumber(
-          this.selectedServing.quantity_g,
-        ),
+        quantity,
 
     };
 
@@ -912,7 +1068,7 @@ implements OnInit {
 
     /*
      * No log for today:
-     * create it.
+     * POST/create it.
      */
     this.nutritionService
       .createLog(
@@ -1189,7 +1345,7 @@ implements OnInit {
 
 
           this.saveError =
-            'This food could not be added. Please try another serving.';
+            'This food could not be added. Please check the quantity and try again.';
 
         }
         else if (
@@ -1228,13 +1384,23 @@ implements OnInit {
   /* =====================================================
      CANCEL
   ===================================================== */
+cancel(): void {
 
-  cancel(): void {
+  if (
+    this.selectedFood
+  ) {
 
-    this.router.navigate([
-      '/healthify',
-    ]);
+    this.backToFoods();
+
+    return;
 
   }
+
+
+  this.router.navigate([
+    '/healthify',
+  ]);
+
+}
 
 }

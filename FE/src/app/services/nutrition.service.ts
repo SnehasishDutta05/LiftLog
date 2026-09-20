@@ -320,28 +320,7 @@ export class NutritionService {
     `${environment.apiBaseUrl}/diet`;
 
 
-  /*
-   * =======================================================
-   * TEMPORARY MOCK DIET API
-   *
-   * :8002
-   *
-   * Used for:
-   *
-   * - foods
-   * - food details
-   * - daily logs
-   * - create log
-   * - update log
-   * - delete log
-   *
-   * When the backend Diet APIs are ready, these methods can
-   * be switched back to apiUrl.
-   * =======================================================
-   */
-
-  private readonly mockDietApiUrl =
-    'http://localhost:8002/api/v1/diet';
+  
 
 
   constructor(
@@ -422,7 +401,7 @@ export class NutritionService {
     return this.http
       .get<DietLogResponse>(
 
-        `${this.mockDietApiUrl}/logs`,
+        `${this.apiUrl}/logs`,
 
         {
           params,
@@ -448,7 +427,7 @@ export class NutritionService {
     return this.http
       .post<DietLogResponse>(
 
-        `${this.mockDietApiUrl}/logs`,
+        `${this.apiUrl}/logs`,
 
         payload,
 
@@ -475,7 +454,7 @@ export class NutritionService {
     return this.http
       .patch<DietLogResponse>(
 
-        `${this.mockDietApiUrl}/logs/${logId}`,
+        `${this.apiUrl}/logs/${logId}`,
 
         payload,
 
@@ -499,7 +478,7 @@ export class NutritionService {
     return this.http
       .delete<void>(
 
-        `${this.mockDietApiUrl}/logs/${logId}`,
+        `${this.apiUrl}/logs/${logId}`,
 
       );
 
@@ -569,7 +548,7 @@ export class NutritionService {
     return this.http
       .get<FoodSearchResponse>(
 
-        `${this.mockDietApiUrl}/foods`,
+        `${this.apiUrl}/foods`,
 
         {
           params,
@@ -595,7 +574,7 @@ export class NutritionService {
     return this.http
       .get<FoodDetails>(
 
-        `${this.mockDietApiUrl}/foods/${foodId}`,
+        `${this.apiUrl}/foods/${foodId}`,
 
       );
 

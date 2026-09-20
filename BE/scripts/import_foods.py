@@ -1,10 +1,14 @@
+import sys
 from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from BE.app.db import SessionLocal
 from BE.app.utils.food_loader import import_food_workbooks
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_WORKBOOKS = [
     PROJECT_ROOT / "BE" / "Temp" / "india_top_100_carbs_and_100_fats_sources.xlsx",
     PROJECT_ROOT / "BE" / "Temp" / "india_top_100_protein_sources (2).xlsx",

@@ -513,25 +513,73 @@
 
         </div>
 
+@if (
+  !selectedFood.servings ||
+  selectedFood.servings.length === 0
+) {
 
-        @if (
-          !selectedFood.servings ||
-          selectedFood.servings.length === 0
-        ) {
+  <div class="quantity-selector">
 
-          <div class="state-card compact">
+    <div class="quantity-heading">
 
-            <strong>
-              No servings available
-            </strong>
+      <span>
+        Quantity
+      </span>
 
-            <span>
-              Try another food.
-            </span>
+      <strong>
+        {{ quantityGrams }}g
+      </strong>
 
-          </div>
+    </div>
 
-        }
+
+    <div class="quantity-controls">
+
+      <button
+        type="button"
+        class="quantity-button"
+        aria-label="Decrease quantity"
+        (click)="decreaseQuantity()"
+      >
+        −
+      </button>
+
+
+      <div class="quantity-input-wrap">
+
+        <input
+          class="quantity-input"
+          type="number"
+          name="quantityGrams"
+          [(ngModel)]="quantityGrams"
+          [min]="minimumQuantity"
+          step="1"
+          inputmode="decimal"
+          (change)="onQuantityChange()"
+        />
+
+        <span>
+          g
+        </span>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="quantity-button"
+        aria-label="Increase quantity"
+        (click)="increaseQuantity()"
+      >
+        +
+      </button>
+
+    </div>
+
+  </div>
+
+}
+       
 
 
         @else {
@@ -636,40 +684,36 @@
            ADD BUTTON
       ================================================== -->
 
-      <div class="add-food-footer">
+     <div class="add-food-footer">
 
-        <button
-          class="add-food-button"
-          type="button"
-          [disabled]="
-            !selectedServing ||
-            isSaving
-          "
-          (click)="addSelectedFood()"
-        >
+  <button
+    class="add-food-button"
+    type="button"
+    [disabled]="
+      quantityGrams < minimumQuantity ||
+      isSaving
+    "
+    (click)="addSelectedFood()"
+  >
 
-          @if (isSaving) {
+    @if (isSaving) {
 
-            Adding...
+      Adding...
 
-          }
+    }
 
-          @else if (selectedServing) {
+    @else {
 
-            Add to
-            {{ mealName }}
+      Add
+      {{ quantityGrams }}g
+      to
+      {{ mealName }}
 
-          }
+    }
 
-          @else {
+  </button>
 
-            Select a serving
-
-          }
-
-        </button>
-
-      </div>
+</div>
 
     </main>
 
