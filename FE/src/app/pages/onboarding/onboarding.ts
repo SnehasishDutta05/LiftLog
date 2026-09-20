@@ -601,11 +601,25 @@ export class Onboarding implements OnDestroy {
       profile,
     );
 
+    const token =
+      localStorage.getItem(
+        'pulseos_access_token',
+      );
+
+    const headers: Record<string, string> = {};
+
+    if (token) {
+      headers['Authorization'] =
+        `Bearer ${token}`;
+    }
 
     this.http
       .post<ProfileResponse>(
         this.profileUrl,
         profile,
+        {
+          headers,
+        },
       )
       .pipe(
 

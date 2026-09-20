@@ -49,6 +49,17 @@ class RefreshTokenRequest(BaseModel):
 
 
 class UserProfileRequest(BaseModel):
+    @field_validator('height', 'weight', mode='before')
+    @classmethod
+    def normalize_numeric_strings(cls, value: object) -> Optional[str]:
+        if value is None:
+            return None
+        if isinstance(value, bool):
+            return str(value)
+        if isinstance(value, (int, float)):
+            return str(value)
+        return value
+
     # Physical data
     dob: Optional[str] = None
     height: Optional[str] = None

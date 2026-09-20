@@ -1,1 +1,616 @@
-<p>account works!</p>
+<div class="account-page">
+
+  <!-- HEADER -->
+  <header class="account-header">
+
+    <button
+      type="button"
+      class="back-button"
+      aria-label="Back to profile"
+      (click)="goBack()"
+    >
+      ‹
+    </button>
+
+    <div>
+      <p class="eyebrow">SETTINGS</p>
+      <h1>Account</h1>
+    </div>
+
+  </header>
+
+
+  <!-- LOADING -->
+  @if (isLoading) {
+
+    <main class="account-content">
+      <div class="state-card">
+        <div class="loader"></div>
+        <p>Loading your profile...</p>
+      </div>
+    </main>
+
+  }
+
+
+  <!-- ERROR -->
+  @else if (errorMessage) {
+
+    <main class="account-content">
+      <div class="state-card error-state">
+        <div class="state-icon">!</div>
+
+        <h2>Unable to load account</h2>
+
+        <p>
+          {{ errorMessage }}
+        </p>
+      </div>
+    </main>
+
+  }
+
+
+  <!-- ACCOUNT -->
+  @else {
+
+    <main class="account-content">
+
+
+      <!-- PROFILE CARD -->
+      <section class="profile-card">
+
+        <div class="avatar">
+          {{ initials }}
+        </div>
+
+        <div class="profile-copy">
+
+          <h2>
+            {{ accountName }}
+          </h2>
+
+          <p>
+            {{ email }}
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- PERSONAL INFORMATION -->
+      <section class="account-section">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">
+              YOUR DETAILS
+            </p>
+
+            <h2>
+              Personal Information
+            </h2>
+          </div>
+        </div>
+
+
+        <div class="info-card">
+
+          <div class="info-row">
+            <div class="info-icon">
+              🎂
+            </div>
+
+            <div class="info-copy">
+              <span>Date of birth</span>
+              <strong>
+                {{ display(profile?.dob) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row">
+            <div class="info-icon">
+              ◇
+            </div>
+
+            <div class="info-copy">
+              <span>Sex</span>
+              <strong>
+                {{ display(profile?.sex) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row">
+            <div class="info-icon">
+              ↕
+            </div>
+
+            <div class="info-copy">
+              <span>Height</span>
+              <strong>
+                {{ height }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row">
+            <div class="info-icon">
+              ⚖
+            </div>
+
+            <div class="info-copy">
+              <span>Weight</span>
+              <strong>
+                {{ weight }}
+              </strong>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- GOALS -->
+      <section class="account-section">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">
+              DIRECTION
+            </p>
+
+            <h2>
+              Goals
+            </h2>
+          </div>
+        </div>
+
+
+        <div class="info-card">
+
+          <div class="info-row">
+            <div class="info-icon">
+              ◎
+            </div>
+
+            <div class="info-copy">
+              <span>Primary goal</span>
+              <strong>
+                {{ display(profile?.primary_goal) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row">
+            <div class="info-icon">
+              ↗
+            </div>
+
+            <div class="info-copy">
+              <span>Target weight</span>
+              <strong>
+                {{ targetWeight }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row multiline-row">
+            <div class="info-icon">
+              ✓
+            </div>
+
+            <div class="info-copy">
+              <span>Goal description</span>
+              <strong>
+                {{ display(profile?.goal_description) }}
+              </strong>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- TRAINING -->
+      <section class="account-section">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">
+              FITNESS
+            </p>
+
+            <h2>
+              Training
+            </h2>
+          </div>
+        </div>
+
+
+        <div class="info-card">
+
+          <div class="info-row">
+            <div class="info-icon">
+              ⚡
+            </div>
+
+            <div class="info-copy">
+              <span>Experience</span>
+              <strong>
+                {{ display(profile?.experience) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row">
+            <div class="info-icon">
+              ◫
+            </div>
+
+            <div class="info-copy">
+              <span>Training days</span>
+              <strong>
+                {{ display(profile?.training_days) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row">
+            <div class="info-icon">
+              ◷
+            </div>
+
+            <div class="info-copy">
+              <span>Preferred time</span>
+              <strong>
+                {{ display(profile?.preferred_time) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row">
+            <div class="info-icon">
+              ⏱
+            </div>
+
+            <div class="info-copy">
+              <span>Available training time</span>
+              <strong>
+                {{ display(profile?.available_training_time) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row multiline-row">
+            <div class="info-icon">
+              +
+            </div>
+
+            <div class="info-copy">
+              <span>Preferred exercises</span>
+              <strong>
+                {{ display(profile?.preferred_exercises) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row multiline-row">
+            <div class="info-icon">
+              !
+            </div>
+
+            <div class="info-copy">
+              <span>Limitations</span>
+              <strong>
+                {{ display(profile?.limitations) }}
+              </strong>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- LIFESTYLE -->
+      <section class="account-section">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">
+              DAILY ROUTINE
+            </p>
+
+            <h2>
+              Lifestyle
+            </h2>
+          </div>
+        </div>
+
+
+        <div class="info-card">
+
+          <div class="info-row">
+            <div class="info-icon">
+              ☀
+            </div>
+
+            <div class="info-copy">
+              <span>Wake time</span>
+              <strong>
+                {{ display(profile?.wake_time) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row">
+            <div class="info-icon">
+              ☾
+            </div>
+
+            <div class="info-copy">
+              <span>Sleep time</span>
+              <strong>
+                {{ display(profile?.sleep_time) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row multiline-row">
+            <div class="info-icon">
+              ◈
+            </div>
+
+            <div class="info-copy">
+              <span>Work schedule</span>
+              <strong>
+                {{ display(profile?.work_schedule) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row multiline-row">
+            <div class="info-icon">
+              ↯
+            </div>
+
+            <div class="info-copy">
+              <span>Daily activity</span>
+              <strong>
+                {{ display(profile?.daily_activity) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row multiline-row">
+            <div class="info-icon">
+              ↔
+            </div>
+
+            <div class="info-copy">
+              <span>Commute</span>
+              <strong>
+                {{ display(profile?.commute) }}
+              </strong>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- NUTRITION -->
+      <section class="account-section">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">
+              FOOD & DIET
+            </p>
+
+            <h2>
+              Nutrition
+            </h2>
+          </div>
+        </div>
+
+
+        <div class="info-card">
+
+          <div class="info-row">
+            <div class="info-icon">
+              ◉
+            </div>
+
+            <div class="info-copy">
+              <span>Meals per day</span>
+              <strong>
+                {{ display(profile?.meals_per_day) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row multiline-row">
+            <div class="info-icon">
+              ♡
+            </div>
+
+            <div class="info-copy">
+              <span>Favorite foods</span>
+              <strong>
+                {{ display(profile?.favorite_foods) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row multiline-row">
+            <div class="info-icon">
+              ◇
+            </div>
+
+            <div class="info-copy">
+              <span>Dietary preferences</span>
+              <strong>
+                {{ display(profile?.dietary_preferences) }}
+              </strong>
+            </div>
+          </div>
+
+
+          <div class="divider"></div>
+
+
+          <div class="info-row">
+            <div class="info-icon">
+              ⌂
+            </div>
+
+            <div class="info-copy">
+              <span>Eating out</span>
+              <strong>
+                {{ display(profile?.eating_out_frequency) }}
+              </strong>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PROFILE DESCRIPTION -->
+      <section class="account-section">
+
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">
+              YOUR JOURNEY
+            </p>
+
+            <h2>
+              About You
+            </h2>
+          </div>
+        </div>
+
+
+        <div class="description-card">
+
+          <div class="description-block">
+            <span>Current description</span>
+
+            <p>
+              {{ display(profile?.current_description) }}
+            </p>
+          </div>
+
+
+          <div class="description-divider"></div>
+
+
+          <div class="description-block">
+            <span>Target description</span>
+
+            <p>
+              {{ display(profile?.target_description) }}
+            </p>
+          </div>
+
+
+          <div class="description-divider"></div>
+
+
+          <div class="description-block">
+            <span>What inspires you</span>
+
+            <p>
+              {{ display(profile?.inspiration_description) }}
+            </p>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      @if (profile) {
+        <p class="profile-version">
+          Profile version {{ profile.version }}
+        </p>
+      }
+
+    </main>
+
+  }
+
+</div>

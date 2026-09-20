@@ -45,7 +45,51 @@ export interface SignupResponse {
   user: UserPublic;
 }
 
+/* =========================================================
+   PROFILE
+========================================================= */
 
+export interface UserProfile {
+  dob: string | null;
+  height: string | null;
+  weight: string | null;
+  sex: string | null;
+
+  wake_time: string | null;
+  sleep_time: string | null;
+  work_schedule: string | null;
+  daily_activity: string | null;
+  commute: string | null;
+  available_training_time: string | null;
+
+  experience: string | null;
+  training_days: string | null;
+  preferred_time: string | null;
+  preferred_exercises: string | null;
+  disliked_exercises: string | null;
+  limitations: string | null;
+
+  typical_foods: string | null;
+  meals_per_day: string | null;
+  eating_out_frequency: string | null;
+  favorite_foods: string | null;
+  favorite_snacks: string | null;
+  dietary_preferences: string | null;
+  cooking_constraints: string | null;
+
+  primary_goal: string | null;
+  target_weight: string | null;
+  goal_description: string | null;
+  lifestyle_change_tolerance: string | null;
+
+  current_description: string | null;
+  target_description: string | null;
+  target_characteristics: string | null;
+  inspiration_description: string | null;
+
+  version: number;
+  created_at: string;
+}
 /* =========================================================
    ROUTINES
 ========================================================= */
@@ -231,7 +275,27 @@ export class LiftlogApiService {
       );
 
   }
+    /* =====================================================
+     PROFILE
+  ===================================================== */
 
+  getProfile(
+    token: string,
+  ):
+    Observable<UserProfile> {
+
+    return this.http
+      .get<UserProfile>(
+        `${this.apiUrl}/profile`,
+        {
+          headers:
+            this.authHeaders(
+              token,
+            ),
+        },
+      );
+
+  }
 
   /* =====================================================
      ROUTINES
