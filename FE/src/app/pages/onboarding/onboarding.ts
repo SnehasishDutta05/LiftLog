@@ -94,77 +94,40 @@ export class Onboarding implements OnDestroy {
   messages: ChatMessage[] = [
     {
       sender: 'bot',
-      text: "Hey! I'm PulseOS 👋",
+      text:
+        "Hey! Let's start with the basics.",
     },
     {
       sender: 'bot',
       text:
-        "Before we start, I'd like to get to know you a little better.",
-    },
-    {
-      sender: 'bot',
-      text:
-        "This will help me build a fitness journey that's right for you.",
-    },
-    {
-      sender: 'bot',
-      text:
-        "Let's start with your date of birth.",
+        'How tall are you?',
     },
   ];
 
 
   questions: Question[] = [
     {
-      key: 'dob',
-      text: "What's your date of birth?",
-      placeholder: 'DD/MM/YYYY',
-      type: 'dob',
-    },
-    {
-      key: 'gender',
-      text: 'How do you identify?',
-      type: 'choice',
-      options: [
-        'Male',
-        'Female',
-        'Prefer not to say',
-      ],
-    },
-    {
       key: 'height',
-      text: "What's your height?",
-      placeholder: 'Enter your height in cm',
-      type: 'number',
+      text: 'How tall are you?',
+      placeholder:
+        'e.g. 172 cm or 5 feet 6 inches',
+      type: 'text',
     },
     {
       key: 'weight',
-      text: "What's your current weight?",
-      placeholder: 'Enter your weight in kg',
-      type: 'number',
-    },
-    {
-      key: 'fitnessLevel',
       text:
-        'How would you describe your current fitness level?',
-      type: 'choice',
-      options: [
-        'Beginner',
-        'Intermediate',
-        'Advanced',
-      ],
+        'And roughly how much do you weigh?',
+      placeholder:
+        'e.g. 70 kg',
+      type: 'text',
     },
     {
-      key: 'goal',
-      text: "What's your main fitness goal?",
-      type: 'choice',
-      options: [
-        'Build strength',
-        'Lose weight',
-        'Improve endurance',
-        'Build muscle',
-        'Stay healthy',
-      ],
+      key: 'dob',
+      text:
+        'Please tell me your date of birth?',
+      placeholder:
+        'DD/MM/YYYY',
+      type: 'dob',
     },
   ];
 
@@ -215,12 +178,21 @@ export class Onboarding implements OnDestroy {
   }
 
 
+  /*
+   * Height and weight are now free-text inputs.
+   *
+   * Examples:
+   * 172 cm
+   * 5 feet 6 inches
+   * 70 kg
+   *
+   * We only restrict DOB input.
+   */
   blockNonNumeric(
     event: KeyboardEvent,
   ): void {
 
     if (
-      this.currentQuestion.type !== 'number' &&
       this.currentQuestion.type !== 'dob'
     ) {
       return;
@@ -257,22 +229,12 @@ export class Onboarding implements OnDestroy {
   }
 
 
+  /*
+   * Height and weight are deliberately NOT sanitized.
+   *
+   * The user's text is preserved exactly.
+   */
   sanitizeInput(): void {
-
-    if (
-      this.currentQuestion.type === 'number'
-    ) {
-
-      this.currentInput =
-        this.currentInput.replace(
-          /[^0-9]/g,
-          '',
-        );
-
-      return;
-
-    }
-
 
     if (
       this.currentQuestion.type === 'dob'
@@ -346,22 +308,11 @@ export class Onboarding implements OnDestroy {
     }
 
 
-    let value =
-      answer ??
-      this.currentInput.trim();
-
-
-    if (
-      this.currentQuestion.type === 'number'
-    ) {
-
-      value =
-        value.replace(
-          /[^0-9]/g,
-          '',
-        );
-
-    }
+    const value =
+      (
+        answer ??
+        this.currentInput
+      ).trim();
 
 
     if (
@@ -525,12 +476,10 @@ export class Onboarding implements OnDestroy {
 
 
     /*
-     * IMPORTANT:
+     * Only height, weight and DOB are collected.
      *
-     * The current backend profile schema expects
-     * these values as strings.
-     *
-     * Do NOT convert height / weight to Number().
+     * All remaining profile fields are intentionally
+     * sent as empty strings.
      */
     const profile:
       ProfileRequest = {
@@ -546,8 +495,7 @@ export class Onboarding implements OnDestroy {
       weight:
         this.answers['weight'] ?? '',
 
-      sex:
-        this.answers['gender'] ?? '',
+      sex: '',
 
       wake_time: '',
 
@@ -561,10 +509,7 @@ export class Onboarding implements OnDestroy {
 
       available_training_time: '',
 
-      experience:
-        this.answers[
-          'fitnessLevel'
-        ] ?? '',
+      experience: '',
 
       training_days: '',
 
@@ -590,8 +535,7 @@ export class Onboarding implements OnDestroy {
 
       cooking_constraints: '',
 
-      primary_goal:
-        this.answers['goal'] ?? '',
+      primary_goal: '',
 
     };
 
@@ -601,17 +545,24 @@ export class Onboarding implements OnDestroy {
       profile,
     );
 
+
     const token =
       localStorage.getItem(
         'pulseos_access_token',
       );
 
-    const headers: Record<string, string> = {};
+
+    const headers:
+      Record<string, string> = {};
+
 
     if (token) {
+
       headers['Authorization'] =
         `Bearer ${token}`;
+
     }
+
 
     this.http
       .post<ProfileResponse>(
@@ -659,12 +610,6 @@ export class Onboarding implements OnDestroy {
           );
 
 
-          /*
-           * Print FastAPI validation details.
-           *
-           * This makes future 422 problems much
-           * easier to identify.
-           */
           if (
             error.status === 422
           ) {
@@ -673,6 +618,7 @@ export class Onboarding implements OnDestroy {
               'Profile validation details:',
               error.error?.detail,
             );
+
 
             this.profileError =
               'Some profile information was not accepted. Please check the console for validation details.';
