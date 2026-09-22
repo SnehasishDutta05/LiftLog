@@ -394,3 +394,219 @@
   }
 
 }
+/* =====================================================
+   PROFILE EDITING
+===================================================== */
+
+.value-area {
+  display: flex;
+  min-width: 0;
+  max-width: 64%;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+
+.value-area strong {
+  max-width: none;
+}
+
+
+.edit-button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: #ecf9f2;
+  color: #207455;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+.edit-button:hover {
+  background: #dff7eb;
+}
+
+
+.edit-area {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+
+.edit-input {
+  width: 100%;
+  min-width: 0;
+  max-width: 150px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #bcd9cc;
+  border-radius: 10px;
+  outline: none;
+  background: #ffffff;
+  color: #10231d;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+.edit-input:focus,
+.edit-textarea:focus {
+  border-color: #56ad82;
+  box-shadow:
+    0 0 0 3px
+    rgba(86, 173, 130, 0.12);
+}
+
+
+.save-button,
+.cancel-button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+
+.save-button {
+  background: #dff7eb;
+  color: #176746;
+}
+
+
+.cancel-button {
+  background: #f2f4f3;
+  color: #75847f;
+}
+
+
+.save-button:disabled,
+.cancel-button:disabled,
+.edit-input:disabled,
+.edit-textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+
+.save-error {
+  padding: 11px 13px;
+  margin-top: 14px;
+  border: 1px solid #f0caca;
+  border-radius: 12px;
+  background: #fff5f5;
+  color: #b43d3d;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   DESCRIPTION EDITING
+===================================================== */
+
+.description-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+
+.description-title span {
+  margin-bottom: 0;
+}
+
+
+.description-block p {
+  margin-top: 7px;
+}
+
+
+.edit-textarea {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  margin-top: 10px;
+  border: 1px solid #bcd9cc;
+  border-radius: 12px;
+  outline: none;
+  background: #ffffff;
+  color: #10231d;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+.description-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+
+.save-text-button,
+.cancel-text-button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+.save-text-button {
+  background: #154b3b;
+  color: #ffffff;
+}
+
+
+.cancel-text-button {
+  background: #edf2f0;
+  color: #52645d;
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 380px) {
+
+  .value-area {
+    max-width: 60%;
+  }
+
+  .edit-input {
+    max-width: 110px;
+  }
+
+}

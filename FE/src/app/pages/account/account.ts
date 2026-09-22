@@ -5,6 +5,10 @@ import {
 } from '@angular/core';
 
 import {
+  FormsModule,
+} from '@angular/forms';
+
+import {
   Router,
 } from '@angular/router';
 
@@ -15,20 +19,52 @@ import {
 } from '../../services/liftlog-api.service';
 
 
+type EditableProfileField =
+  Exclude<
+    keyof UserProfile,
+    'version' | 'created_at'
+  >;
+
+
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [],
-  templateUrl: './account.html',
-  styleUrl: './account.css',
+
+  imports: [
+    FormsModule,
+  ],
+
+  templateUrl:
+    './account.html',
+
+  styleUrl:
+    './account.css',
 })
 export class Account implements OnInit {
 
   user: UserPublic | null = null;
+
   profile: UserProfile | null = null;
 
+
   isLoading = true;
+
   errorMessage = '';
+
+
+  /*
+   * Only one field can be edited at a time.
+   */
+  editingField:
+    EditableProfileField | null =
+      null;
+
+
+  editValue = '';
+
+  isSaving = false;
+
+  saveError = '';
 
 
   constructor(
@@ -44,61 +80,329 @@ export class Account implements OnInit {
 
 
   ngOnInit(): void {
+
     this.loadAccount();
+
   }
 
+
+  /* =====================================================
+     LOAD ACCOUNT
+  ===================================================== */
 
   private loadAccount(): void {
 
-  const token =
-    localStorage.getItem(
-      'pulseos_access_token',
-    );
+    const token =
+      localStorage.getItem(
+        'pulseos_access_token',
+      );
 
-  if (!token) {
-    this.router.navigate(['/login']);
-    return;
+
+    if (!token) {
+
+      this.router.navigate([
+        '/login',
+      ]);
+
+      return;
+
+    }
+
+
+    this.isLoading = true;
+
+    this.errorMessage = '';
+
+
+    this.api
+      .getProfile(token)
+      .subscribe({
+
+        next: profile => {
+
+          this.profile =
+            profile;
+
+          this.isLoading =
+            false;
+
+
+          this.changeDetector
+            .detectChanges();
+
+        },
+
+
+        error: error => {
+
+          console.error(
+            'Unable to load profile:',
+            error,
+          );
+
+
+          this.isLoading =
+            false;
+
+
+          this.errorMessage =
+            'Could not load your profile.';
+
+
+          this.changeDetector
+            .detectChanges();
+
+        },
+
+      });
+
   }
 
-  this.isLoading = true;
-  this.errorMessage = '';
 
-  this.api
-    .getProfile(token)
-    .subscribe({
+  /* =====================================================
+     START EDITING
+  ===================================================== */
 
-      next: profile => {
+  startEdit(
+    field: EditableProfileField,
+  ): void {
 
-        this.profile = profile;
-        this.isLoading = false;
+    if (
+      !this.profile ||
+      this.isSaving
+    ) {
+      return;
+    }
 
-        this.changeDetector
-          .detectChanges();
-      },
 
-      error: error => {
+    this.editingField =
+      field;
 
-        console.error(
-          'Unable to load profile:',
-          error,
-        );
 
-        this.isLoading = false;
+    const currentValue =
+      this.profile[field];
 
-        this.errorMessage =
-          'Could not load your profile.';
 
-        this.changeDetector
-          .detectChanges();
-      },
+    this.editValue =
+      typeof currentValue === 'string'
+        ? currentValue
+        : '';
 
-    });
 
-}
+    this.saveError = '';
+
+  }
+
+
+  /* =====================================================
+     CANCEL EDITING
+  ===================================================== */
+
+  cancelEdit(): void {
+
+    if (this.isSaving) {
+      return;
+    }
+
+
+    this.editingField =
+      null;
+
+    this.editValue = '';
+
+    this.saveError = '';
+
+  }
+
+
+  /* =====================================================
+     SAVE FIELD
+  ===================================================== */
+
+  saveField(
+    field: EditableProfileField,
+  ): void {
+
+    if (
+      !this.profile ||
+      this.isSaving
+    ) {
+      return;
+    }
+
+
+    const token =
+      localStorage.getItem(
+        'pulseos_access_token',
+      );
+
+
+    if (!token) {
+
+      this.router.navigate([
+        '/login',
+      ]);
+
+      return;
+
+    }
+
+
+    /*
+     * Make a complete copy of the profile.
+     *
+     * Only the selected field is changed.
+     */
+    const updatedProfile:
+      UserProfile = {
+
+        ...this.profile,
+
+        [field]:
+          this.editValue.trim(),
+
+      };
+
+
+    this.isSaving = true;
+
+    this.saveError = '';
+
+
+    this.api
+      .updateProfile(
+        token,
+        updatedProfile,
+      )
+      .subscribe({
+
+        next: () => {
+
+          /*
+           * POST only returns:
+           *
+           * {
+           *   message: "..."
+           * }
+           *
+           * Therefore fetch the backend-confirmed
+           * latest profile after saving.
+           */
+          this.api
+            .getProfile(token)
+            .subscribe({
+
+              next: profile => {
+
+                this.profile =
+                  profile;
+
+
+                this.editingField =
+                  null;
+
+
+                this.editValue =
+                  '';
+
+
+                this.isSaving =
+                  false;
+
+
+                this.changeDetector
+                  .detectChanges();
+
+              },
+
+
+              error: error => {
+
+                console.error(
+                  'Profile saved but reload failed:',
+                  error,
+                );
+
+
+                /*
+                 * The POST succeeded, so update the
+                 * visible profile locally even if the
+                 * follow-up GET happens to fail.
+                 */
+                this.profile =
+                  updatedProfile;
+
+
+                this.editingField =
+                  null;
+
+
+                this.editValue =
+                  '';
+
+
+                this.isSaving =
+                  false;
+
+
+                this.changeDetector
+                  .detectChanges();
+
+              },
+
+            });
+
+        },
+
+
+        error: error => {
+
+          console.error(
+            'Unable to update profile:',
+            error,
+          );
+
+
+          this.isSaving =
+            false;
+
+
+          this.saveError =
+            'Could not save this change. Please try again.';
+
+
+          this.changeDetector
+            .detectChanges();
+
+        },
+
+      });
+
+  }
+
+
+  /* =====================================================
+     HELPERS
+  ===================================================== */
+
+  isEditing(
+    field: EditableProfileField,
+  ): boolean {
+
+    return (
+      this.editingField ===
+      field
+    );
+
+  }
 
 
   goBack(): void {
-    this.router.navigate(['/profile']);
+
+    this.router.navigate([
+      '/profile',
+    ]);
+
   }
 
 
@@ -112,14 +416,26 @@ export class Account implements OnInit {
     const cleaned =
       value?.trim();
 
-    return cleaned || 'Not set';
+
+    return (
+      cleaned ||
+      'Not set'
+    );
+
   }
 
+
+  /* =====================================================
+     USER
+  ===================================================== */
 
   get initials(): string {
 
     const name =
-      this.user?.full_name?.trim();
+      this.user
+        ?.full_name
+        ?.trim();
+
 
     if (name) {
 
@@ -128,77 +444,107 @@ export class Account implements OnInit {
           .split(/\s+/)
           .filter(Boolean);
 
-      if (words.length >= 2) {
+
+      if (
+        words.length >= 2
+      ) {
+
         return (
           words[0][0] +
-          words[words.length - 1][0]
+          words[
+            words.length - 1
+          ][0]
         ).toUpperCase();
+
       }
+
 
       return name
         .slice(0, 2)
         .toUpperCase();
+
     }
 
+
     const email =
-      this.user?.email?.trim();
+      this.user
+        ?.email
+        ?.trim();
+
 
     if (email) {
+
       return email
         .slice(0, 2)
         .toUpperCase();
+
     }
 
+
     return 'P';
+
   }
 
 
   get accountName(): string {
 
     const name =
-      this.user?.full_name?.trim();
+      this.user
+        ?.full_name
+        ?.trim();
 
-    return name || 'PulseOS User';
+
+    return (
+      name ||
+      'PulseOS User'
+    );
+
   }
 
 
   get email(): string {
-    return this.user?.email || 'Not set';
+
+    return (
+      this.user?.email ||
+      'Not set'
+    );
+
   }
 
 
+  /* =====================================================
+     IMPORTANT
+
+     Do NOT append units here.
+
+     These values are strings controlled by the backend.
+  ===================================================== */
+
   get height(): string {
 
-    const value =
-      this.profile?.height?.trim();
+    return this.display(
+      this.profile?.height,
+    );
 
-    return value
-      ? `${value} ft`
-      : 'Not set';
   }
 
 
   get weight(): string {
 
-    const value =
-      this.profile?.weight?.trim();
+    return this.display(
+      this.profile?.weight,
+    );
 
-    return value
-      ? `${value} kg`
-      : 'Not set';
   }
 
 
   get targetWeight(): string {
 
-    const value =
+    return this.display(
       this.profile
-        ?.target_weight
-        ?.trim();
+        ?.target_weight,
+    );
 
-    return value
-      ? `${value} kg`
-      : 'Not set';
   }
 
 }

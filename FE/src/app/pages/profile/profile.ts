@@ -28,6 +28,12 @@ interface RecentWorkoutView {
 }
 
 
+interface WeightHistoryPoint {
+  date: string;
+  weight: number;
+}
+
+
 @Component({
   selector: 'app-profile',
 
@@ -47,6 +53,608 @@ export class Profile
 
   private readonly WORKOUTS_CHANGED_KEY =
     'pulseos_workouts_changed';
+
+
+  /* =====================================================
+     WEIGHT TRACKER
+
+     There is currently no weight-history endpoint in the
+     supplied API service, so the tracker records genuine
+     profile-weight snapshots locally as the profile changes.
+     No sample/fake measurements are created.
+  ===================================================== */
+
+  private loadWeightTracker(): void {
+
+    const token =
+      localStorage.getItem(
+        'pulseos_access_token',
+      );
+
+
+    if (!token) {
+      return;
+    }
+
+
+    this.liftlogApi
+      .getProfile(
+        token,
+      )
+      .subscribe({
+
+        next: profile => {
+
+          const weight =
+            this.parseWeight(
+              profile.weight,
+            );
+
+
+          if (weight === null) {
+            return;
+          }
+
+
+          this.currentWeight =
+            weight;
+
+
+          this.recordWeightSnapshot(
+            weight,
+          );
+
+
+          this.buildWeightChart();
+
+
+          this.changeDetector
+            .detectChanges();
+
+        },
+
+        error: error => {
+
+          console.error(
+            'Unable to load weight tracker:',
+            error,
+          );
+
+        },
+
+      });
+
+  }
+
+
+  private parseWeight(
+    value:
+      string |
+      null |
+      undefined,
+  ): number | null {
+
+    if (!value) {
+      return null;
+    }
+
+
+    const parsed =
+      Number.parseFloat(
+        value,
+      );
+
+
+    return Number.isFinite(
+      parsed,
+    )
+      ? parsed
+      : null;
+
+  }
+
+
+  private recordWeightSnapshot(
+    weight: number,
+  ): void {
+
+    const storageKey =
+      this.getWeightStorageKey();
+
+
+    let history:
+      WeightHistoryPoint[] = [];
+
+
+    try {
+
+      const saved =
+        localStorage.getItem(
+          storageKey,
+        );
+
+
+      if (saved) {
+
+        const parsed =
+          JSON.parse(
+            saved,
+          );
+
+
+        if (Array.isArray(parsed)) {
+
+          history =
+            parsed
+              .filter(
+                point =>
+                  point &&
+                  typeof point.date ===
+                    'string' &&
+                  Number.isFinite(
+                    Number(
+                      point.weight,
+                    ),
+                  ),
+              )
+              .map(
+                point => ({
+                  date:
+                    point.date,
+                  weight:
+                    Number(
+                      point.weight,
+                    ),
+                }));
+
+        }
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        'Unable to read saved weight history:',
+        error,
+      );
+
+    }
+
+
+    const today =
+      this.toLocalDateKey(
+        new Date(),
+      );
+
+
+    const existingTodayIndex =
+      history.findIndex(
+        point =>
+          point.date ===
+          today,
+      );
+
+
+    if (
+      existingTodayIndex >=
+      0
+    ) {
+
+      history[existingTodayIndex] = {
+        date:
+          today,
+        weight,
+      };
+
+    } else {
+
+      history.push({
+        date:
+          today,
+        weight,
+      });
+
+    }
+
+
+    history.sort(
+      (
+        first,
+        second,
+      ) =>
+        first.date.localeCompare(
+          second.date,
+        ),
+    );
+
+
+    const cutoff =
+      new Date();
+
+    cutoff.setDate(
+      cutoff.getDate() -
+      365,
+    );
+
+
+    history =
+      history.filter(
+        point => {
+
+          const date =
+            new Date(
+              `${point.date}T00:00:00`,
+            );
+
+
+          return (
+            !Number.isNaN(
+              date.getTime(),
+            ) &&
+            date >= cutoff
+          );
+
+        },
+      );
+
+
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify(
+        history,
+      ),
+    );
+
+
+    const threeMonthsAgo =
+      new Date();
+
+    threeMonthsAgo.setMonth(
+      threeMonthsAgo.getMonth() -
+      3,
+    );
+
+
+    this.weightHistory =
+      history.filter(
+        point =>
+          new Date(
+            `${point.date}T00:00:00`,
+          ) >= threeMonthsAgo,
+      );
+
+  }
+
+
+  private getWeightStorageKey(): string {
+
+    const identity =
+      this.email
+        .trim()
+        .toLowerCase() ||
+      'user';
+
+
+    return (
+      `${this.WEIGHT_HISTORY_KEY}_${identity}`
+    );
+
+  }
+
+
+  private buildWeightChart(): void {
+
+    const history =
+      this.weightHistory;
+
+
+    if (
+      history.length ===
+      0
+    ) {
+
+      this.weightChartPoints =
+        '';
+
+      this.weightChartAreaPoints =
+        '';
+
+      this.weightChartLabels =
+        [];
+
+      return;
+
+    }
+
+
+    const weights =
+      history.map(
+        point =>
+          point.weight,
+      );
+
+
+    const rawMin =
+      Math.min(
+        ...weights,
+      );
+
+    const rawMax =
+      Math.max(
+        ...weights,
+      );
+
+
+    this.weightChartMin =
+      Math.floor(
+        rawMin -
+        2,
+      );
+
+    this.weightChartMax =
+      Math.ceil(
+        rawMax +
+        2,
+      );
+
+
+    if (
+      this.weightChartMax ===
+      this.weightChartMin
+    ) {
+      this.weightChartMax +=
+        1;
+    }
+
+
+    const left =
+      12;
+
+    const right =
+      308;
+
+    const top =
+      16;
+
+    const bottom =
+      142;
+
+    const width =
+      right - left;
+
+    const height =
+      bottom - top;
+
+    const range =
+      this.weightChartMax -
+      this.weightChartMin;
+
+
+    const points =
+      history.map(
+        (
+          point,
+          index,
+        ) => {
+
+          const x =
+            history.length === 1
+              ? left +
+                width / 2
+              : left +
+                (
+                  index /
+                  (
+                    history.length -
+                    1
+                  )
+                ) *
+                width;
+
+
+          const y =
+            bottom -
+            (
+              (
+                point.weight -
+                this.weightChartMin
+              ) /
+              range
+            ) *
+            height;
+
+
+          return {
+            x,
+            y,
+          };
+
+        },
+      );
+
+
+    this.weightChartPoints =
+      points
+        .map(
+          point =>
+            `${point.x.toFixed(1)},${point.y.toFixed(1)}`,
+        )
+        .join(' ');
+
+
+    this.weightChartAreaPoints =
+      [
+        `${points[0].x.toFixed(1)},${bottom}`,
+        ...points.map(
+          point =>
+            `${point.x.toFixed(1)},${point.y.toFixed(1)}`,
+        ),
+        `${points[points.length - 1].x.toFixed(1)},${bottom}`,
+      ].join(' ');
+
+
+    const labelIndexes =
+      history.length <= 3
+        ? history.map(
+            (_, index) =>
+              index,
+          )
+        : [
+            0,
+            Math.floor(
+              (
+                history.length -
+                1
+              ) /
+              2,
+            ),
+            history.length -
+              1,
+          ];
+
+
+    this.weightChartLabels =
+      labelIndexes.map(
+        index => ({
+          x:
+            points[index].x,
+          label:
+            this.formatWeightChartDate(
+              history[index].date,
+            ),
+        }),
+      );
+
+  }
+
+
+  private formatWeightChartDate(
+    value: string,
+  ): string {
+
+    const date =
+      new Date(
+        `${value}T00:00:00`,
+      );
+
+
+    if (
+      Number.isNaN(
+        date.getTime(),
+      )
+    ) {
+      return '';
+    }
+
+
+    return new Intl.DateTimeFormat(
+      'en',
+      {
+        month:
+          'short',
+        day:
+          'numeric',
+      },
+    ).format(
+      date,
+    );
+
+  }
+
+
+  get firstTrackedWeight():
+    number | null {
+
+    return (
+      this.weightHistory[0]
+        ?.weight ??
+      null
+    );
+
+  }
+
+
+  get latestTrackedWeight():
+    number | null {
+
+    return (
+      this.weightHistory[
+        this.weightHistory.length -
+        1
+      ]?.weight ??
+      this.currentWeight
+    );
+
+  }
+
+
+  get latestWeightPoint(): {
+    x: number;
+    y: number;
+  } | null {
+
+    if (
+      !this.weightChartPoints
+    ) {
+      return null;
+    }
+
+
+    const lastPoint =
+      this.weightChartPoints
+        .split(' ')
+        .at(-1);
+
+
+    if (!lastPoint) {
+      return null;
+    }
+
+
+    const [x, y] =
+      lastPoint
+        .split(',')
+        .map(Number);
+
+
+    if (
+      !Number.isFinite(x) ||
+      !Number.isFinite(y)
+    ) {
+      return null;
+    }
+
+
+    return {
+      x,
+      y,
+    };
+
+  }
+
+
+  formatWeight(
+    value:
+      number |
+      null,
+  ): string {
+
+    if (value === null) {
+      return '—';
+    }
+
+
+    return new Intl.NumberFormat(
+      'en-IN',
+      {
+        maximumFractionDigits:
+          1,
+      },
+    ).format(
+      value,
+    );
+
+  }
 
 
   /* =====================================================
@@ -105,6 +713,35 @@ export class Profile
 
 
   /* =====================================================
+     WEIGHT TRACKER
+  ===================================================== */
+
+  private readonly WEIGHT_HISTORY_KEY =
+    'pulseos_weight_history';
+
+  weightHistory:
+    WeightHistoryPoint[] = [];
+
+  currentWeight:
+    number | null = null;
+
+  weightChartPoints =
+    '';
+
+  weightChartAreaPoints =
+    '';
+
+  weightChartLabels:
+    { x: number; label: string }[] = [];
+
+  weightChartMin =
+    0;
+
+  weightChartMax =
+    0;
+
+
+  /* =====================================================
      CONSTRUCTOR
   ===================================================== */
 
@@ -129,6 +766,8 @@ export class Profile
     this.loadUserData();
 
     this.loadWorkoutProgress();
+
+    this.loadWeightTracker();
 
   }
 

@@ -350,6 +350,232 @@
 
       </section>
 
+
+      <!-- ==================================================
+           PROGRESS OVER TIME
+      =================================================== -->
+
+      <section class="profile-section weight-tracker-section">
+
+        <div class="weight-tracker-heading">
+
+          <div>
+            <span class="weight-tracker-kicker">
+              YOUR JOURNEY
+            </span>
+
+            <h2>
+              Progress Over Time
+            </h2>
+          </div>
+
+
+          <span class="weight-range-pill">
+            Last 3 Months
+          </span>
+
+        </div>
+
+
+        <article class="weight-chart-card">
+
+          <div class="weight-chart-top">
+
+            <div class="weight-chart-metric">
+              <span class="weight-chart-icon">
+                ⚖️
+              </span>
+
+              <span>
+                Weight
+              </span>
+            </div>
+
+
+            <div class="weight-chart-current">
+              <strong>
+                {{ formatWeight(latestTrackedWeight) }} kg
+              </strong>
+
+              <span>
+                CURRENT
+              </span>
+            </div>
+
+          </div>
+
+
+          @if (weightHistory.length === 0) {
+
+            <div class="weight-chart-empty">
+
+              <div class="weight-chart-empty-icon">
+                ↗
+              </div>
+
+              <strong>
+                Your weight journey starts here
+              </strong>
+
+              <span>
+                Add your weight in your account details to begin tracking progress.
+              </span>
+
+            </div>
+
+          } @else {
+
+            <div class="weight-chart-wrap">
+
+              <div class="weight-axis-labels">
+                <span>
+                  {{ weightChartMax }}
+                </span>
+
+                <span>
+                  {{ ((weightChartMax + weightChartMin) / 2).toFixed(0) }}
+                </span>
+
+                <span>
+                  {{ weightChartMin }}
+                </span>
+              </div>
+
+
+              <svg
+                class="weight-chart"
+                viewBox="0 0 320 170"
+                role="img"
+                aria-label="Weight progress over the last three months"
+              >
+
+                <defs>
+                  <linearGradient
+                    id="weightAreaGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stop-color="#70d9a5"
+                      stop-opacity="0.28"
+                    />
+
+                    <stop
+                      offset="100%"
+                      stop-color="#70d9a5"
+                      stop-opacity="0.02"
+                    />
+                  </linearGradient>
+                </defs>
+
+
+                <line
+                  class="weight-grid-line"
+                  x1="12"
+                  y1="16"
+                  x2="308"
+                  y2="16"
+                />
+
+                <line
+                  class="weight-grid-line"
+                  x1="12"
+                  y1="79"
+                  x2="308"
+                  y2="79"
+                />
+
+                <line
+                  class="weight-grid-line"
+                  x1="12"
+                  y1="142"
+                  x2="308"
+                  y2="142"
+                />
+
+
+                <polygon
+                  class="weight-area"
+                  [attr.points]="weightChartAreaPoints"
+                />
+
+
+                <polyline
+                  class="weight-line"
+                  [attr.points]="weightChartPoints"
+                />
+
+
+                @if (latestWeightPoint; as point) {
+                  <circle
+                    class="weight-latest-halo"
+                    [attr.cx]="point.x"
+                    [attr.cy]="point.y"
+                    r="7"
+                  />
+
+                  <circle
+                    class="weight-latest-dot"
+                    [attr.cx]="point.x"
+                    [attr.cy]="point.y"
+                    r="3.5"
+                  />
+                }
+
+
+                @for (label of weightChartLabels; track label.label) {
+                  <text
+                    class="weight-date-label"
+                    [attr.x]="label.x"
+                    y="164"
+                    text-anchor="middle"
+                  >
+                    {{ label.label }}
+                  </text>
+                }
+
+              </svg>
+
+            </div>
+
+
+            <div class="weight-chart-footer">
+
+              <div>
+                <span>
+                  Started
+                </span>
+
+                <strong>
+                  {{ formatWeight(firstTrackedWeight) }} kg
+                </strong>
+              </div>
+
+
+              <div class="weight-chart-footer-divider"></div>
+
+
+              <div>
+                <span>
+                  Current
+                </span>
+
+                <strong>
+                  {{ formatWeight(latestTrackedWeight) }} kg
+                </strong>
+              </div>
+
+            </div>
+
+          }
+
+        </article>
+
+      </section>
+
     </div>
 
   </main>

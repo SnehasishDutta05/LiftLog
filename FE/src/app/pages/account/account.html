@@ -13,8 +13,13 @@
     </button>
 
     <div>
-      <p class="eyebrow">SETTINGS</p>
-      <h1>Account</h1>
+      <p class="eyebrow">
+        SETTINGS
+      </p>
+
+      <h1>
+        Account
+      </h1>
     </div>
 
   </header>
@@ -24,10 +29,17 @@
   @if (isLoading) {
 
     <main class="account-content">
+
       <div class="state-card">
+
         <div class="loader"></div>
-        <p>Loading your profile...</p>
+
+        <p>
+          Loading your profile...
+        </p>
+
       </div>
+
     </main>
 
   }
@@ -37,15 +49,23 @@
   @else if (errorMessage) {
 
     <main class="account-content">
-      <div class="state-card error-state">
-        <div class="state-icon">!</div>
 
-        <h2>Unable to load account</h2>
+      <div class="state-card error-state">
+
+        <div class="state-icon">
+          !
+        </div>
+
+        <h2>
+          Unable to load account
+        </h2>
 
         <p>
           {{ errorMessage }}
         </p>
+
       </div>
+
     </main>
 
   }
@@ -79,11 +99,22 @@
       </section>
 
 
+      @if (saveError) {
+
+        <div class="save-error">
+          {{ saveError }}
+        </div>
+
+      }
+
+
       <!-- PERSONAL INFORMATION -->
       <section class="account-section">
 
         <div class="section-heading">
+
           <div>
+
             <p class="section-kicker">
               YOUR DETAILS
             </p>
@@ -91,74 +122,300 @@
             <h2>
               Personal Information
             </h2>
+
           </div>
+
         </div>
 
 
         <div class="info-card">
 
+
+          <!-- DOB -->
           <div class="info-row">
+
             <div class="info-icon">
               🎂
             </div>
 
             <div class="info-copy">
-              <span>Date of birth</span>
-              <strong>
-                {{ display(profile?.dob) }}
-              </strong>
+
+              <span>
+                Date of birth
+              </span>
+
+              @if (isEditing('dob')) {
+
+                <div class="edit-area">
+
+                  <input
+                    class="edit-input"
+                    type="text"
+                    [(ngModel)]="editValue"
+                    [disabled]="isSaving"
+                  />
+
+                  <button
+                    type="button"
+                    class="save-button"
+                    aria-label="Save date of birth"
+                    [disabled]="isSaving"
+                    (click)="saveField('dob')"
+                  >
+                    ✓
+                  </button>
+
+                  <button
+                    type="button"
+                    class="cancel-button"
+                    aria-label="Cancel"
+                    [disabled]="isSaving"
+                    (click)="cancelEdit()"
+                  >
+                    ×
+                  </button>
+
+                </div>
+
+              } @else {
+
+                <div class="value-area">
+
+                  <strong>
+                    {{ display(profile?.dob) }}
+                  </strong>
+
+                  <button
+                    type="button"
+                    class="edit-button"
+                    aria-label="Edit date of birth"
+                    (click)="startEdit('dob')"
+                  >
+                    ✎
+                  </button>
+
+                </div>
+
+              }
+
             </div>
+
           </div>
 
 
           <div class="divider"></div>
 
 
+          <!-- SEX -->
           <div class="info-row">
+
             <div class="info-icon">
               ◇
             </div>
 
             <div class="info-copy">
-              <span>Sex</span>
-              <strong>
-                {{ display(profile?.sex) }}
-              </strong>
+
+              <span>
+                Sex
+              </span>
+
+              @if (isEditing('sex')) {
+
+                <div class="edit-area">
+
+                  <input
+                    class="edit-input"
+                    type="text"
+                    [(ngModel)]="editValue"
+                    [disabled]="isSaving"
+                  />
+
+                  <button
+                    type="button"
+                    class="save-button"
+                    [disabled]="isSaving"
+                    (click)="saveField('sex')"
+                  >
+                    ✓
+                  </button>
+
+                  <button
+                    type="button"
+                    class="cancel-button"
+                    [disabled]="isSaving"
+                    (click)="cancelEdit()"
+                  >
+                    ×
+                  </button>
+
+                </div>
+
+              } @else {
+
+                <div class="value-area">
+
+                  <strong>
+                    {{ display(profile?.sex) }}
+                  </strong>
+
+                  <button
+                    type="button"
+                    class="edit-button"
+                    (click)="startEdit('sex')"
+                  >
+                    ✎
+                  </button>
+
+                </div>
+
+              }
+
             </div>
+
           </div>
 
 
           <div class="divider"></div>
 
 
+          <!-- HEIGHT -->
           <div class="info-row">
+
             <div class="info-icon">
               ↕
             </div>
 
             <div class="info-copy">
-              <span>Height</span>
-              <strong>
-                {{ height }}
-              </strong>
+
+              <span>
+                Height
+              </span>
+
+              @if (isEditing('height')) {
+
+                <div class="edit-area">
+
+                  <input
+                    class="edit-input"
+                    type="text"
+                    [(ngModel)]="editValue"
+                    [disabled]="isSaving"
+                  />
+
+                  <button
+                    type="button"
+                    class="save-button"
+                    [disabled]="isSaving"
+                    (click)="saveField('height')"
+                  >
+                    ✓
+                  </button>
+
+                  <button
+                    type="button"
+                    class="cancel-button"
+                    [disabled]="isSaving"
+                    (click)="cancelEdit()"
+                  >
+                    ×
+                  </button>
+
+                </div>
+
+              } @else {
+
+                <div class="value-area">
+
+                  <strong>
+                    {{ height }}
+                  </strong>
+
+                  <button
+                    type="button"
+                    class="edit-button"
+                    (click)="startEdit('height')"
+                  >
+                    ✎
+                  </button>
+
+                </div>
+
+              }
+
             </div>
+
           </div>
 
 
           <div class="divider"></div>
 
 
+          <!-- WEIGHT -->
           <div class="info-row">
+
             <div class="info-icon">
               ⚖
             </div>
 
             <div class="info-copy">
-              <span>Weight</span>
-              <strong>
-                {{ weight }}
-              </strong>
+
+              <span>
+                Weight
+              </span>
+
+              @if (isEditing('weight')) {
+
+                <div class="edit-area">
+
+                  <input
+                    class="edit-input"
+                    type="text"
+                    [(ngModel)]="editValue"
+                    [disabled]="isSaving"
+                  />
+
+                  <button
+                    type="button"
+                    class="save-button"
+                    [disabled]="isSaving"
+                    (click)="saveField('weight')"
+                  >
+                    ✓
+                  </button>
+
+                  <button
+                    type="button"
+                    class="cancel-button"
+                    [disabled]="isSaving"
+                    (click)="cancelEdit()"
+                  >
+                    ×
+                  </button>
+
+                </div>
+
+              } @else {
+
+                <div class="value-area">
+
+                  <strong>
+                    {{ weight }}
+                  </strong>
+
+                  <button
+                    type="button"
+                    class="edit-button"
+                    (click)="startEdit('weight')"
+                  >
+                    ✎
+                  </button>
+
+                </div>
+
+              }
+
             </div>
+
           </div>
 
         </div>
@@ -170,7 +427,9 @@
       <section class="account-section">
 
         <div class="section-heading">
+
           <div>
+
             <p class="section-kicker">
               DIRECTION
             </p>
@@ -178,58 +437,113 @@
             <h2>
               Goals
             </h2>
+
           </div>
+
         </div>
 
 
         <div class="info-card">
 
-          <div class="info-row">
-            <div class="info-icon">
-              ◎
+          @for (
+            item of [
+              {
+                field: 'primary_goal',
+                label: 'Primary goal',
+                icon: '◎'
+              },
+              {
+                field: 'target_weight',
+                label: 'Target weight',
+                icon: '↗'
+              },
+              {
+                field: 'goal_description',
+                label: 'Goal description',
+                icon: '✓'
+              }
+            ];
+            track item.field;
+            let last = $last
+          ) {
+
+            <div
+              class="info-row"
+              [class.multiline-row]="
+                item.field === 'goal_description'
+              "
+            >
+
+              <div class="info-icon">
+                {{ item.icon }}
+              </div>
+
+              <div class="info-copy">
+
+                <span>
+                  {{ item.label }}
+                </span>
+
+                @if (isEditing($any(item.field))) {
+
+                  <div class="edit-area">
+
+                    <input
+                      class="edit-input"
+                      type="text"
+                      [(ngModel)]="editValue"
+                      [disabled]="isSaving"
+                    />
+
+                    <button
+                      type="button"
+                      class="save-button"
+                      [disabled]="isSaving"
+                      (click)="saveField($any(item.field))"
+                    >
+                      ✓
+                    </button>
+
+                    <button
+                      type="button"
+                      class="cancel-button"
+                      [disabled]="isSaving"
+                      (click)="cancelEdit()"
+                    >
+                      ×
+                    </button>
+
+                  </div>
+
+                } @else {
+
+                  <div class="value-area">
+
+                    <strong>
+                      {{ display($any(profile)?.[item.field]) }}
+                    </strong>
+
+                    <button
+                      type="button"
+                      class="edit-button"
+                      (click)="startEdit($any(item.field))"
+                    >
+                      ✎
+                    </button>
+
+                  </div>
+
+                }
+
+              </div>
+
             </div>
 
-            <div class="info-copy">
-              <span>Primary goal</span>
-              <strong>
-                {{ display(profile?.primary_goal) }}
-              </strong>
-            </div>
-          </div>
+            @if (!last) {
+              <div class="divider"></div>
+            }
 
-
-          <div class="divider"></div>
-
-
-          <div class="info-row">
-            <div class="info-icon">
-              ↗
-            </div>
-
-            <div class="info-copy">
-              <span>Target weight</span>
-              <strong>
-                {{ targetWeight }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row multiline-row">
-            <div class="info-icon">
-              ✓
-            </div>
-
-            <div class="info-copy">
-              <span>Goal description</span>
-              <strong>
-                {{ display(profile?.goal_description) }}
-              </strong>
-            </div>
-          </div>
+          }
 
         </div>
 
@@ -240,7 +554,9 @@
       <section class="account-section">
 
         <div class="section-heading">
+
           <div>
+
             <p class="section-kicker">
               FITNESS
             </p>
@@ -248,109 +564,123 @@
             <h2>
               Training
             </h2>
+
           </div>
+
         </div>
 
 
         <div class="info-card">
 
-          <div class="info-row">
-            <div class="info-icon">
-              ⚡
+          @for (
+            item of [
+              {
+                field: 'experience',
+                label: 'Experience',
+                icon: '⚡'
+              },
+              {
+                field: 'training_days',
+                label: 'Training days',
+                icon: '◫'
+              },
+              {
+                field: 'preferred_time',
+                label: 'Preferred time',
+                icon: '◷'
+              },
+              {
+                field: 'available_training_time',
+                label: 'Available training time',
+                icon: '⏱'
+              },
+              {
+                field: 'preferred_exercises',
+                label: 'Preferred exercises',
+                icon: '+'
+              },
+              {
+                field: 'limitations',
+                label: 'Limitations',
+                icon: '!'
+              }
+            ];
+            track item.field;
+            let last = $last
+          ) {
+
+            <div class="info-row">
+
+              <div class="info-icon">
+                {{ item.icon }}
+              </div>
+
+              <div class="info-copy">
+
+                <span>
+                  {{ item.label }}
+                </span>
+
+                @if (isEditing($any(item.field))) {
+
+                  <div class="edit-area">
+
+                    <input
+                      class="edit-input"
+                      type="text"
+                      [(ngModel)]="editValue"
+                      [disabled]="isSaving"
+                    />
+
+                    <button
+                      type="button"
+                      class="save-button"
+                      [disabled]="isSaving"
+                      (click)="saveField($any(item.field))"
+                    >
+                      ✓
+                    </button>
+
+                    <button
+                      type="button"
+                      class="cancel-button"
+                      [disabled]="isSaving"
+                      (click)="cancelEdit()"
+                    >
+                      ×
+                    </button>
+
+                  </div>
+
+                } @else {
+
+                  <div class="value-area">
+
+                    <strong>
+                      {{ display($any(profile)?.[item.field]) }}
+                    </strong>
+
+                    <button
+                      type="button"
+                      class="edit-button"
+                      (click)="startEdit($any(item.field))"
+                    >
+                      ✎
+                    </button>
+
+                  </div>
+
+                }
+
+              </div>
+
             </div>
 
-            <div class="info-copy">
-              <span>Experience</span>
-              <strong>
-                {{ display(profile?.experience) }}
-              </strong>
-            </div>
-          </div>
+            @if (!last) {
+              <div class="divider"></div>
+            }
 
-
-          <div class="divider"></div>
-
-
-          <div class="info-row">
-            <div class="info-icon">
-              ◫
-            </div>
-
-            <div class="info-copy">
-              <span>Training days</span>
-              <strong>
-                {{ display(profile?.training_days) }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row">
-            <div class="info-icon">
-              ◷
-            </div>
-
-            <div class="info-copy">
-              <span>Preferred time</span>
-              <strong>
-                {{ display(profile?.preferred_time) }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row">
-            <div class="info-icon">
-              ⏱
-            </div>
-
-            <div class="info-copy">
-              <span>Available training time</span>
-              <strong>
-                {{ display(profile?.available_training_time) }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row multiline-row">
-            <div class="info-icon">
-              +
-            </div>
-
-            <div class="info-copy">
-              <span>Preferred exercises</span>
-              <strong>
-                {{ display(profile?.preferred_exercises) }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row multiline-row">
-            <div class="info-icon">
-              !
-            </div>
-
-            <div class="info-copy">
-              <span>Limitations</span>
-              <strong>
-                {{ display(profile?.limitations) }}
-              </strong>
-            </div>
-          </div>
+          }
 
         </div>
 
@@ -361,7 +691,9 @@
       <section class="account-section">
 
         <div class="section-heading">
+
           <div>
+
             <p class="section-kicker">
               DAILY ROUTINE
             </p>
@@ -369,92 +701,118 @@
             <h2>
               Lifestyle
             </h2>
+
           </div>
+
         </div>
 
 
         <div class="info-card">
 
-          <div class="info-row">
-            <div class="info-icon">
-              ☀
+          @for (
+            item of [
+              {
+                field: 'wake_time',
+                label: 'Wake time',
+                icon: '☀'
+              },
+              {
+                field: 'sleep_time',
+                label: 'Sleep time',
+                icon: '☾'
+              },
+              {
+                field: 'work_schedule',
+                label: 'Work schedule',
+                icon: '◈'
+              },
+              {
+                field: 'daily_activity',
+                label: 'Daily activity',
+                icon: '↯'
+              },
+              {
+                field: 'commute',
+                label: 'Commute',
+                icon: '↔'
+              }
+            ];
+            track item.field;
+            let last = $last
+          ) {
+
+            <div class="info-row">
+
+              <div class="info-icon">
+                {{ item.icon }}
+              </div>
+
+              <div class="info-copy">
+
+                <span>
+                  {{ item.label }}
+                </span>
+
+                @if (isEditing($any(item.field))) {
+
+                  <div class="edit-area">
+
+                    <input
+                      class="edit-input"
+                      type="text"
+                      [(ngModel)]="editValue"
+                      [disabled]="isSaving"
+                    />
+
+                    <button
+                      type="button"
+                      class="save-button"
+                      [disabled]="isSaving"
+                      (click)="saveField($any(item.field))"
+                    >
+                      ✓
+                    </button>
+
+                    <button
+                      type="button"
+                      class="cancel-button"
+                      [disabled]="isSaving"
+                      (click)="cancelEdit()"
+                    >
+                      ×
+                    </button>
+
+                  </div>
+
+                } @else {
+
+                  <div class="value-area">
+
+                    <strong>
+                      {{ display($any(profile)?.[item.field]) }}
+                    </strong>
+
+                    <button
+                      type="button"
+                      class="edit-button"
+                      (click)="startEdit($any(item.field))"
+                    >
+                      ✎
+                    </button>
+
+                  </div>
+
+                }
+
+              </div>
+
             </div>
 
-            <div class="info-copy">
-              <span>Wake time</span>
-              <strong>
-                {{ display(profile?.wake_time) }}
-              </strong>
-            </div>
-          </div>
+            @if (!last) {
+              <div class="divider"></div>
+            }
 
-
-          <div class="divider"></div>
-
-
-          <div class="info-row">
-            <div class="info-icon">
-              ☾
-            </div>
-
-            <div class="info-copy">
-              <span>Sleep time</span>
-              <strong>
-                {{ display(profile?.sleep_time) }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row multiline-row">
-            <div class="info-icon">
-              ◈
-            </div>
-
-            <div class="info-copy">
-              <span>Work schedule</span>
-              <strong>
-                {{ display(profile?.work_schedule) }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row multiline-row">
-            <div class="info-icon">
-              ↯
-            </div>
-
-            <div class="info-copy">
-              <span>Daily activity</span>
-              <strong>
-                {{ display(profile?.daily_activity) }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row multiline-row">
-            <div class="info-icon">
-              ↔
-            </div>
-
-            <div class="info-copy">
-              <span>Commute</span>
-              <strong>
-                {{ display(profile?.commute) }}
-              </strong>
-            </div>
-          </div>
+          }
 
         </div>
 
@@ -465,7 +823,9 @@
       <section class="account-section">
 
         <div class="section-heading">
+
           <div>
+
             <p class="section-kicker">
               FOOD & DIET
             </p>
@@ -473,86 +833,126 @@
             <h2>
               Nutrition
             </h2>
+
           </div>
+
         </div>
 
 
         <div class="info-card">
 
-          <div class="info-row">
-            <div class="info-icon">
-              ◉
+          @for (
+            item of [
+              {
+                field: 'meals_per_day',
+                label: 'Meals per day',
+                icon: '◉'
+              },
+              {
+                field: 'favorite_foods',
+                label: 'Favorite foods',
+                icon: '♡'
+              },
+              {
+                field: 'dietary_preferences',
+                label: 'Dietary preferences',
+                icon: '◇'
+              },
+              {
+                field: 'eating_out_frequency',
+                label: 'Eating out',
+                icon: '⌂'
+              }
+            ];
+            track item.field;
+            let last = $last
+          ) {
+
+            <div class="info-row">
+
+              <div class="info-icon">
+                {{ item.icon }}
+              </div>
+
+              <div class="info-copy">
+
+                <span>
+                  {{ item.label }}
+                </span>
+
+                @if (isEditing($any(item.field))) {
+
+                  <div class="edit-area">
+
+                    <input
+                      class="edit-input"
+                      type="text"
+                      [(ngModel)]="editValue"
+                      [disabled]="isSaving"
+                    />
+
+                    <button
+                      type="button"
+                      class="save-button"
+                      [disabled]="isSaving"
+                      (click)="saveField($any(item.field))"
+                    >
+                      ✓
+                    </button>
+
+                    <button
+                      type="button"
+                      class="cancel-button"
+                      [disabled]="isSaving"
+                      (click)="cancelEdit()"
+                    >
+                      ×
+                    </button>
+
+                  </div>
+
+                } @else {
+
+                  <div class="value-area">
+
+                    <strong>
+                      {{ display($any(profile)?.[item.field]) }}
+                    </strong>
+
+                    <button
+                      type="button"
+                      class="edit-button"
+                      (click)="startEdit($any(item.field))"
+                    >
+                      ✎
+                    </button>
+
+                  </div>
+
+                }
+
+              </div>
+
             </div>
 
-            <div class="info-copy">
-              <span>Meals per day</span>
-              <strong>
-                {{ display(profile?.meals_per_day) }}
-              </strong>
-            </div>
-          </div>
+            @if (!last) {
+              <div class="divider"></div>
+            }
 
-
-          <div class="divider"></div>
-
-
-          <div class="info-row multiline-row">
-            <div class="info-icon">
-              ♡
-            </div>
-
-            <div class="info-copy">
-              <span>Favorite foods</span>
-              <strong>
-                {{ display(profile?.favorite_foods) }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row multiline-row">
-            <div class="info-icon">
-              ◇
-            </div>
-
-            <div class="info-copy">
-              <span>Dietary preferences</span>
-              <strong>
-                {{ display(profile?.dietary_preferences) }}
-              </strong>
-            </div>
-          </div>
-
-
-          <div class="divider"></div>
-
-
-          <div class="info-row">
-            <div class="info-icon">
-              ⌂
-            </div>
-
-            <div class="info-copy">
-              <span>Eating out</span>
-              <strong>
-                {{ display(profile?.eating_out_frequency) }}
-              </strong>
-            </div>
-          </div>
+          }
 
         </div>
 
       </section>
 
 
-      <!-- PROFILE DESCRIPTION -->
+      <!-- ABOUT YOU -->
       <section class="account-section">
 
         <div class="section-heading">
+
           <div>
+
             <p class="section-kicker">
               YOUR JOURNEY
             </p>
@@ -560,43 +960,107 @@
             <h2>
               About You
             </h2>
+
           </div>
+
         </div>
 
 
         <div class="description-card">
 
-          <div class="description-block">
-            <span>Current description</span>
+          @for (
+            item of [
+              {
+                field: 'current_description',
+                label: 'Current description'
+              },
+              {
+                field: 'target_description',
+                label: 'Target description'
+              },
+              {
+                field: 'inspiration_description',
+                label: 'What inspires you'
+              }
+            ];
+            track item.field;
+            let last = $last
+          ) {
 
-            <p>
-              {{ display(profile?.current_description) }}
-            </p>
-          </div>
+            <div class="description-block">
+
+              <div class="description-title">
+
+                <span>
+                  {{ item.label }}
+                </span>
+
+                @if (!isEditing($any(item.field))) {
+
+                  <button
+                    type="button"
+                    class="edit-button"
+                    (click)="startEdit($any(item.field))"
+                  >
+                    ✎
+                  </button>
+
+                }
+
+              </div>
 
 
-          <div class="description-divider"></div>
+              @if (isEditing($any(item.field))) {
+
+                <textarea
+                  class="edit-textarea"
+                  [(ngModel)]="editValue"
+                  [disabled]="isSaving"
+                  rows="4"
+                ></textarea>
 
 
-          <div class="description-block">
-            <span>Target description</span>
+                <div class="description-actions">
 
-            <p>
-              {{ display(profile?.target_description) }}
-            </p>
-          </div>
+                  <button
+                    type="button"
+                    class="save-text-button"
+                    [disabled]="isSaving"
+                    (click)="saveField($any(item.field))"
+                  >
+                    @if (isSaving) {
+                      Saving...
+                    } @else {
+                      Save
+                    }
+                  </button>
 
+                  <button
+                    type="button"
+                    class="cancel-text-button"
+                    [disabled]="isSaving"
+                    (click)="cancelEdit()"
+                  >
+                    Cancel
+                  </button>
 
-          <div class="description-divider"></div>
+                </div>
 
+              } @else {
 
-          <div class="description-block">
-            <span>What inspires you</span>
+                <p>
+                  {{ display($any(profile)?.[item.field]) }}
+                </p>
 
-            <p>
-              {{ display(profile?.inspiration_description) }}
-            </p>
-          </div>
+              }
+
+            </div>
+
+            @if (!last) {
+              <div class="description-divider"></div>
+            }
+
+          }
 
         </div>
 
@@ -604,9 +1068,11 @@
 
 
       @if (profile) {
+
         <p class="profile-version">
           Profile version {{ profile.version }}
         </p>
+
       }
 
     </main>

@@ -45,6 +45,7 @@ export interface SignupResponse {
   user: UserPublic;
 }
 
+
 /* =========================================================
    PROFILE
 ========================================================= */
@@ -90,6 +91,13 @@ export interface UserProfile {
   version: number;
   created_at: string;
 }
+
+
+export interface UpdateProfileResponse {
+  message: string;
+}
+
+
 /* =========================================================
    ROUTINES
 ========================================================= */
@@ -275,7 +283,9 @@ export class LiftlogApiService {
       );
 
   }
-    /* =====================================================
+
+
+  /* =====================================================
      PROFILE
   ===================================================== */
 
@@ -296,6 +306,41 @@ export class LiftlogApiService {
       );
 
   }
+
+
+  updateProfile(
+    token: string,
+    profile: UserProfile,
+  ):
+    Observable<UpdateProfileResponse> {
+
+    /*
+     * GET /profile returns version and created_at,
+     * but POST /profile does not accept those fields.
+     *
+     * Remove them before sending the profile back.
+     */
+    const {
+      version,
+      created_at,
+      ...body
+    } = profile;
+
+
+    return this.http
+      .post<UpdateProfileResponse>(
+        `${this.apiUrl}/profile`,
+        body,
+        {
+          headers:
+            this.authHeaders(
+              token,
+            ),
+        },
+      );
+
+  }
+
 
   /* =====================================================
      ROUTINES
