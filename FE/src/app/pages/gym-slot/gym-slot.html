@@ -1,0 +1,350 @@
+<div class="slot-shell">
+
+  <main class="slot-main">
+
+    <div class="slot-content">
+
+      <header class="slot-header">
+
+        <button
+          class="back-button"
+          type="button"
+          aria-label="Back to gym"
+          (click)="goBack()"
+        >
+          ←
+        </button>
+
+
+        <div>
+
+          <span class="page-eyebrow">
+            PULSEOS
+          </span>
+
+          <h1>
+            Confirm Booking
+          </h1>
+
+        </div>
+
+      </header>
+
+
+      @if (isLoading) {
+
+        <section class="state-card">
+
+          <span class="loader"></span>
+
+          <div>
+
+            <strong>
+              Loading session
+            </strong>
+
+            <p>
+              Getting your selected booking details…
+            </p>
+
+          </div>
+
+        </section>
+
+      } @else if (loadError) {
+
+        <section class="state-card">
+
+          <span class="state-icon">
+            🕐
+          </span>
+
+          <div>
+
+            <strong>
+              Session unavailable
+            </strong>
+
+            <p>
+              {{ loadError }}
+            </p>
+
+          </div>
+
+        </section>
+
+      } @else if (detail) {
+
+        <section class="gym-card">
+
+          <div
+            class="gym-image"
+            [class.placeholder]="
+              !detail.gym.image_url ||
+              gymImageFailed
+            "
+          >
+
+            @if (
+              detail.gym.image_url &&
+              !gymImageFailed
+            ) {
+
+              <img
+                [src]="detail.gym.image_url"
+                [alt]="detail.gym.name"
+                (error)="onGymImageError()"
+              >
+
+            } @else {
+
+              <span aria-hidden="true">
+                🏋️
+              </span>
+
+            }
+
+          </div>
+
+
+          <div class="gym-copy">
+
+            <button
+              class="gym-name"
+              type="button"
+              (click)="openGymDetails()"
+            >
+              {{ detail.gym.name }}
+              <span aria-hidden="true">›</span>
+            </button>
+
+            <p>
+              {{ detail.gym.address }}
+            </p>
+
+          </div>
+
+        </section>
+
+
+        @if (!booking) {
+
+          <section class="selection-card">
+
+            <div class="selection-heading">
+
+              <span class="selection-icon">
+                🗓️
+              </span>
+
+              <div>
+
+                <span class="section-eyebrow">
+                  YOUR SESSION
+                </span>
+
+                <h2>
+                  Booking details
+                </h2>
+
+              </div>
+
+            </div>
+
+
+            <div class="detail-row">
+
+              <span>
+                Date
+              </span>
+
+              <strong>
+                {{ formatDate(detail.slot.date) }}
+              </strong>
+
+            </div>
+
+
+            <div class="detail-row">
+
+              <span>
+                Time
+              </span>
+
+              <strong>
+                {{ formatTime(detail.slot.start_time) }}
+                –
+                {{ formatTime(detail.slot.end_time) }}
+              </strong>
+
+            </div>
+
+
+            <div class="detail-row">
+
+              <span>
+                Gym
+              </span>
+
+              <strong>
+                {{ detail.gym.name }}
+              </strong>
+
+            </div>
+
+          </section>
+
+
+          <div class="actions">
+
+            <button
+              class="directions-button"
+              type="button"
+              (click)="openDirections()"
+            >
+              <span>
+                📍
+                Get Directions
+              </span>
+
+              <span aria-hidden="true">
+                ↗
+              </span>
+            </button>
+
+
+            <button
+              class="confirm-button"
+              type="button"
+              [disabled]="isBooking"
+              (click)="confirmBooking()"
+            >
+
+              @if (isBooking) {
+
+                <span class="button-loader"></span>
+                Confirming…
+
+              } @else {
+
+                Confirm Booking
+                <span aria-hidden="true">→</span>
+
+              }
+
+            </button>
+
+          </div>
+
+
+          @if (bookingError) {
+
+            <p class="booking-error">
+              {{ bookingError }}
+            </p>
+
+          }
+
+        } @else {
+
+          <section class="success-card">
+
+            <span class="success-icon">
+              ✓
+            </span>
+
+            <span class="section-eyebrow">
+              BOOKING CONFIRMED
+            </span>
+
+            <h2>
+              You're booked!
+            </h2>
+
+            <p>
+              Your gym session is confirmed.
+            </p>
+
+
+            <div class="booking-number">
+              Booking #{{ booking.booking_id }}
+            </div>
+
+
+            <div class="success-details">
+
+              <div>
+
+                <span>
+                  Gym
+                </span>
+
+                <strong>
+                  {{ booking.gym.name }}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Date
+                </span>
+
+                <strong>
+                  {{ formatDate(booking.date) }}
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Time
+                </span>
+
+                <strong>
+                  {{ formatTime(booking.start_time) }}
+                  –
+                  {{ formatTime(booking.end_time) }}
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <div class="success-actions">
+
+              <button
+                class="directions-button"
+                type="button"
+                (click)="openDirections()"
+              >
+                📍 Get Directions
+              </button>
+
+
+              <button
+                class="home-button"
+                type="button"
+                (click)="goHome()"
+              >
+                Back to Home
+              </button>
+
+            </div>
+
+          </section>
+
+        }
+
+      }
+
+    </div>
+
+  </main>
+
+</div>

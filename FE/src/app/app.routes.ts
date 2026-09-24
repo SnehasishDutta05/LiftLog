@@ -13,9 +13,15 @@ import { Healthify } from './pages/healthify/healthify';
 import { WorkoutHistory } from './pages/workout-history/workout-history';
 import { WorkoutDetailPage } from './pages/workout-detail/workout-detail';
 import { Account } from './pages/account/account';
+
+import { GymBooking } from './pages/gym-booking/gym-booking';
+import { GymSlot } from './pages/gym-slot/gym-slot';
+import { GymDetails } from './pages/gym-details/gym-details';
+
 import {
   rootRedirectGuard,
 } from './core/guards/root-redirect-guard';
+
 
 export const routes: Routes = [
 
@@ -41,6 +47,25 @@ export const routes: Routes = [
   {
     path: 'home',
     component: Home,
+  },
+
+  /* =====================================================
+     GYMS
+  ===================================================== */
+
+  {
+    path: 'gyms/:gymId/details',
+    component: GymDetails,
+  },
+
+  {
+    path: 'gyms/:gymId/slots/:slotId',
+    component: GymSlot,
+  },
+
+  {
+    path: 'gyms/:gymId',
+    component: GymBooking,
   },
 
   /* =====================================================
@@ -105,12 +130,12 @@ export const routes: Routes = [
   ===================================================== */
 
   {
-  path: '',
-  canActivate: [
-    rootRedirectGuard,
-  ],
-  component: Home,
-},
+    path: '',
+    canActivate: [
+      rootRedirectGuard,
+    ],
+    component: Home,
+  },
 
   /*
    * IMPORTANT:

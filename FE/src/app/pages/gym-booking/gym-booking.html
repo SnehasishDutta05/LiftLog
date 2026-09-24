@@ -1,0 +1,360 @@
+<div class="booking-shell">
+
+  <main class="booking-main">
+
+    <div class="booking-content">
+
+      <header class="booking-header">
+
+        <button
+          class="back-button"
+          type="button"
+          aria-label="Back to home"
+          (click)="goBack()"
+        >
+          ←
+        </button>
+
+
+        <div>
+
+          <span class="page-eyebrow">
+            PULSEOS
+          </span>
+
+          <h1>
+            Book a Session
+          </h1>
+
+        </div>
+
+      </header>
+
+
+      @if (isLoadingGym) {
+
+        <section class="state-card">
+
+          <span class="loader"></span>
+
+          <div>
+
+            <strong>
+              Loading gym
+            </strong>
+
+            <p>
+              Getting the latest gym information…
+            </p>
+
+          </div>
+
+        </section>
+
+      } @else if (gymError) {
+
+        <section class="state-card">
+
+          <span class="state-icon">
+            🏋️
+          </span>
+
+          <div>
+
+            <strong>
+              Gym unavailable
+            </strong>
+
+            <p>
+              {{ gymError }}
+            </p>
+
+          </div>
+
+        </section>
+
+      } @else if (gym) {
+
+        <section class="gym-hero">
+
+          <div
+            class="gym-hero-image"
+            [class.placeholder]="
+              !gym.image_url ||
+              gymImageFailed
+            "
+          >
+
+            @if (
+              gym.image_url &&
+              !gymImageFailed
+            ) {
+
+              <img
+                [src]="gym.image_url"
+                [alt]="gym.name"
+                (error)="onGymImageError()"
+              >
+
+            } @else {
+
+              <span aria-hidden="true">
+                🏋️
+              </span>
+
+            }
+
+          </div>
+
+
+          <div class="gym-hero-copy">
+
+            <button
+              class="gym-name-button"
+              type="button"
+              (click)="openGymDetails()"
+            >
+              <span>
+                {{ gym.name }}
+              </span>
+
+              <span aria-hidden="true">
+                ›
+              </span>
+            </button>
+
+
+            <p>
+              {{ gym.address }}
+            </p>
+
+
+            @if (gym.distance_km !== null) {
+
+              <span class="distance-pill">
+                📍
+                {{ formatDistance(gym.distance_km) }}
+              </span>
+
+            }
+
+
+            <button
+              class="details-link"
+              type="button"
+              (click)="openGymDetails()"
+            >
+              View gym details
+              <span aria-hidden="true">→</span>
+            </button>
+
+          </div>
+
+        </section>
+
+      }
+
+
+      <section class="booking-section">
+
+        <div class="section-heading">
+
+          <div>
+
+            <span class="section-eyebrow">
+              NEXT 7 DAYS
+            </span>
+
+            <h2>
+              Choose a day
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <div class="date-strip">
+
+          @for (
+            day of days;
+            track day.date
+          ) {
+
+            <button
+              class="date-card"
+              [class.active]="
+                selectedDate ===
+                day.date
+              "
+              type="button"
+              (click)="selectDate(day.date)"
+            >
+
+              <span class="date-weekday">
+                {{ day.weekday }}
+              </span>
+
+              <strong>
+                {{ day.dayNumber }}
+              </strong>
+
+              <span class="date-month">
+                {{ day.month }}
+              </span>
+
+            </button>
+
+          }
+
+        </div>
+
+      </section>
+
+
+      <section class="booking-section slots-section">
+
+        <div class="section-heading">
+
+          <div>
+
+            <span class="section-eyebrow">
+              AVAILABLE TIMES
+            </span>
+
+            <h2>
+              Pick your session
+            </h2>
+
+          </div>
+
+
+          @if (
+            !isLoadingSlots &&
+            !slotsError
+          ) {
+
+            <span class="slot-count">
+              {{ availableSlotCount }}
+            </span>
+
+          }
+
+        </div>
+
+
+        @if (isLoadingSlots) {
+
+          <div class="state-card">
+
+            <span class="loader"></span>
+
+            <div>
+
+              <strong>
+                Checking availability
+              </strong>
+
+              <p>
+                Loading sessions for the next 7 days…
+              </p>
+
+            </div>
+
+          </div>
+
+        } @else if (slotsError) {
+
+          <div class="state-card">
+
+            <span class="state-icon">
+              🕐
+            </span>
+
+            <div class="state-copy">
+
+              <strong>
+                Slots unavailable
+              </strong>
+
+              <p>
+                {{ slotsError }}
+              </p>
+
+              <button
+                type="button"
+                (click)="retrySlots()"
+              >
+                Try Again
+              </button>
+
+            </div>
+
+          </div>
+
+        } @else if (selectedSlots.length === 0) {
+
+          <div class="empty-slots">
+
+            <span>
+              🗓️
+            </span>
+
+            <strong>
+              No sessions on this day
+            </strong>
+
+            <p>
+              Select another day to see available slots.
+            </p>
+
+          </div>
+
+        } @else {
+
+          <div class="slot-grid">
+
+            @for (
+              slot of selectedSlots;
+              track slot.slot_id
+            ) {
+
+              <button
+                class="slot-button"
+                [class.unavailable]="
+                  !slot.available
+                "
+                [disabled]="
+                  !slot.available
+                "
+                type="button"
+                (click)="selectSlot(slot)"
+              >
+
+                <span>
+                  {{ formatSlotTime(slot.start_time) }}
+                </span>
+
+                <small>
+                  @if (slot.available) {
+                    Available
+                  } @else {
+                    Full
+                  }
+                </small>
+
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+      </section>
+
+    </div>
+
+  </main>
+
+</div>

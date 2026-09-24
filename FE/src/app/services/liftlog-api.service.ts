@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 
 import {
+  map,
   Observable,
 } from 'rxjs';
 
@@ -97,6 +98,164 @@ export interface UpdateProfileResponse {
   message: string;
 }
 
+
+
+
+/* =========================================================
+   GYMS
+========================================================= */
+
+export interface NearbyGym {
+  gym_id: number;
+  name: string;
+  image_url: string | null;
+  distance_km: number;
+}
+
+
+export interface GymSummary {
+  gym_id: number;
+  name: string;
+  image_url: string | null;
+  address: string;
+  distance_km: number | null;
+}
+
+
+export interface GymSlot {
+  slot_id: number;
+  start_time: string;
+  end_time: string;
+  available: boolean;
+}
+
+
+export interface GymSlotDay {
+  date: string;
+  slots: GymSlot[];
+}
+
+
+export interface GymSlotsResponse {
+  gym_id: number;
+  slots: GymSlotDay[];
+}
+
+
+export interface GymSlotDetail {
+  gym: {
+    gym_id: number;
+    name: string;
+    address: string;
+    image_url: string | null;
+  };
+
+  slot: {
+    slot_id: number;
+    date: string;
+    start_time: string;
+    end_time: string;
+  };
+
+  maps_url: string;
+}
+
+
+export interface GymOperatingHours {
+  open: string;
+  close: string;
+}
+
+
+export interface GymDetails {
+  gym_id: number;
+  name: string;
+  about: string;
+  address: string;
+
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+
+  maps_url: string;
+
+  contact: {
+    phone: string;
+    email: string;
+  };
+
+  timings:
+    Record<
+      string,
+      GymOperatingHours
+    >;
+
+  equipment: string[];
+  photos: string[];
+}
+
+
+/* =========================================================
+   BOOKINGS
+========================================================= */
+
+export interface CreateBookingRequest {
+  gym_id: number;
+  slot_id: number;
+  date: string;
+}
+
+
+export interface BookingGymSummary {
+  gym_id: number;
+  name: string;
+}
+
+
+export interface BookingResponse {
+  booking_id: number;
+  status: string;
+  gym: BookingGymSummary;
+  date: string;
+  start_time: string;
+  end_time: string;
+}
+
+
+export interface BookingListItem {
+  booking_id: number;
+  gym: BookingGymSummary;
+  date: string;
+  start_time: string;
+  end_time: string;
+  status: string;
+}
+
+
+export interface BookingDetail {
+  booking_id: number;
+  status: string;
+
+  gym: {
+    gym_id: number;
+    name: string;
+    address: string;
+    maps_url: string;
+  };
+
+  slot: {
+    date: string;
+    start_time: string;
+    end_time: string;
+  };
+}
+
+
+export interface CancelBookingResponse {
+  booking_id: number;
+  status: string;
+}
 
 /* =========================================================
    ROUTINES
@@ -217,6 +376,47 @@ export class LiftlogApiService {
 
   }
 
+
+
+
+  /* =====================================================
+     API RESPONSE NORMALIZER
+
+     The current Swagger schema shows some gym endpoints
+     as "string". This keeps the FE compatible with both:
+     - normal JSON object/array responses
+     - JSON serialized inside a string response
+  ===================================================== */
+
+  private parseJsonResponse<T>(
+    response:
+      T |
+      string,
+  ): T {
+
+    if (
+      typeof response !==
+      'string'
+    ) {
+      return response;
+    }
+
+
+    try {
+
+      return JSON.parse(
+        response,
+      ) as T;
+
+    } catch {
+
+      throw new Error(
+        'The server returned an invalid JSON response.',
+      );
+
+    }
+
+  }
 
   /* =====================================================
      SIGNUP
@@ -341,6 +541,514 @@ export class LiftlogApiService {
 
   }
 
+
+
+  /* =====================================================
+     LOCAL GYM PREVIEW IMAGES
+
+     Used only when the backend does not provide image_url
+     / photos yet. Once real CDN URLs exist in the DB,
+     backend images automatically take priority.
+  ===================================================== */
+
+  private localGymImage(
+    gymId: number,
+    gymName = '',
+  ): string {
+
+    const normalizedName =
+      gymName
+        .trim()
+        .toLowerCase();
+
+
+    if (
+      normalizedName.includes(
+        'metro muscle',
+      )
+    ) {
+
+      return (
+        '/gyms/metro-muscle-house.png'
+      );
+
+    }
+
+
+    if (
+      normalizedName.includes(
+        'prime performance',
+      )
+    ) {
+
+      return (
+        '/gyms/prime-performance.png'
+      );
+
+    }
+
+
+    const fallbackImages = [
+      '/gyms/metro-muscle-house.png',
+      '/gyms/prime-performance.png',
+      '/gyms/third-gym.png',
+    ];
+
+
+    const index =
+      Math.abs(
+        Math.trunc(
+          gymId,
+        ),
+      ) %
+      fallbackImages.length;
+
+
+    return fallbackImages[
+      index
+    ];
+
+  }
+
+
+  private resolveGymImage(
+    gymId: number,
+    gymName: string,
+    _imageUrl:
+      string |
+      null |
+      undefined,
+  ): string {
+
+    /*
+     * TEMPORARY DEMO IMAGE OVERRIDE
+     *
+     * The seeded gym rows currently contain image URLs that are
+     * non-empty but are not usable by the browser. Because a
+     * non-empty string is truthy, the previous fallback logic never
+     * reached the local images.
+     *
+     * For the current seeded/demo gyms, always use the local image.
+     * Later, when real CDN URLs are stored in the database, change
+     * this back to prefer the backend URL.
+     */
+    return this.localGymImage(
+      gymId,
+      gymName,
+    );
+
+  }
+
+
+
+  /* =====================================================
+     GYMS
+  ===================================================== */
+
+  getNearbyGyms(
+    lat: number,
+    lng: number,
+    radius = 10,
+    limit = 20,
+    offset = 0,
+  ):
+    Observable<NearbyGym[]> {
+
+    return this.http
+      .get<
+        NearbyGym[] |
+        string
+      >(
+        `${this.apiUrl}/gyms/nearby`,
+        {
+          params: {
+            lat:
+              lat.toString(),
+
+            lng:
+              lng.toString(),
+
+            radius:
+              radius.toString(),
+
+            limit:
+              limit.toString(),
+
+            offset:
+              offset.toString(),
+          },
+        },
+      )
+      .pipe(
+        map(
+          response =>
+            this.parseJsonResponse<
+              NearbyGym[]
+            >(
+              response,
+            ),
+        ),
+
+        map(
+          gyms =>
+            gyms.map(
+              gym => ({
+                ...gym,
+
+                image_url:
+                  this.resolveGymImage(
+                    gym.gym_id,
+                    gym.name,
+                    gym.image_url,
+                  ),
+              }),
+            ),
+        ),
+      );
+
+  }
+
+
+  getGymSummary(
+    gymId: number,
+    lat?: number | null,
+    lng?: number | null,
+  ):
+    Observable<GymSummary> {
+
+    const params:
+      Record<string, string> =
+      {};
+
+
+    if (
+      lat !== null &&
+      lat !== undefined &&
+      Number.isFinite(
+        lat,
+      )
+    ) {
+
+      params['lat'] =
+        lat.toString();
+
+    }
+
+
+    if (
+      lng !== null &&
+      lng !== undefined &&
+      Number.isFinite(
+        lng,
+      )
+    ) {
+
+      params['lng'] =
+        lng.toString();
+
+    }
+
+
+    return this.http
+      .get<
+        GymSummary |
+        string
+      >(
+        `${this.apiUrl}/gyms/${gymId}`,
+        {
+          params,
+        },
+      )
+      .pipe(
+        map(
+          response =>
+            this.parseJsonResponse<
+              GymSummary
+            >(
+              response,
+            ),
+        ),
+
+        map(
+          gym => ({
+            ...gym,
+
+            image_url:
+              this.resolveGymImage(
+                gym.gym_id,
+                gym.name,
+                gym.image_url,
+              ),
+          }),
+        ),
+      );
+
+  }
+
+
+  getGymSlots(
+    gymId: number,
+    fromDate: string,
+    toDate: string,
+  ):
+    Observable<GymSlotsResponse> {
+
+    return this.http
+      .get<
+        GymSlotsResponse |
+        string
+      >(
+        `${this.apiUrl}/gyms/${gymId}/slots`,
+        {
+          params: {
+            from:
+              fromDate,
+
+            to:
+              toDate,
+          },
+        },
+      )
+      .pipe(
+        map(
+          response =>
+            this.parseJsonResponse<
+              GymSlotsResponse
+            >(
+              response,
+            ),
+        ),
+      );
+
+  }
+
+
+  getGymSlotDetail(
+    gymId: number,
+    slotId: number,
+  ):
+    Observable<GymSlotDetail> {
+
+    return this.http
+      .get<
+        GymSlotDetail |
+        string
+      >(
+        `${this.apiUrl}/gyms/${gymId}/slots/${slotId}`,
+      )
+      .pipe(
+        map(
+          response =>
+            this.parseJsonResponse<
+              GymSlotDetail
+            >(
+              response,
+            ),
+        ),
+
+        map(
+          detail => ({
+            ...detail,
+
+            gym: {
+              ...detail.gym,
+
+              image_url:
+                this.resolveGymImage(
+                  detail.gym.gym_id,
+                  detail.gym.name,
+                  detail.gym.image_url,
+                ),
+            },
+          }),
+        ),
+      );
+
+  }
+
+
+  getGymDetails(
+    gymId: number,
+  ):
+    Observable<GymDetails> {
+
+    return this.http
+      .get<
+        GymDetails |
+        string
+      >(
+        `${this.apiUrl}/gyms/${gymId}/details`,
+      )
+      .pipe(
+        map(
+          response =>
+            this.parseJsonResponse<
+              GymDetails
+            >(
+              response,
+            ),
+        ),
+
+        map(
+          gym => ({
+            ...gym,
+
+            photos: [
+              this.localGymImage(
+                gym.gym_id,
+                gym.name,
+              ),
+
+              ...(
+                Array.isArray(
+                  gym.photos,
+                )
+                  ? gym.photos
+                  : []
+              ),
+            ],
+          }),
+        ),
+      );
+
+  }
+
+
+  /* =====================================================
+     BOOKINGS
+  ===================================================== */
+
+  getBookings(
+    token: string,
+  ):
+    Observable<BookingListItem[]> {
+
+    return this.http
+      .get<
+        BookingListItem[] |
+        string
+      >(
+        `${this.apiUrl}/bookings`,
+        {
+          headers:
+            this.authHeaders(
+              token,
+            ),
+        },
+      )
+      .pipe(
+        map(
+          response =>
+            this.parseJsonResponse<
+              BookingListItem[]
+            >(
+              response,
+            ),
+        ),
+      );
+
+  }
+
+
+  createBooking(
+    token: string,
+    request:
+      CreateBookingRequest,
+  ):
+    Observable<BookingResponse> {
+
+    return this.http
+      .post<
+        BookingResponse |
+        string
+      >(
+        `${this.apiUrl}/bookings`,
+        request,
+        {
+          headers:
+            this.authHeaders(
+              token,
+            ),
+        },
+      )
+      .pipe(
+        map(
+          response =>
+            this.parseJsonResponse<
+              BookingResponse
+            >(
+              response,
+            ),
+        ),
+      );
+
+  }
+
+
+  getBooking(
+    token: string,
+    bookingId: number,
+  ):
+    Observable<BookingDetail> {
+
+    return this.http
+      .get<
+        BookingDetail |
+        string
+      >(
+        `${this.apiUrl}/bookings/${bookingId}`,
+        {
+          headers:
+            this.authHeaders(
+              token,
+            ),
+        },
+      )
+      .pipe(
+        map(
+          response =>
+            this.parseJsonResponse<
+              BookingDetail
+            >(
+              response,
+            ),
+        ),
+      );
+
+  }
+
+
+  cancelBooking(
+    token: string,
+    bookingId: number,
+  ):
+    Observable<CancelBookingResponse> {
+
+    return this.http
+      .delete<
+        CancelBookingResponse |
+        string
+      >(
+        `${this.apiUrl}/bookings/${bookingId}`,
+        {
+          headers:
+            this.authHeaders(
+              token,
+            ),
+        },
+      )
+      .pipe(
+        map(
+          response =>
+            this.parseJsonResponse<
+              CancelBookingResponse
+            >(
+              response,
+            ),
+        ),
+      );
+
+  }
 
   /* =====================================================
      ROUTINES

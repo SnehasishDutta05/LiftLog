@@ -1,0 +1,330 @@
+<div class="details-shell">
+
+  <main class="details-main">
+
+    <div class="details-content">
+
+      <header class="details-header">
+
+        <button
+          class="back-button"
+          type="button"
+          aria-label="Back to booking"
+          (click)="goBack()"
+        >
+          ←
+        </button>
+
+
+        <div>
+
+          <span class="page-eyebrow">
+            PULSEOS
+          </span>
+
+          <h1>
+            Gym Details
+          </h1>
+
+        </div>
+
+      </header>
+
+
+      @if (isLoading) {
+
+        <section class="state-card">
+
+          <span class="loader"></span>
+
+          <div>
+
+            <strong>
+              Loading gym
+            </strong>
+
+            <p>
+              Getting equipment, timings and contact details…
+            </p>
+
+          </div>
+
+        </section>
+
+      } @else if (errorMessage) {
+
+        <section class="state-card">
+
+          <span class="state-icon">
+            🏋️
+          </span>
+
+          <div>
+
+            <strong>
+              Gym details unavailable
+            </strong>
+
+            <p>
+              {{ errorMessage }}
+            </p>
+
+          </div>
+
+        </section>
+
+      } @else if (gym) {
+
+        @if (gym.photos.length > 0) {
+
+          <section class="photo-strip">
+
+            @for (
+              photo of gym.photos;
+              track photo
+            ) {
+
+              @if (!failedPhotos.has(photo)) {
+
+                <img
+                  [src]="photo"
+                  [alt]="gym.name"
+                  loading="lazy"
+                  (error)="onPhotoError(photo)"
+                >
+
+              }
+
+            }
+
+          </section>
+
+        } @else {
+
+          <section class="photo-placeholder">
+            🏋️
+          </section>
+
+        }
+
+
+        <section class="gym-heading-card">
+
+          <span class="page-eyebrow">
+            GYM
+          </span>
+
+          <h2>
+            {{ gym.name }}
+          </h2>
+
+          <p class="gym-address">
+            {{ gym.address }}
+          </p>
+
+
+          <div class="primary-actions">
+
+            <button
+              class="book-button"
+              type="button"
+              (click)="bookSession()"
+            >
+              Book a Session
+              <span aria-hidden="true">→</span>
+            </button>
+
+
+            <button
+              class="directions-button"
+              type="button"
+              (click)="openDirections()"
+            >
+              📍 Directions
+            </button>
+
+          </div>
+
+        </section>
+
+
+        <section class="details-section">
+
+          <span class="section-eyebrow">
+            ABOUT
+          </span>
+
+          <h2>
+            About this gym
+          </h2>
+
+
+          <div class="content-card about-card">
+
+            <p>
+              {{ gym.about || 'No description available.' }}
+            </p>
+
+          </div>
+
+        </section>
+
+
+        <section class="details-section">
+
+          <span class="section-eyebrow">
+            CONTACT
+          </span>
+
+          <h2>
+            Get in touch
+          </h2>
+
+
+          <div class="content-card contact-card">
+
+            <button
+              type="button"
+              (click)="callGym()"
+            >
+
+              <span class="contact-icon">
+                📞
+              </span>
+
+              <span class="contact-copy">
+
+                <small>
+                  Phone
+                </small>
+
+                <strong>
+                  {{ gym.contact.phone || 'Not available' }}
+                </strong>
+
+              </span>
+
+              <span aria-hidden="true">
+                ›
+              </span>
+
+            </button>
+
+
+            <button
+              type="button"
+              (click)="emailGym()"
+            >
+
+              <span class="contact-icon">
+                ✉️
+              </span>
+
+              <span class="contact-copy">
+
+                <small>
+                  Email
+                </small>
+
+                <strong>
+                  {{ gym.contact.email || 'Not available' }}
+                </strong>
+
+              </span>
+
+              <span aria-hidden="true">
+                ›
+              </span>
+
+            </button>
+
+          </div>
+
+        </section>
+
+
+        <section class="details-section">
+
+          <span class="section-eyebrow">
+            HOURS
+          </span>
+
+          <h2>
+            Opening hours
+          </h2>
+
+
+          <div class="content-card timing-card">
+
+            @for (
+              timing of timings;
+              track timing.day
+            ) {
+
+              <div class="timing-row">
+
+                <span>
+                  {{ timing.day }}
+                </span>
+
+                <strong>
+                  {{ formatTime(timing.open) }}
+                  –
+                  {{ formatTime(timing.close) }}
+                </strong>
+
+              </div>
+
+            }
+
+          </div>
+
+        </section>
+
+
+        <section class="details-section">
+
+          <span class="section-eyebrow">
+            EQUIPMENT
+          </span>
+
+          <h2>
+            What you'll find
+          </h2>
+
+
+          @if (gym.equipment.length > 0) {
+
+            <div class="equipment-grid">
+
+              @for (
+                equipment of gym.equipment;
+                track equipment
+              ) {
+
+                <span class="equipment-chip">
+                  ✓
+                  {{ equipment }}
+                </span>
+
+              }
+
+            </div>
+
+          } @else {
+
+            <div class="content-card empty-card">
+              Equipment information is not available.
+            </div>
+
+          }
+
+        </section>
+
+      }
+
+    </div>
+
+  </main>
+
+</div>

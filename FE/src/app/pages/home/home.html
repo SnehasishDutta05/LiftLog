@@ -210,7 +210,7 @@
 
               <p class="location-label">
                 <span>📍</span>
-                Using your current location
+                Closest to your current location
               </p>
 
             } @else {
@@ -223,6 +223,18 @@
             }
 
           </div>
+
+
+          @if (
+            gymStatus === 'ready' &&
+            nearbyGyms.length > 0
+          ) {
+
+            <span class="gym-count">
+              {{ nearbyGyms.length }}
+            </span>
+
+          }
 
         </div>
 
@@ -246,45 +258,6 @@
               <p>
                 Getting your current location…
               </p>
-
-            </div>
-
-          </div>
-
-        }
-
-
-        <!-- ===============================================
-             LOCATION READY
-        ================================================ -->
-
-        @if (locationStatus === 'ready') {
-
-          <div class="gym-state-card">
-
-            <span class="state-icon">
-              📍
-            </span>
-
-
-            <div class="state-copy">
-
-              <strong>
-                Location found
-              </strong>
-
-              <p>
-                Find gyms around your current location on Google Maps.
-              </p>
-
-
-              <button
-                type="button"
-                (click)="findNearbyGyms()"
-              >
-                Find gyms within 5 km
-                <span aria-hidden="true">→</span>
-              </button>
 
             </div>
 
@@ -329,6 +302,217 @@
               </button>
 
             </div>
+
+          </div>
+
+        }
+
+
+        <!-- ===============================================
+             GYMS LOADING
+        ================================================ -->
+
+        @if (
+          locationStatus === 'ready' &&
+          gymStatus === 'loading'
+        ) {
+
+          <div class="gym-state-card">
+
+            <span class="location-loader"></span>
+
+            <div>
+
+              <strong>
+                Finding nearby gyms
+              </strong>
+
+              <p>
+                Checking gyms closest to you…
+              </p>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ===============================================
+             GYM API ERROR
+        ================================================ -->
+
+        @if (
+          locationStatus === 'ready' &&
+          gymStatus === 'error'
+        ) {
+
+          <div class="gym-state-card location-error">
+
+            <span class="state-icon">
+              🏋️
+            </span>
+
+
+            <div class="state-copy">
+
+              <strong>
+                Could not load gyms
+              </strong>
+
+              <p>
+                {{ gymErrorMessage }}
+              </p>
+
+
+              <button
+                type="button"
+                (click)="findNearbyGyms()"
+              >
+                Try Again
+              </button>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ===============================================
+             NO GYMS FOUND
+        ================================================ -->
+
+        @if (
+          locationStatus === 'ready' &&
+          gymStatus === 'empty'
+        ) {
+
+          <div class="gym-state-card">
+
+            <span class="state-icon">
+              🏋️
+            </span>
+
+
+            <div class="state-copy">
+
+              <strong>
+                No nearby gyms found
+              </strong>
+
+              <p>
+                We could not find a gym within 10 km of your location.
+              </p>
+
+
+              <button
+                type="button"
+                (click)="findNearbyGyms()"
+              >
+                Search Again
+              </button>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ===============================================
+             NEARBY GYM RESULTS
+        ================================================ -->
+
+        @if (
+          locationStatus === 'ready' &&
+          gymStatus === 'ready'
+        ) {
+
+          <div class="gym-list">
+
+            @for (
+              gym of nearbyGyms;
+              track gym.gym_id
+            ) {
+
+              <button
+                class="gym-card"
+                type="button"
+                (click)="openGym(gym)"
+              >
+
+                <div
+                  class="gym-photo"
+                  [class.gym-photo-placeholder]="
+                    !gym.image_url ||
+                    failedGymImages.has(gym.gym_id)
+                  "
+                >
+
+                  @if (
+                    gym.image_url &&
+                    !failedGymImages.has(gym.gym_id)
+                  ) {
+
+                    <img
+                      [src]="gym.image_url"
+                      [alt]="gym.name"
+                      loading="lazy"
+                      (error)="onGymImageError(gym.gym_id)"
+                    >
+
+                  } @else {
+
+                    <span aria-hidden="true">
+                      🏋️
+                    </span>
+
+                  }
+
+                </div>
+
+
+                <div class="gym-card-body">
+
+                  <div class="gym-title-row">
+
+                    <h3>
+                      {{ gym.name }}
+                    </h3>
+
+
+                    <span class="gym-rating">
+                      {{ formatDistance(gym.distance_km) }}
+                    </span>
+
+                  </div>
+
+
+                  <p class="gym-address">
+                    Tap to view available sessions and book your visit.
+                  </p>
+
+
+                  <div class="gym-meta">
+
+                    <span>
+                      📍
+                      {{ formatDistance(gym.distance_km) }}
+                    </span>
+
+
+                    <span class="open-status">
+                      Book session →
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </button>
+
+            }
 
           </div>
 

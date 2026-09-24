@@ -1,0 +1,428 @@
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f7f6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  font: inherit;
+}
+
+.details-shell {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background: #f5f7f6;
+  color: #10231d;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.details-main {
+  width: 100%;
+  max-width: 444px;
+  min-height: 100vh;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fbfdfc 100%
+    );
+}
+
+.details-content {
+  width: 100%;
+  padding:
+    max(22px, env(safe-area-inset-top))
+    18px
+    max(38px, env(safe-area-inset-bottom));
+}
+
+.details-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #eff6f2;
+  color: #154b3b;
+  font-size: 21px;
+  cursor: pointer;
+}
+
+.page-eyebrow,
+.section-eyebrow {
+  color: #168358;
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: 1.1px;
+}
+
+.details-header h1 {
+  margin: 4px 0 0;
+  color: #10231d;
+  font-size: 23px;
+  line-height: 1.1;
+  font-weight: 850;
+  letter-spacing: -0.55px;
+}
+
+.photo-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+
+.photo-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.photo-strip img {
+  width: 300px;
+  height: 190px;
+  flex: 0 0 300px;
+  display: block;
+  object-fit: cover;
+  border-radius: 21px;
+  background: #edf5f1;
+  scroll-snap-align: start;
+}
+
+.photo-placeholder {
+  height: 185px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 21px;
+  background: #eaf7f1;
+  color: #128458;
+  font-size: 46px;
+}
+
+.gym-heading-card {
+  margin-top: 14px;
+  padding: 17px;
+  border: 1px solid #e1eae6;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow:
+    0 8px 26px
+    rgba(24, 91, 65, 0.045);
+}
+
+.gym-heading-card h2 {
+  margin: 7px 0 0;
+  color: #10231d;
+  font-size: 21px;
+  line-height: 1.12;
+  font-weight: 850;
+  letter-spacing: -0.45px;
+}
+
+.gym-address {
+  margin: 7px 0 0;
+  color: #81908a;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.primary-actions {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+  gap: 9px;
+  margin-top: 15px;
+}
+
+.book-button,
+.directions-button {
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 13px;
+  border: none;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.book-button {
+  justify-content: space-between;
+  background: #128458;
+  color: #ffffff;
+}
+
+.directions-button {
+  background: #e7f7ef;
+  color: #087b4b;
+}
+
+.details-section {
+  margin-top: 27px;
+}
+
+.details-section h2 {
+  margin: 6px 0 11px;
+  color: #10231d;
+  font-size: 18px;
+  line-height: 1.15;
+  font-weight: 850;
+  letter-spacing: -0.35px;
+}
+
+.content-card {
+  border: 1px solid #e3ebe7;
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.about-card {
+  padding: 16px;
+}
+
+.about-card p {
+  margin: 0;
+  color: #6f7f79;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.contact-card {
+  overflow: hidden;
+}
+
+.contact-card button {
+  width: 100%;
+  display: grid;
+  grid-template-columns:
+    40px
+    minmax(0, 1fr)
+    15px;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 14px;
+  border: none;
+  border-bottom: 1px solid #edf2ef;
+  background: transparent;
+  color: #10231d;
+  text-align: left;
+  cursor: pointer;
+}
+
+.contact-card button:last-child {
+  border-bottom: none;
+}
+
+.contact-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #edf8f3;
+  font-size: 17px;
+}
+
+.contact-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-copy small {
+  color: #899690;
+  font-size: 8px;
+}
+
+.contact-copy strong {
+  margin-top: 3px;
+  overflow: hidden;
+  color: #10231d;
+  font-size: 10px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timing-card {
+  padding: 4px 14px;
+}
+
+.timing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #edf2ef;
+}
+
+.timing-row:last-child {
+  border-bottom: none;
+}
+
+.timing-row span {
+  color: #6f7f79;
+  font-size: 10px;
+}
+
+.timing-row strong {
+  color: #10231d;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.equipment-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.equipment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 11px;
+  border: 1px solid #dcebe4;
+  border-radius: 999px;
+  background: #f5fbf8;
+  color: #315e4d;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.empty-card {
+  padding: 16px;
+  color: #81908a;
+  font-size: 10px;
+}
+
+.state-card {
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid #e3ebe7;
+  border-radius: 17px;
+  background: #ffffff;
+}
+
+.state-card strong {
+  display: block;
+  color: #10231d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.state-card p {
+  margin: 4px 0 0;
+  color: #87948f;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.loader {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  border: 3px solid #d8eee4;
+  border-top-color: #128458;
+  border-radius: 50%;
+  animation: details-spin 0.75s linear infinite;
+}
+
+.state-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #e8f8f0;
+  font-size: 19px;
+}
+
+@keyframes details-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 360px) {
+  .details-content {
+    padding:
+      20px
+      12px
+      34px;
+  }
+
+  .photo-strip img {
+    width: 278px;
+    flex-basis: 278px;
+  }
+}
+
+@media (min-width: 445px) {
+  :host {
+    padding: 28px 0;
+  }
+
+  .details-main {
+    min-height:
+      calc(100vh - 56px);
+
+    box-shadow:
+      0 16px 50px
+      rgba(7, 21, 45, 0.08);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .back-button:hover {
+    background: #e5f2eb;
+  }
+
+  .book-button:hover {
+    background: #0e764e;
+  }
+
+  .directions-button:hover {
+    background: #d9f3e7;
+  }
+
+  .contact-card button:hover {
+    background: #fbfefc;
+  }
+}
