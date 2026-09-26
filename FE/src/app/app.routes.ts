@@ -17,6 +17,7 @@ import { Account } from './pages/account/account';
 import { GymBooking } from './pages/gym-booking/gym-booking';
 import { GymSlot } from './pages/gym-slot/gym-slot';
 import { GymDetails } from './pages/gym-details/gym-details';
+import { BookingDetailPage } from './pages/booking-detail/booking-detail';
 
 import {
   rootRedirectGuard,
@@ -66,6 +67,15 @@ export const routes: Routes = [
   {
     path: 'gyms/:gymId',
     component: GymBooking,
+  },
+
+  /* =====================================================
+     BOOKINGS
+  ===================================================== */
+
+  {
+    path: 'bookings/:bookingId',
+    component: BookingDetailPage,
   },
 
   /* =====================================================

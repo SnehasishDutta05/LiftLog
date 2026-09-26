@@ -197,6 +197,191 @@
       </section>
 
 
+
+
+      <!-- ==================================================
+           MY BOOKINGS
+      =================================================== -->
+
+      <section class="profile-section bookings-section">
+
+        <div class="section-heading-row">
+
+          <h2>
+            My Bookings
+          </h2>
+
+
+          @if (hasMoreBookings) {
+
+            <button
+              class="text-action"
+              type="button"
+              (click)="toggleAllBookings()"
+            >
+              @if (showAllBookings) {
+                Show Less
+              } @else {
+                View All
+              }
+            </button>
+
+          }
+
+        </div>
+
+
+        @if (isLoadingBookings) {
+
+          <div class="booking-list-card booking-state-card">
+
+            <span class="activity-loader"></span>
+
+            <span>
+              Loading your bookings...
+            </span>
+
+          </div>
+
+        } @else if (bookingsError) {
+
+          <div class="booking-list-card booking-empty-card">
+
+            <div class="booking-empty-icon">
+              🗓️
+            </div>
+
+            <strong>
+              Unable to load bookings
+            </strong>
+
+            <span>
+              {{ bookingsError }}
+            </span>
+
+          </div>
+
+        } @else if (myBookings.length === 0) {
+
+          <div class="booking-list-card booking-empty-card">
+
+            <div class="booking-empty-icon">
+              🗓️
+            </div>
+
+            <strong>
+              No bookings yet
+            </strong>
+
+            <span>
+              Your booked gym sessions will appear here.
+            </span>
+
+          </div>
+
+        } @else {
+
+          <div class="booking-list-card">
+
+            @for (
+              booking of visibleBookings;
+              track booking.bookingId
+            ) {
+
+              <button
+                class="booking-row"
+                type="button"
+                (click)="openBooking(booking.bookingId)"
+              >
+
+                <div
+                  class="booking-thumbnail"
+                  [class.placeholder]="
+                    !booking.imageUrl ||
+                    failedBookingImages.has(booking.bookingId)
+                  "
+                >
+
+                  @if (
+                    booking.imageUrl &&
+                    !failedBookingImages.has(booking.bookingId)
+                  ) {
+
+                    <img
+                      [src]="booking.imageUrl"
+                      [alt]="booking.gymName"
+                      loading="lazy"
+                      (error)="onBookingImageError(booking.bookingId)"
+                    >
+
+                  } @else {
+
+                    <span aria-hidden="true">
+                      🏋️
+                    </span>
+
+                  }
+
+                </div>
+
+
+                <div class="booking-copy">
+
+                  <div class="booking-title-row">
+
+                    <strong>
+                      {{ booking.gymName }}
+                    </strong>
+
+
+                    <span
+                      class="booking-status"
+                      [class]="
+                        'booking-status ' +
+                        booking.statusClass
+                      "
+                    >
+                      {{ booking.statusLabel }}
+                    </span>
+
+                  </div>
+
+
+                  <div class="booking-meta">
+
+                    <span>
+                      🗓️
+                      {{ booking.dateLabel }}
+                    </span>
+
+
+                    <span>
+                      🕐
+                      {{ booking.timeLabel }}
+                    </span>
+
+                  </div>
+
+                </div>
+
+
+                <span
+                  class="booking-chevron"
+                  aria-hidden="true"
+                >
+                  ›
+                </span>
+
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+      </section>
+
       <!-- ==================================================
            RECENT ACTIVITY
       =================================================== -->

@@ -9,6 +9,7 @@ import {
 } from '@angular/router';
 
 import {
+  BookingListItem,
   LiftlogApiService,
   WorkoutDetail,
 } from '../../services/liftlog-api.service';
@@ -31,6 +32,19 @@ interface RecentWorkoutView {
 interface WeightHistoryPoint {
   date: string;
   weight: number;
+}
+
+
+interface MyBookingView {
+  bookingId: number;
+  gymId: number;
+  gymName: string;
+  imageUrl: string;
+  dateLabel: string;
+  timeLabel: string;
+  statusLabel: string;
+  statusClass: string;
+  timestamp: number;
 }
 
 
@@ -712,6 +726,26 @@ export class Profile
     '';
 
 
+
+  /* =====================================================
+     MY BOOKINGS
+  ===================================================== */
+
+  myBookings:
+    MyBookingView[] = [];
+
+  isLoadingBookings =
+    false;
+
+  bookingsError =
+    '';
+
+  showAllBookings =
+    false;
+
+  failedBookingImages =
+    new Set<number>();
+
   /* =====================================================
      WEIGHT TRACKER
   ===================================================== */
@@ -766,6 +800,8 @@ export class Profile
     this.loadUserData();
 
     this.loadWorkoutProgress();
+
+    this.loadBookings();
 
     this.loadWeightTracker();
 
@@ -1819,6 +1855,525 @@ export class Profile
   }
 
 
+
+  /* =====================================================
+     BOOKINGS
+  ===================================================== */
+
+  private loadBookings(): void {
+
+    const token =
+      localStorage.getItem(
+        'pulseos_access_token',
+      );
+
+
+    if (!token) {
+
+      this.myBookings =
+        [];
+
+      this.bookingsError =
+        'Bookings are unavailable.';
+
+      this.isLoadingBookings =
+        false;
+
+      this.changeDetector
+        .detectChanges();
+
+      return;
+
+    }
+
+
+    this.isLoadingBookings =
+      true;
+
+    this.bookingsError =
+      '';
+
+    this.myBookings =
+      [];
+
+
+    this.changeDetector
+      .detectChanges();
+
+
+    this.liftlogApi
+      .getBookings(
+        token,
+      )
+      .subscribe({
+
+        next: bookings => {
+
+          const now =
+            Date.now();
+
+
+          this.myBookings =
+            [...bookings]
+              .map(
+                booking =>
+                  this.toMyBookingView(
+                    booking,
+                  ),
+              )
+              .sort(
+                (
+                  first,
+                  second,
+                ) => {
+
+                  const firstUpcoming =
+                    first.timestamp >=
+                    now;
+
+                  const secondUpcoming =
+                    second.timestamp >=
+                    now;
+
+
+                  if (
+                    firstUpcoming !==
+                    secondUpcoming
+                  ) {
+
+                    return firstUpcoming
+                      ? -1
+                      : 1;
+
+                  }
+
+
+                  return firstUpcoming
+                    ? first.timestamp -
+                      second.timestamp
+                    : second.timestamp -
+                      first.timestamp;
+
+                },
+              );
+
+
+          this.isLoadingBookings =
+            false;
+
+
+          this.changeDetector
+            .detectChanges();
+
+        },
+
+
+        error: error => {
+
+          console.error(
+            'Unable to load bookings:',
+            error,
+          );
+
+
+          this.myBookings =
+            [];
+
+          this.bookingsError =
+            'Could not load your bookings.';
+
+          this.isLoadingBookings =
+            false;
+
+
+          this.changeDetector
+            .detectChanges();
+
+        },
+
+      });
+
+  }
+
+
+  private toMyBookingView(
+    booking:
+      BookingListItem,
+  ): MyBookingView {
+
+    const timestamp =
+      this.bookingTimestamp(
+        booking,
+      );
+
+
+    const normalizedStatus =
+      booking.status
+        ?.trim()
+        .toLowerCase() ||
+      'confirmed';
+
+
+    let statusLabel =
+      this.capitalizeWord(
+        normalizedStatus,
+      );
+
+    let statusClass =
+      normalizedStatus;
+
+
+    if (
+      normalizedStatus ===
+      'confirmed' &&
+      timestamp >=
+      Date.now()
+    ) {
+
+      statusLabel =
+        'Upcoming';
+
+      statusClass =
+        'upcoming';
+
+    } else if (
+      normalizedStatus ===
+      'confirmed'
+    ) {
+
+      statusLabel =
+        'Completed';
+
+      statusClass =
+        'completed';
+
+    }
+
+
+    return {
+
+      bookingId:
+        booking.booking_id,
+
+      gymId:
+        booking.gym.gym_id,
+
+      gymName:
+        booking.gym.name,
+
+      imageUrl:
+        booking.image_url ||
+        '',
+
+      dateLabel:
+        this.formatBookingDate(
+          booking.date,
+        ),
+
+      timeLabel:
+        (
+          `${this.formatBookingTime(
+            booking.start_time,
+          )} – ${this.formatBookingTime(
+            booking.end_time,
+          )}`
+        ),
+
+      statusLabel,
+      statusClass,
+      timestamp,
+
+    };
+
+  }
+
+
+  get visibleBookings():
+    MyBookingView[] {
+
+    return this.showAllBookings
+      ? this.myBookings
+      : this.myBookings.slice(
+          0,
+          2,
+        );
+
+  }
+
+
+  get hasMoreBookings(): boolean {
+
+    return (
+      this.myBookings.length >
+      2
+    );
+
+  }
+
+
+  toggleAllBookings(): void {
+
+    this.showAllBookings =
+      !this.showAllBookings;
+
+  }
+
+
+  openBooking(
+    bookingId: number,
+  ): void {
+
+    this.router.navigate([
+      '/bookings',
+      bookingId,
+    ]);
+
+  }
+
+
+  onBookingImageError(
+    bookingId:
+      number,
+  ): void {
+
+    this.failedBookingImages.add(
+      bookingId,
+    );
+
+
+    this.changeDetector
+      .detectChanges();
+
+  }
+
+
+  private bookingTimestamp(
+    booking:
+      BookingListItem,
+  ): number {
+
+    const dateParts =
+      booking.date
+        .split(
+          '-',
+        )
+        .map(
+          Number,
+        );
+
+
+    const timeParts =
+      booking.start_time
+        .split(
+          ':',
+        )
+        .map(
+          Number,
+        );
+
+
+    if (
+      dateParts.length !==
+        3 ||
+      dateParts.some(
+        part =>
+          !Number.isFinite(
+            part,
+          ),
+      )
+    ) {
+
+      return 0;
+
+    }
+
+
+    const [
+      year,
+      month,
+      day,
+    ] =
+      dateParts;
+
+
+    const hour =
+      Number.isFinite(
+        timeParts[0],
+      )
+        ? timeParts[0]
+        : 0;
+
+    const minute =
+      Number.isFinite(
+        timeParts[1],
+      )
+        ? timeParts[1]
+        : 0;
+
+
+    return new Date(
+      year,
+      month -
+        1,
+      day,
+      hour,
+      minute,
+      0,
+      0,
+    ).getTime();
+
+  }
+
+
+  private formatBookingDate(
+    value:
+      string,
+  ): string {
+
+    const parts =
+      value
+        .split(
+          '-',
+        )
+        .map(
+          Number,
+        );
+
+
+    if (
+      parts.length !==
+        3 ||
+      parts.some(
+        part =>
+          !Number.isFinite(
+            part,
+          ),
+      )
+    ) {
+
+      return value;
+
+    }
+
+
+    const date =
+      new Date(
+        parts[0],
+        parts[1] -
+          1,
+        parts[2],
+      );
+
+
+    return new Intl.DateTimeFormat(
+      'en',
+      {
+        weekday:
+          'short',
+
+        day:
+          'numeric',
+
+        month:
+          'short',
+
+        year:
+          'numeric',
+      },
+    ).format(
+      date,
+    );
+
+  }
+
+
+  private formatBookingTime(
+    value:
+      string,
+  ): string {
+
+    const [
+      hourText,
+      minuteText,
+    ] =
+      value.split(
+        ':',
+      );
+
+
+    const hour =
+      Number(
+        hourText,
+      );
+
+    const minute =
+      Number(
+        minuteText,
+      );
+
+
+    if (
+      !Number.isFinite(
+        hour,
+      ) ||
+      !Number.isFinite(
+        minute,
+      )
+    ) {
+
+      return value;
+
+    }
+
+
+    const suffix =
+      hour >=
+        12
+        ? 'PM'
+        : 'AM';
+
+    const displayHour =
+      hour %
+        12 ||
+      12;
+
+
+    return (
+      `${displayHour}:${String(
+        minute,
+      ).padStart(
+        2,
+        '0',
+      )} ${suffix}`
+    );
+
+  }
+
+
+  private capitalizeWord(
+    value:
+      string,
+  ): string {
+
+    if (!value) {
+      return '';
+    }
+
+
+    return (
+      value
+        .charAt(
+          0,
+        )
+        .toUpperCase() +
+      value.slice(
+        1,
+      )
+    );
+
+  }
+
+
   /* =====================================================
      NAVIGATION
   ===================================================== */
@@ -1857,6 +2412,8 @@ export class Profile
      * workout data instead of doing nothing.
      */
     this.loadWorkoutProgress();
+
+    this.loadBookings();
 
   }
 

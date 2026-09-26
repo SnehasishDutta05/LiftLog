@@ -49,7 +49,7 @@ export interface HomeNotification {
 export class Home implements OnInit {
 
   private readonly GYM_RADIUS_KM =
-    10;
+    25;
 
   private readonly GYM_PAGE_SIZE =
     20;

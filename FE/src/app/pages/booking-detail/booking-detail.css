@@ -1,0 +1,495 @@
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f7f6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  font: inherit;
+}
+
+.booking-detail-shell {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+
+  background: #f5f7f6;
+  color: #10231d;
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.booking-detail-main {
+  width: 100%;
+  max-width: 444px;
+  min-height: 100vh;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fbfdfc 100%
+    );
+}
+
+.booking-detail-content {
+  width: 100%;
+
+  padding:
+    max(22px, env(safe-area-inset-top))
+    18px
+    max(38px, env(safe-area-inset-bottom));
+}
+
+.booking-detail-header {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin-bottom: 20px;
+}
+
+.back-button {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #eff6f2;
+  color: #154b3b;
+
+  font-size: 21px;
+
+  cursor: pointer;
+}
+
+.page-eyebrow,
+.confirmation-kicker {
+  color: #168358;
+
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 850;
+
+  letter-spacing: 1.1px;
+}
+
+.booking-detail-header h1 {
+  margin: 4px 0 0;
+
+  color: #10231d;
+
+  font-size: 23px;
+  line-height: 1.1;
+  font-weight: 850;
+
+  letter-spacing: -0.55px;
+}
+
+.gym-preview-card {
+  appearance: none;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  padding: 0;
+
+  border: 1px solid #e1eae6;
+  border-radius: 21px;
+
+  background: #ffffff;
+  color: #10231d;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 9px 28px
+    rgba(24, 91, 65, 0.045);
+}
+
+.gym-preview-image {
+  width: 100%;
+  height: 165px;
+
+  overflow: hidden;
+
+  background: #edf5f1;
+}
+
+.gym-preview-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.gym-preview-image.placeholder {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  color: #128458;
+
+  font-size: 46px;
+}
+
+.gym-preview-copy {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    20px;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 15px 16px;
+}
+
+.gym-preview-copy h2 {
+  margin: 0;
+
+  overflow: hidden;
+
+  color: #10231d;
+
+  font-size: 17px;
+  line-height: 1.2;
+  font-weight: 850;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gym-preview-copy p {
+  margin: 6px 0 0;
+
+  color: #81908a;
+
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.gym-preview-chevron {
+  color: #82918b;
+
+  font-size: 27px;
+  line-height: 1;
+}
+
+.booking-confirmation-card {
+  margin-top: 18px;
+  padding: 24px 18px 18px;
+
+  border: 1px solid #e1eae6;
+  border-radius: 21px;
+
+  background: #ffffff;
+
+  text-align: center;
+
+  box-shadow:
+    0 9px 28px
+    rgba(24, 91, 65, 0.045);
+}
+
+.confirmation-icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 14px;
+
+  border-radius: 50%;
+
+  background: #bff2da;
+  color: #0f8a59;
+
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.confirmation-icon.cancelled {
+  background: #ffe3e1;
+  color: #b95550;
+}
+
+.booking-confirmation-card.cancelled
+.confirmation-kicker {
+  color: #b95550;
+}
+
+.booking-confirmation-card h2 {
+  margin: 8px 0 0;
+
+  color: #10231d;
+
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 850;
+
+  letter-spacing: -0.45px;
+}
+
+.confirmation-description {
+  margin: 7px 0 0;
+
+  color: #81908a;
+
+  font-size: 10px;
+}
+
+.booking-number {
+  display: inline-flex;
+
+  margin-top: 13px;
+  padding: 7px 10px;
+
+  border-radius: 999px;
+
+  background: #eff7f3;
+  color: #52655e;
+
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.booking-summary {
+  margin-top: 18px;
+
+  border-top: 1px solid #edf2ef;
+}
+
+.summary-row {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 13px 0;
+
+  border-bottom: 1px solid #edf2ef;
+
+  text-align: left;
+}
+
+.summary-row span {
+  color: #899690;
+
+  font-size: 9px;
+}
+
+.summary-row strong {
+  max-width: 70%;
+
+  color: #10231d;
+
+  font-size: 10px;
+  line-height: 1.35;
+
+  text-align: right;
+}
+
+.booking-actions {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 9px;
+
+  margin-top: 18px;
+}
+
+.directions-button,
+.home-button {
+  width: 100%;
+  min-height: 48px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  padding: 11px 15px;
+
+  border: none;
+  border-radius: 13px;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.directions-button {
+  justify-content: space-between;
+
+  background: #e8f8f0;
+  color: #087b4b;
+}
+
+.home-button {
+  background: #128458;
+  color: #ffffff;
+}
+
+.state-card {
+  min-height: 90px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 15px;
+
+  border: 1px solid #e3ebe7;
+  border-radius: 17px;
+
+  background: #ffffff;
+}
+
+.state-card strong {
+  display: block;
+
+  color: #10231d;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.state-card p {
+  margin: 4px 0 0;
+
+  color: #87948f;
+
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.loader {
+  width: 29px;
+  height: 29px;
+
+  flex: 0 0 29px;
+
+  border: 3px solid #d8eee4;
+  border-top-color: #128458;
+  border-radius: 50%;
+
+  animation:
+    booking-detail-spin
+    0.75s
+    linear
+    infinite;
+}
+
+.state-icon {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #e8f8f0;
+
+  font-size: 19px;
+}
+
+@keyframes booking-detail-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 360px) {
+
+  .booking-detail-content {
+    padding:
+      20px
+      12px
+      34px;
+  }
+
+}
+
+@media (min-width: 445px) {
+
+  :host {
+    padding: 28px 0;
+  }
+
+  .booking-detail-main {
+    min-height:
+      calc(100vh - 56px);
+
+    box-shadow:
+      0 16px 50px
+      rgba(7, 21, 45, 0.08);
+  }
+
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+  .back-button:hover {
+    background: #e5f2eb;
+  }
+
+  .gym-preview-card:hover {
+    border-color: #cfe7db;
+  }
+
+  .directions-button:hover {
+    background: #d9f3e7;
+  }
+
+  .home-button:hover {
+    background: #0e764e;
+  }
+
+}

@@ -230,6 +230,12 @@ export interface BookingListItem {
   start_time: string;
   end_time: string;
   status: string;
+
+  /*
+   * Client-side preview image.
+   * The backend does not currently include it in /bookings.
+   */
+  image_url?: string;
 }
 
 
@@ -242,6 +248,7 @@ export interface BookingDetail {
     name: string;
     address: string;
     maps_url: string;
+    image_url?: string;
   };
 
   slot: {
@@ -551,10 +558,27 @@ export class LiftlogApiService {
      backend images automatically take priority.
   ===================================================== */
 
-  private localGymImage(
-    gymId: number,
-    gymName = '',
-  ): string {
+  private readonly localGymImages = [
+    '/gyms/metro-muscle-house.png',
+    '/gyms/prime-performance.png',
+    '/gyms/third-gym.png',
+    '/gyms/skyline-strength.png',
+    '/gyms/gritty-powerlifting.png',
+    '/gyms/mint-functional.png',
+    '/gyms/crossfit-warehouse.png',
+    '/gyms/luxury-wellness.png',
+    '/gyms/vintage-bodybuilding.png',
+  ];
+
+
+  private readonly gymImageAssignments =
+    new Map<number, string>();
+
+
+  private namedGymImage(
+    gymName:
+      string,
+  ): string | null {
 
     const normalizedName =
       gymName
@@ -567,11 +591,7 @@ export class LiftlogApiService {
         'metro muscle',
       )
     ) {
-
-      return (
-        '/gyms/metro-muscle-house.png'
-      );
-
+      return '/gyms/metro-muscle-house.png';
     }
 
 
@@ -580,33 +600,188 @@ export class LiftlogApiService {
         'prime performance',
       )
     ) {
+      return '/gyms/prime-performance.png';
+    }
 
-      return (
-        '/gyms/prime-performance.png'
+
+    if (
+      normalizedName.includes(
+        'beast mode',
+      )
+    ) {
+      return '/gyms/vintage-bodybuilding.png';
+    }
+
+
+    if (
+      normalizedName.includes(
+        'crossfit',
+      )
+    ) {
+      return '/gyms/crossfit-warehouse.png';
+    }
+
+
+    return null;
+
+  }
+
+
+  private assignUniqueGymImages(
+    gyms:
+      Array<{
+        gym_id: number;
+        name: string;
+      }>,
+  ): void {
+
+    const usedImages =
+      new Set<string>();
+
+
+    gyms.forEach(
+      gym => {
+
+        const namedImage =
+          this.namedGymImage(
+            gym.name,
+          );
+
+
+        if (namedImage) {
+
+          this.gymImageAssignments.set(
+            gym.gym_id,
+            namedImage,
+          );
+
+          usedImages.add(
+            namedImage,
+          );
+
+        }
+
+      },
+    );
+
+
+    const availableImages =
+      this.localGymImages.filter(
+        image =>
+          !usedImages.has(
+            image,
+          ),
       );
+
+
+    let imageIndex =
+      0;
+
+
+    [...gyms]
+      .sort(
+        (
+          first,
+          second,
+        ) =>
+          first.gym_id -
+          second.gym_id,
+      )
+      .forEach(
+        gym => {
+
+          if (
+            this.gymImageAssignments.has(
+              gym.gym_id,
+            )
+          ) {
+            return;
+          }
+
+
+          const image =
+            availableImages[
+              imageIndex %
+              availableImages.length
+            ] ||
+            this.localGymImages[
+              Math.abs(
+                Math.trunc(
+                  gym.gym_id,
+                ),
+              ) %
+              this.localGymImages.length
+            ];
+
+
+          this.gymImageAssignments.set(
+            gym.gym_id,
+            image,
+          );
+
+
+          imageIndex +=
+            1;
+
+        },
+      );
+
+  }
+
+
+  private localGymImage(
+    gymId: number,
+    gymName = '',
+  ): string {
+
+    const assignedImage =
+      this.gymImageAssignments.get(
+        gymId,
+      );
+
+
+    if (assignedImage) {
+      return assignedImage;
+    }
+
+
+    const namedImage =
+      this.namedGymImage(
+        gymName,
+      );
+
+
+    if (namedImage) {
+
+      this.gymImageAssignments.set(
+        gymId,
+        namedImage,
+      );
+
+
+      return namedImage;
 
     }
 
 
-    const fallbackImages = [
-      '/gyms/metro-muscle-house.png',
-      '/gyms/prime-performance.png',
-      '/gyms/third-gym.png',
-    ];
+    const fallbackImage =
+      this.localGymImages[
+        Math.abs(
+          Math.trunc(
+            gymId,
+          ),
+        ) %
+        this.localGymImages.length
+      ];
 
 
-    const index =
-      Math.abs(
-        Math.trunc(
-          gymId,
-        ),
-      ) %
-      fallbackImages.length;
+    this.gymImageAssignments.set(
+      gymId,
+      fallbackImage,
+    );
 
 
-    return fallbackImages[
-      index
-    ];
+    return fallbackImage;
 
   }
 
@@ -690,8 +865,14 @@ export class LiftlogApiService {
         ),
 
         map(
-          gyms =>
-            gyms.map(
+          gyms => {
+
+            this.assignUniqueGymImages(
+              gyms,
+            );
+
+
+            return gyms.map(
               gym => ({
                 ...gym,
 
@@ -702,7 +883,9 @@ export class LiftlogApiService {
                     gym.image_url,
                   ),
               }),
-            ),
+            );
+
+          },
         ),
       );
 
@@ -945,6 +1128,21 @@ export class LiftlogApiService {
               response,
             ),
         ),
+
+        map(
+          bookings =>
+            bookings.map(
+              booking => ({
+                ...booking,
+
+                image_url:
+                  this.localGymImage(
+                    booking.gym.gym_id,
+                    booking.gym.name,
+                  ),
+              }),
+            ),
+        ),
       );
 
   }
@@ -1012,6 +1210,22 @@ export class LiftlogApiService {
             >(
               response,
             ),
+        ),
+
+        map(
+          booking => ({
+            ...booking,
+
+            gym: {
+              ...booking.gym,
+
+              image_url:
+                this.localGymImage(
+                  booking.gym.gym_id,
+                  booking.gym.name,
+                ),
+            },
+          }),
         ),
       );
 
