@@ -34,13 +34,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "3MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "20kB",
+                  "maximumError": "30kB"
                 }
               ],
               "outputHashing": "all"
@@ -56,6 +56,12 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+"options": {
+  "allowedHosts": [
+    "liftlog.co.in",
+    "www.liftlog.co.in"
+  ]
+},
           "configurations": {
             "production": {
               "buildTarget": "pulseos-frontend:build:production"

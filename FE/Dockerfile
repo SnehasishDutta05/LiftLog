@@ -1,4 +1,4 @@
-FROM node:24-alpine
+FROM node:24-alpine AS build
 
 WORKDIR /app
 
@@ -8,6 +8,15 @@ RUN npm ci
 
 COPY FE/ .
 
-EXPOSE 4200
+RUN npx ng build
 
-CMD ["npm", "start", "--", "--host", "0.0.0.0", "--port", "4200"]
+
+FROM nginx:alpine
+
+COPY --from=build /app/dist/pulseos-frontend/browser /usr/share/nginx/html
+
+COPY FE/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
